@@ -1,0 +1,122 @@
+.dispmsg {
+	color: #3399ff;
+	font-size: 80%;
+	font-style: italic;
+	font-weight: bold;
+	padding: 5px 5px 5px 5px;
+	
+}
+
+.dispsimplemsg {
+	color: #00529B; /*#362Cff;*/
+	background-color:#bde5f8; /* #BDE5F8; */
+	font: normal 120%;
+	padding: 10px 10px 10px 10px;
+	display: inline-block;
+	/* margin: 5px;
+	 border: #46b6ec solid 1px; */
+	border-radius: 6px;
+	
+}
+
+.dispsimplemsg:before {
+	content: "\e196";
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: normal;
+	text-decoration: inherit;
+}
+
+.dispsimplemsg:before b i {
+	/*for bold and italics*/
+	content: none;
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: normal;
+	text-decoration: inherit;
+}
+	
+
+.dispsuccessmsg {
+	/* color: #009900; */
+	color: #008000; /* #4F8A10; */
+	background-color: #dff2bf; /* #DFF2BF; */ 
+	font: normal 120%;
+	padding: 10px 10px 10px 10px;
+	display: inline-block;
+	/* margin: 5px;
+	 border: #4F8A10 solid 1px; */
+	border-radius: 6px;
+}
+
+.dispsuccessmsg:before {
+	content: "\e194";
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: normal;
+	text-decoration: inherit;
+}
+
+.dispfailuremsg {
+	/* color: #DD0000; */
+	color: #D8000C;
+	background-color: #FCD7D7;
+	font: normal 120%;
+	padding: 10px 10px 10px 10px;	
+	display: inline-block;
+	/* margin: 5px;
+	 border: #fcc5c5 solid 1px; */ 
+	border-radius: 6px; 
+}
+
+.dispfailuremsg:before {
+	content: "\e193";
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: normal;
+	text-decoration: inherit;
+}
+
+.dispwarnmsg {
+	color: #9F6000; /*#C88640;*/
+	background-color: #FEEFB3;
+	font: normal 120%;
+	padding: 10px 10px 10px 10px;	
+	display: inline-block;
+	/* margin: 5px;
+	 border: #fcc5c5 solid 1px; */ 
+}
+
+.dispwarnmsg:before {
+	content: "\e197";
+	font-family: 'Glyphicons Halflings';
+	font-style: normal;
+	font-weight: normal;
+	text-decoration: inherit;
+}
+
+.error {
+	/* color: #DD0000; */
+	color: #D8000C;
+	font: normal 100%;
+	padding: 10px 10px 10px 0px;	
+	/* margin: 5px;
+	 border: #fcc5c5 solid 1px; */ 
+	border-radius: 6px; 
+}
+
+
+.link {
+	overflow: visible; /* Shrinkwrap the text in IE7- */
+	margin: 0;
+	border: 0;
+	
+	display:block;padding:3px 20px;clear:both;font-weight:normal;line-height:1.42857143;color:#333333;white-space:nowrap;
+	
+	
+	background: transparent;
+	/*text-decoration: underline; /* Make it look linky */
+	cursor: pointer;
+	/* Buttons don’t make the cursor change in all browsers */
+	-moz-user-select: text; /* Make button text selectable in Gecko */
+}

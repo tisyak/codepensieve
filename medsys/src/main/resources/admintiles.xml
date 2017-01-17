@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+	<definition name="blankLayout"
+		template="/WEB-INF/medsys/ui_template/BaseBlankLayout.jsp">
+		
+		<put-attribute name="title" value="" />
+		<put-attribute name="message"
+			value="/WEB-INF/medsys/common/Message.jsp" />
+		<put-attribute name="jsdisable"
+			value="/WEB-INF/medsys/common/JsDisable.jsp" />
+		<put-attribute name="body" value="" />
+	</definition>
+	
+	<definition name="baseLayout"
+		template="/WEB-INF/medsys/ui_template/BaseLayout.jsp">
+		<put-attribute name="title" value="" />
+		<put-attribute name="header"
+			value="/WEB-INF/medsys/ui_template/Header.jsp" />
+		<put-attribute name="menu"
+			value="/WEB-INF/medsys/ui_template/Menu.jsp" />
+		<put-attribute name="jsdisable"
+			value="/WEB-INF/medsys/common/JsDisable.jsp" />
+		<put-attribute name="message"
+			value="/WEB-INF/medsys/common/Message.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer"
+			value="/WEB-INF/medsys/ui_template/Footer.jsp" />
+	</definition>
+
+	<definition name="*.forgotpassword.*.tiles" extends="blankLayout" >
+		<put-attribute name="title" value="medsys - {1} - Forgot Password - {2}" />
+		
+		<put-attribute name="body"
+			value="/WEB-INF/medsys/{1}/forgotpassword/{2}.jsp" />
+	
+	</definition>
+	
+	<definition name="*.*.*.tiles" extends="baseLayout" >
+		<put-attribute name="title" value="medsys - {1} - {2}" />
+		
+		<put-attribute name="body"
+			value="/WEB-INF/medsys/{1}/{2}/{3}.jsp" />
+	
+	</definition>
+	
+	<definition name="*.*.tiles" extends="baseLayout" >
+		<put-attribute name="title" value="medsys - {1} - {2}" />
+		
+		<put-attribute name="body"
+			value="/WEB-INF/medsys/{1}/{2}.jsp" />
+	
+	</definition>
+	
+	
+	<definition name="*.tiles" extends="blankLayout" >
+		<put-attribute name="title" value="medsys - {1}" />
+		<put-attribute name="body"
+			value="/WEB-INF/medsys/{1}.jsp" />			
+	</definition>
+	
+	
+	
+	
+</tiles-definitions>
