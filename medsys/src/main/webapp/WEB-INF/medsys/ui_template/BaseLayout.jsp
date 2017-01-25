@@ -134,7 +134,7 @@
 
 <!-- application script for Charisma demo -->
 <script src="<c:url value="/resources/js/charisma.js"/>"></script>
-<script src="<c:url value="/resources/js/medsys.js"/>"></script>
+
 
 
 </body>

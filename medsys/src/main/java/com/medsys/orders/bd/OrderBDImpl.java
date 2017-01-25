@@ -1,7 +1,6 @@
 package com.medsys.orders.bd;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.medsys.common.model.Response;
 import com.medsys.orders.dao.OrderDAO;
+import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
  
 @Service
@@ -52,21 +53,36 @@ public class OrderBDImpl implements OrderBD {
 		 return orderDAO.searchForOrders(order);
 	}
 
-	/*@Override
-	public List<Orders> listOrderswithAvailableDSCs() {
-		return orderDAO.listOrderswithAvailableDSCs();
-	}
-	
 	@Override
-	public List<Orders>  monthlyOrderListHavingInwardDSCs(){
-		return orderDAO.monthlyOrderListHavingInwardDSCs();
+	public List<OrderProductSet> getAllProductsInOrder(Integer orderId) {
+		logger.debug("Get All products in Order: " + orderId);
+		return orderDAO.getAllProductsInOrder(orderId);
 	}
-	
+
 	@Override
-	public List<Orders>  monthlyOrderListHavingOutwardDSCs(){
-		return orderDAO.monthlyOrderListHavingOutwardDSCs();
+	public Response addProductToOrder(OrderProductSet newOrderProductSet) {
+		logger.debug("ADD product to Order: " + newOrderProductSet);
+		return orderDAO.addProductToOrder(newOrderProductSet);
 	}
-   
-*/
+
+	@Override
+	public OrderProductSet getProductInOrder(Integer orderProductSetId) {
+		logger.debug("GET product for orderProductSetId: " + orderProductSetId);
+		return orderDAO.getProductInOrder(orderProductSetId);
+	}
+
+	@Override
+	public Response updateProuctInOrder(OrderProductSet orderProductSet) {
+		logger.debug("UPDATE orderProductSet: " + orderProductSet);
+		return orderDAO.updateProuctInOrder(orderProductSet);
+	}
+
+	@Override
+	public Response deleteProductFromOrder(OrderProductSet orderProductSet) {
+		logger.debug("DELETE orderProductSet: " + orderProductSet);
+		return orderDAO.deleteProductFromOrder(orderProductSet);
+	}
+
+
    
 }

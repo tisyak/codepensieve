@@ -1,7 +1,6 @@
 package com.medsys.orders.dao;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -9,10 +8,13 @@ import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
+import com.medsys.common.model.Response;
+import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
+import com.medsys.util.EpSystemError;
 
 @Repository
 public class OrderDAOImpl implements OrderDAO {
@@ -38,21 +40,21 @@ public class OrderDAOImpl implements OrderDAO {
 	public Orders getOrder(Integer orderId) {
 		logger.debug("OrderDAOImpl.getOrder() - [" + orderId + "]");
 		Query query = getCurrentSession().createQuery(
-				"from Orders where order_id = '"+orderId.toString() + "'");
+				"from Orders where orderId = "+orderId + "");
 		//query.setParameter("orderId", orderId.toString());
 
 		logger.debug(query.toString());
 		if (query.list().size() == 0) {
 			logger.debug("No user found.");
-			throw new UsernameNotFoundException("Orders [" + orderId
-					+ "] not found");
+			throw new EmptyResultDataAccessException ("Order [" + orderId
+					+ "] not found",1);
 		} else {
 			
 			logger.debug("Orders List Size: " + query.list().size());
 			List<Orders> list = (List<Orders>) query.list();
-			Orders userObject = (Orders) list.get(0);
+			Orders order = (Orders) list.get(0);
 
-			return userObject;
+			return order;
 		}
 	}
 
@@ -62,8 +64,8 @@ public class OrderDAOImpl implements OrderDAO {
 		if (order != null) {
 			getCurrentSession().delete(order);
 		} else {
-			throw new UsernameNotFoundException("Orders Username : [" + orderId
-					+ "] not found");
+			throw new EmptyResultDataAccessException ("Order [" + orderId
+					+ "] not found",1);
 		}
 	}
 
@@ -118,52 +120,68 @@ public class OrderDAOImpl implements OrderDAO {
 			return list;
 		/*}*/
 	}
-	
 
-	/*@Override
-	public List<Orders> listOrderswithAvailableDSCs() {
-		logger.debug("OrderDAOImpl.listOrderswithAvailableDSCs()");
+	@Override
+	public List<OrderProductSet> getAllProductsInOrder(Integer orderId) {
+		logger.debug("Fetching all products in Order: " + orderId);
+		return getCurrentSession().createQuery("from OrderProductSet "
+				+ " where orderId = " + orderId
+				+ " order by productInv.product.productCode asc ").list();
+	}
+
+	@Override
+	public Response addProductToOrder(OrderProductSet newOrderProductSet) {
+		logger.debug("Adding product to Order: " + newOrderProductSet);
+		getCurrentSession().save(newOrderProductSet);
+		//TODO: change return appropriately
+		return new Response(true, null);
+	}
+
+	@Override
+	public OrderProductSet getProductInOrder(Integer orderProductSetId) {
+		logger.debug("Getting product having orderProductSetId: " + orderProductSetId);
+		
 		Query query = getCurrentSession().createQuery(
-				"select cdi.orderInfo from OrderDSCInfo cdi where cdi.dscAvailable='true' order by cdi.orderInfo.companyName asc ");
+				"from OrderProductSet where orderProductSetId = "+orderProductSetId.toString() + "");
+		//query.setParameter("orderId", orderId.toString());
 
 		logger.debug(query.toString());
 		if (query.list().size() == 0) {
-			logger.debug("No orders found matching current search criteria.");
-			return null;
+			logger.debug("Product not found in order.");
+			throw new EmptyResultDataAccessException ("OrderProductSet [" + orderProductSetId
+					+ "] not found",1);
 		} else {
 			
-			logger.debug("Search Orders List Size: " + query.list().size());
-			@SuppressWarnings("unchecked")
-			List<Orders> list = (List<Orders>) query.list();
-			return list;
+			logger.debug("OrderProductSet List Size: " + query.list().size());
+			List<OrderProductSet> list = (List<OrderProductSet>) query.list();
+			OrderProductSet orderProductSet = (OrderProductSet) list.get(0);
+			return orderProductSet;
 		}
 	}
-	
+
 	@Override
-	public List<Orders> monthlyOrderListHavingInwardDSCs() {
-		logger.debug("OrderDAOImpl.monthlyInwardDSCs()");
-		@SuppressWarnings("unchecked")
-		List<Orders> orders =  getCurrentSession().createQuery("select orderDSCInfo.orderInfo from DscTransferInfo dti "
-				+ " where dti.orderDSCInfo.dscAvailable=true"
-				+ " and to_char(dti.transferDate,'YYYY/MM') = '"+ 
-				Calendar.getInstance().get(Calendar.YEAR) +"/"+ (Calendar.getInstance().get(Calendar.MONTH)+1) +"'  order by orderDSCInfo.orderInfo.companyName asc ")
-				.list();
-		logger.debug("Result: " + orders);
-		return orders;
+	public Response updateProuctInOrder(OrderProductSet orderProductSet) {
+		OrderProductSet orderProductSetToUpdate = getProductInOrder(orderProductSet.getOrderProductSetId());
+		orderProductSetToUpdate.setQty(orderProductSet.getQty());
+		getCurrentSession().update(orderProductSetToUpdate);
+		//TODO: change return appropriately
+		return new Response(true, null);
 	}
 
-	
 	@Override
-	public List<Orders> monthlyOrderListHavingOutwardDSCs() {
-		logger.debug("OrderDAOImpl.monthlyOutwardDSCs()");
-		@SuppressWarnings("unchecked")
-		List<Orders> orders =   getCurrentSession().createQuery("select orderDSCInfo.orderInfo from DscTransferInfo dti "
-				+ " where dti.orderDSCInfo.dscAvailable=false"
-				+ " and to_char(dti.dscReturnDate,'YYYY/MM') = '"+ 
-				Calendar.getInstance().get(Calendar.YEAR) +"/"+ (Calendar.getInstance().get(Calendar.MONTH)+1) +"'  order by orderDSCInfo.orderInfo.companyName asc ")
-				.list();
-		logger.debug("Result: " + orders);
-		return orders;
+	public Response deleteProductFromOrder(OrderProductSet orderProductSet) {
+		OrderProductSet existingOrderProductSet = getProductInOrder(orderProductSet.getOrderProductSetId());
+		
+		if (existingOrderProductSet != null) {
+			getCurrentSession().delete(existingOrderProductSet);
+			return new Response(true, null);
+		}
+		
+		return new Response(false, EpSystemError.NO_RECORD_FOUND);
+		
 	}
-*/
+	
+	
+	
+	
 }

@@ -80,24 +80,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.csrf().disable();
 	}
 
-	/*
-	 * @Bean public AccessDecisionManager defaultAccessDecisionManager() {
-	 * 
-	 * @SuppressWarnings("rawtypes") List<AccessDecisionVoter> decisionVoters =
-	 * new ArrayList<AccessDecisionVoter>(); RoleVoter roleVoter = roleVoter();
-	 * decisionVoters.add(roleVoter); AuthenticatedVoter authenticatedVoter =
-	 * new AuthenticatedVoter(); decisionVoters.add(authenticatedVoter); return
-	 * defaultAccessDecisionManager();
-	 * 
-	 * }
-	 *//**
-	 * Role voter.
-	 * 
-	 * @return the role voter
-	 */
-	/*
-	 * @Bean public RoleVoter roleVoter() { RoleVoter roleVoter = new
-	 * RoleVoter(); roleVoter.setRolePrefix(""); return roleVoter; }
-	 */
+	
 
 }

@@ -1,8 +1,9 @@
 package com.medsys.orders.bd;
 
 import java.util.List;
-import java.util.UUID;
 
+import com.medsys.common.model.Response;
+import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
 
 public interface OrderBD {
@@ -18,5 +19,17 @@ public interface OrderBD {
 	public List<Orders> getAllOrders();
 	
 	public List<Orders> searchForOrders(Orders order);
+	
+	public List<OrderProductSet> getAllProductsInOrder(Integer orderId);
+
+	public Response addProductToOrder(OrderProductSet newOrderProductSet);
+
+	public OrderProductSet getProductInOrder(Integer orderProductSetId);
+
+	public Response updateProuctInOrder(OrderProductSet orderProductSet);
+
+	public Response deleteProductFromOrder(OrderProductSet orderProductSet);
+
+	
 
 }

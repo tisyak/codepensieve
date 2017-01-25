@@ -77,12 +77,11 @@
   <logger name="org.w3c.tidy" level="OFF"/>
   <logger name="ch.qos" level="WARN"/>
   <logger name="org.slf4j" level="OFF"/>
-  <logger name="org.springframework" level="WARN"/>
-  <logger name="org.apache" level="WARN"/>
+  <logger name="org.springframework" level="DEBUG"/>
+  <logger name="org.apache" level="DEBUG"/>
   <logger name="org.jboss" level="WARN"/>
   <logger name="org.hibernate" level="DEBUG"/>
   <logger name="org.postgresql" level="WARN"/>
-  <logger name="org.opensaml" level="ERROR"/>
 
   <root level="DEBUG">
     <appender-ref ref="S"/>

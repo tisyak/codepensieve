@@ -1,5 +1,6 @@
 package com.medsys.orders.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -22,14 +23,19 @@ import com.medsys.product.model.Set;
 
 @Entity
 @Table(name = "order_product_set")
-public class OrderProductSet {
+public class OrderProductSet implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4745389593451287026L;
+
 	static Logger logger = LoggerFactory.getLogger(OrderProductSet.class);
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "product_set_id", columnDefinition = "serial")
-	private Integer productSetId; 
+	private Integer orderProductSetId; 
 
 	@Column(name = "order_id")
 	private Integer orderId;
@@ -55,13 +61,22 @@ public class OrderProductSet {
 	/** The update timestamp. */
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
+	
+	
 
-	public Integer getProductSetId() {
-		return productSetId;
+	public OrderProductSet() {
 	}
 
-	public void setProductSetId(Integer productSetId) {
-		this.productSetId = productSetId;
+	public OrderProductSet(Integer setId, String productCode, String lotNo, Integer qty) {
+		// TODO Complete this Constructor
+	}
+
+	public Integer getOrderProductSetId() {
+		return orderProductSetId;
+	}
+
+	public void setOrderProductSetId(Integer orderProductSetId) {
+		this.orderProductSetId = orderProductSetId;
 	}
 
 	public Integer getOrderId() {
@@ -120,7 +135,7 @@ public class OrderProductSet {
 		int result = 1;
 		result = prime * result + ((orderId == null) ? 0 : orderId.hashCode());
 		result = prime * result + ((productInv == null) ? 0 : productInv.hashCode());
-		result = prime * result + ((productSetId == null) ? 0 : productSetId.hashCode());
+		result = prime * result + ((orderProductSetId == null) ? 0 : orderProductSetId.hashCode());
 		return result;
 	}
 
@@ -143,17 +158,17 @@ public class OrderProductSet {
 				return false;
 		} else if (!productInv.equals(other.productInv))
 			return false;
-		if (productSetId == null) {
-			if (other.productSetId != null)
+		if (orderProductSetId == null) {
+			if (other.orderProductSetId != null)
 				return false;
-		} else if (!productSetId.equals(other.productSetId))
+		} else if (!orderProductSetId.equals(other.orderProductSetId))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "OrderProductSet [productSetId=" + productSetId + ", order=" + orderId + ", set=" + set + ", productInv="
+		return "OrderProductSet [orderProductSetId=" + orderProductSetId + ", order=" + orderId + ", set=" + set + ", productInv="
 				+ productInv + ", qty=" + qty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 	
