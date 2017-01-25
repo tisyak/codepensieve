@@ -36,7 +36,6 @@
     <link href="<c:url value="/resources/css/noty_theme_default.css"/>" rel='stylesheet'>
     <link href="<c:url value="/resources/css/elfinder.min.css"/>" rel='stylesheet'>
     <link href="<c:url value="/resources/css/elfinder.theme.css"/>" rel='stylesheet'>
-    <link href="<c:url value="/resources/css/jquery.iphone.toggle.css"/>" rel='stylesheet'>
     <link href="<c:url value="/resources/css/uploadify.css"/>" rel='stylesheet'>
     <link href="<c:url value="/resources/css/animate.min.css"/>" rel='stylesheet'>
     <link href="<c:url value="/resources/css/style.css"/>" rel='stylesheet'>
