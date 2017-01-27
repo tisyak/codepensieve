@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%
@@ -122,8 +122,7 @@
 
 <!-- star rating plugin -->
 <script src="<c:url value="/resources/js/jquery.raty.min.js"/>"></script>
-<!-- for iOS style toggle switch -->
-<script src="<c:url value="/resources/js/jquery.iphone.toggle.js"/>"></script>
+
 <!-- autogrowing textarea plugin -->
 <script src="<c:url value="/resources/js/jquery.autogrow-textarea.js"/>"></script>
 <!-- multiple file upload plugin -->

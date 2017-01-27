@@ -10,7 +10,7 @@
 <link href="<c:url value="/resources/css/datepicker.css"/>"
 	rel='stylesheet'>
 <!-- JQGrid Action URLs -->	
-	<c:url value="/orderproduct/records" var="recordsUrl"/>
+<c:url value="/orderproduct/records" var="recordsUrl"/>
 <c:url value="/orderproduct/create" var="addUrl"/>
 <c:url value="/orderproduct/update" var="editUrl"/>
 <c:url value="/orderproduct/delete" var="deleteUrl"/>
@@ -50,17 +50,16 @@
 	<form:hidden path="orderId" cssClass="form-control" title="orderId"
 		autocomplete="off" />
 
-	<div class="form-group col-md-2">
+	<div class="form-group col-md-6">
 		<label for="inputOrderNumber">Order No</label>
 		<form:label path="orderNumber" cssClass="form-control"
 			title="orderNumber" />
 
 
 	</div>
-	<div class="form-group col-md-2">
+	<div class="form-group col-md-6">
 		<label for="inputCustomerName">Order From</label>
-		<form:select path="customer.customerId" cssClass="resizedSelect"
-			disabled="true">
+		<form:select path="customer.customerId" cssClass="resizedSelect">
 			<form:option value="" label="--  Select  --" />
 			<c:forEach items="${customerList}" var="customer">
 				<form:option value="${customer.customerId}">${customer.name}</form:option>
@@ -71,7 +70,7 @@
 
 	</div>
 
-	<div class="form-group col-md-2">
+	<div class="form-group col-md-6">
 		<label for="inputReferredBy">Referred By</label>
 		<form:input path="refSource" cssClass="form-control" title="refSource"
 			autocomplete="off" />
@@ -80,18 +79,11 @@
 
 
 
-	<div class="form-group col-md-2">
-		<label for="inputPatientName">Mobile No</label>
-		<form:input path="mobileNo" cssClass="form-control" title="mobileNo" />
-		<form:errors path="mobileNo" cssClass="error" />
-
-	</div>
-
-	<div class="form-group col-md-2">
+	<div class="form-group col-md-6">
 		<form:input path="orderDate" placeholder="Order Date"
 			cssClass="form-control" />
 	</div>
-	<div class="form-group col-md-2">
+	<div class="form-group col-md-6">
 		<form:input path="deliveryDate" placeholder="Delivery Date"
 			cssClass="form-control" />
 	</div>
@@ -99,7 +91,7 @@
 
 	<!-- JQGrid HTML -->
 
-	<h1 id='banner'>System Records</h1>
+	<h1 id='banner'>Products</h1>
 
 	<div id='jqgrid'>
 		<table id='grid'></table>

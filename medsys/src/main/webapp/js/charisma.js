@@ -162,8 +162,6 @@ function docReady() {
     //popover
     $('[data-toggle="popover"]').popover();
 
-    //iOS / iPhone style toggle switch
-    $('.iphone-toggle').iphoneStyle();
 
     //star rating
     $('.raty').raty({
