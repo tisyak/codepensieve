@@ -1,14 +1,56 @@
-$(function() {
+
+<%@page import="com.medsys.ui.util.UIActions"%>
+
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+
+
+<!-- JQGrid Header Files -->
+
+<link rel="stylesheet" type="text/css" media="screen"
+	href='<c:url value="/resources/css/ui-lightness/jquery-ui-min.css"/>' />
+<link rel="stylesheet" type="text/css" media="screen"
+	href='<c:url value="/resources/css/ui.jqgrid.min.css"/>' />
+
+<script type='text/javascript'
+	src='<c:url value="/resources/js/jquery-ui.min.js"/>'></script>
+
+<script type='text/javascript'
+	src='<c:url value="/resources/js/jqgrid/grid.locale-en-min.js"/>'></script>
+<script type='text/javascript'
+	src='<c:url value="/resources/js/jqgrid/jquery.jqgrid.min.js"/>'></script>
+<script type='text/javascript'
+	src='<c:url value="/resources/js/jqgrid/order.product.grid.js"/>'></script>
+
+
+<!-- End of JQGrid Header Files -->
+
+<script src="<c:url value="/resources/js/moment.min.js"/>"></script>
+<script src="<c:url value="/resources/js/datepicker.js"/>"></script>
+<link href="<c:url value="/resources/css/datepicker.css"/>" rel='stylesheet'>
+<!-- JQGrid Action URLs -->	
+	<c:url value="/setPdtTemplate/list" var="recordsUrl"/>
+<c:url value="/orderproduct/create" var="addUrl"/>
+<c:url value="/orderproduct/update" var="editUrl"/>
+<c:url value="/orderproduct/delete" var="deleteUrl"/>
+<!--End of JQGrid Action URLs -->	
+
+
+<script>
+	var dateErrMsg = 'Please enter a valid date';
+	$(function() {
 		$("#grid").jqGrid({
 		   	url:'${recordsUrl}',
 			datatype: 'json',
 			mtype: 'GET',
-		   	colNames:['orderProductSetId', 'productInvId', 'Product Code', 'Product Name', 'Qty', 'Role'],
+		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Product Name', 'Qty', 'Role'],
 		   	colModel:[
 		   		{name:'orderProductSetId',index:'id', width:55, editable:false, editoptions:{readonly:true, size:20}, hidden:true},
-		   		{name:'productInvId',index:'productInvId', width:100, editable:true, editrules:{required:true}, editoptions:{size:10}, hidden:true},
-		   		{name:'productCode',index:'productCode', width:100, editable:true, editrules:{required:true}, editoptions:{size:20}},
-		   		{name:'productDesc',index:'productDesc', width:100, editable:true, editrules:{required:true}, editoptions:{size:250}},
+		   		{name:'setPdtId',index:'setPdtId', width:100, editable:true, editrules:{required:true}, editoptions:{size:10}, hidden:true},
+		   		{name:'product.productCode',index:'product.productCode', width:100, editable:true, editrules:{required:true}, editoptions:{size:20}},
+		   		{name:'product.productDesc',index:'product.productDesc', width:100, editable:true, editrules:{required:true}, editoptions:{size:250}},
 		   		{name:'qty',index:'qty', width:100, editable:true, editrules:{required:true}, editoptions:{size:5}},
 		   		{name:'role',index:'role', width:50, editable:true, editrules:{required:true}, 
 		   			edittype:"select", formatter:'select', stype: 'select', 
@@ -19,11 +61,11 @@ $(function() {
 		   	postData: {},
 			rowNum:-1,
 		   	rowList:[],
-		   	height: 200,
+		   	height: 400,
 		   	autowidth: true,
 			rownumbers: true,
-		   	pager:'#pager',
-		   	sortname: 'productCode',
+		   //	pager:,
+		   	sortname: 'product.productCode',
 		    viewrecords: true,
 		    sortorder: "asc",
 		    caption:"Products",
@@ -37,8 +79,10 @@ $(function() {
 		        records: "records",
 		        repeatitems: false,
 		        cell: "cell",
-		        id: "orderId"
+		        id: "setId"
 		    }
+			
+			
 		});
 	/*	$("#grid").jqGrid('navGrid','#pager',
 				{edit:false, add:false, del:false, search:true},
@@ -247,3 +291,45 @@ $(function() {
 					});
 		}
 	}
+	
+	
+</script>
+
+
+<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.ADD_ORDER%>"
+	var="action" />
+<form:form method="POST" action="${action}" modelAttribute="order"
+	autocomplete="off">
+
+	<form:hidden path="orderId" cssClass="form-control" title="orderId"
+		autocomplete="off" />
+		
+		<form:hidden path="set.setId" cssClass="form-control" title="set.setId"
+		autocomplete="off" />
+	<div class="form-group col-md-2">
+		<label for="inputOrderNumber">Order No</label>
+		<form:label path="orderNumber" cssClass="form-control"
+			title="orderNumber" />
+	</div>
+	
+	<!-- JQGrid HTML -->
+
+	<h1 id='banner'>Products</h1>
+
+	<div id='jqgrid'>
+		<table id='grid'></table>
+		<div id='pager'></div>
+	</div>
+
+	<div id='msgbox' title='' style='display: none'></div>
+
+	<!-- End of JQGrid HTML -->
+	
+	
+	<button type="submit" class="btn btn-primary">Add Order</button>
+	<c:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_ORDERS%>"
+		var="listAllOrdersAction" />
+
+	<button type="submit" formmethod="get" class="btn btn-default"
+		formaction="${listAllOrdersAction}">Cancel</button>
+</form:form>

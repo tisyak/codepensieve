@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.medsys.customer.model.Customer;
+import com.medsys.product.model.Set;
 
 @Entity
 @Table(name = "orders")
@@ -64,6 +65,12 @@ public class Orders {
 	@Size(max = 20, message = "{error.field.max}")
 	@Column(name = "order_status", length = 20)
 	private String orderStatus; 
+	
+
+	@ManyToOne
+	@JoinColumn(name="set_id",referencedColumnName="set_id")
+	private Set set;
+	
 	
 	/** The update by. */
 	@Column(name = "update_by")
@@ -148,6 +155,15 @@ public class Orders {
 		this.orderStatus = orderStatus;
 	}
 
+
+	public Set getSet() {
+		return set;
+	}
+
+	public void setSet(Set set) {
+		this.set = set;
+	}
+
 	public String getUpdateBy() {
 		return updateBy;
 	}
@@ -208,11 +224,10 @@ public class Orders {
 	public String toString() {
 		return "Orders [orderId=" + orderId + ", orderNumber=" + orderNumber + ", customer=" + customer
 				+ ", patientName=" + patientName + ", refSource=" + refSource + ", orderDate=" + orderDate
-				+ ", deliveryDate=" + deliveryDate + ", orderStatus=" + orderStatus + ", updateBy=" + updateBy
-				+ ", updateTimestamp=" + updateTimestamp + "]";
+				+ ", deliveryDate=" + deliveryDate + ", orderStatus=" + orderStatus + ", set=" + set + ", updateBy="
+				+ updateBy + ", updateTimestamp=" + updateTimestamp + ", products=" + products + "]";
 	}
-	
-	
+
 
 			
 }

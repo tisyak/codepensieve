@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -23,49 +22,46 @@ import com.medsys.product.model.ProductInv;
 @Entity
 @Table(name = "invoice_product_list")
 public class InvoiceProductList {
-	
+
 	static Logger logger = LoggerFactory.getLogger(InvoiceProductList.class);
-	
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "product_set_id", columnDefinition = "serial")
-	private Integer productSetId; 
-	
+	private Integer productSetId;
+
 	@ManyToOne
-	@JoinColumn(name="invoice_no",referencedColumnName="invoice_no")
+	@JoinColumn(name = "invoice_no", referencedColumnName = "invoice_no")
 	private Invoice invoice;
-	
+
 	@ManyToOne
-	@JoinColumns({
-		@JoinColumn(name="product_id",referencedColumnName="product_id"),
-		@JoinColumn(name="lot_no",referencedColumnName="lot_no")})
+	@JoinColumn(name = "product_id", referencedColumnName = "product_id")
 	private ProductInv productInv;
-	
+
 	@NotNull
 	@Column(name = "rate_per_unit")
-	private BigDecimal ratePerUnit; 
-	
+	private BigDecimal ratePerUnit;
+
 	@NotNull
 	@Column(name = "total")
-	private BigDecimal total; 
-	
+	private BigDecimal total;
+
 	@NotNull
 	@Column(name = "vat_amount")
-	private BigDecimal vatAmount; 
-	
+	private BigDecimal vatAmount;
+
 	@ManyToOne
-	@JoinColumn(name="vat_type",referencedColumnName="tax_id")
+	@JoinColumn(name = "vat_type", referencedColumnName = "tax_id")
 	private TaxMaster vatType;
-	
+
 	@NotNull
 	@Column(name = "price")
-	private BigDecimal price; 
-	
+	private BigDecimal price;
+
 	@NotNull
 	@Column(name = "qty")
-	private Integer qty; 
-	
+	private Integer qty;
+
 	/** The update by. */
 	@Column(name = "update_by")
 	private String updateBy;
@@ -73,7 +69,5 @@ public class InvoiceProductList {
 	/** The update timestamp. */
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
-	
-	
 
 }

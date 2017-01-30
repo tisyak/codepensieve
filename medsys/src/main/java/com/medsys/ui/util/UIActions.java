@@ -38,6 +38,26 @@ public class UIActions {
     public static final String LOAD_DELETE_CUSTOMER="customer/loadDelete";
     public static final String DELETE_CUSTOMER="customer/delete";
     
+    public static final String LIST_ALL_SETS="set/list";
+    public static final String LOAD_SEARCH_SETS="set/loadSearch";
+    public static final String SEARCH_SETS="set/search";
+    public static final String LOAD_ADD_SET="set/loadAdd";
+    public static final String ADD_SET="set/add";
+    public static final String EDIT_SET="set/edit";
+    public static final String SAVE_SET="set/save";
+    public static final String LOAD_DELETE_SET="set/loadDelete";
+    public static final String DELETE_SET="set/delete";
+    
+    public static final String LIST_ALL_PRODUCT_SET_TEMPLATE="setPdtTemplate/list";
+    public static final String LOAD_SEARCH_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadSearch";
+    public static final String SEARCH_PRODUCT_SET_TEMPLATE="setPdtTemplate/search";
+    public static final String LOAD_ADD_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadAdd";
+    public static final String ADD_PRODUCT_SET_TEMPLATE="setPdtTemplate/add";
+    public static final String EDIT_PRODUCT_SET_TEMPLATE="setPdtTemplate/edit";
+    public static final String SAVE_PRODUCT_SET_TEMPLATE="setPdtTemplate/save";
+    public static final String LOAD_DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadDelete";
+    public static final String DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/delete";
+    
     public static final String LIST_ALL_ORDERS="orders/list";
     public static final String LOAD_SEARCH_ORDERS="orders/loadSearch";
     public static final String SEARCH_ORDERS="orders/search";
@@ -47,6 +67,17 @@ public class UIActions {
     public static final String SAVE_ORDER="orders/save";
     public static final String LOAD_DELETE_ORDER="orders/loadDelete";
     public static final String DELETE_ORDER="orders/delete";
+    
+    public static final String LIST_ALL_PRODUCT_ORDERS="orderproduct/list";
+    public static final String LOAD_SEARCH_PRODUCT_ORDERS="orderproduct/loadSearch";
+    public static final String SEARCH_PRODUCT_ORDERS="orderproduct/search";
+    public static final String LOAD_ADD_PRODUCT_ORDER="orderproduct/loadAdd";
+    public static final String ADD_PRODUCT_ORDER="orderproduct/add";
+    public static final String EDIT_PRODUCT_ORDER="orderproduct/edit";
+    public static final String SAVE_PRODUCT_ORDER="orderproduct/save";
+    public static final String LOAD_DELETE_PRODUCT_ORDER="orderproduct/loadDelete";
+    public static final String DELETE_PRODUCT_ORDER="orderproduct/delete";
+    
     
     public static final String LIST_ALL_INVOICES="invoices/list";
     public static final String LOAD_SEARCH_INVOICES="invoices/loadSearch";

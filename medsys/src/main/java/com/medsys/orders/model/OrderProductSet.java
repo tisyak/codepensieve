@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -18,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.medsys.product.model.ProductInv;
-import com.medsys.product.model.Set;
 
 
 @Entity
@@ -41,13 +39,7 @@ public class OrderProductSet implements Serializable {
 	private Integer orderId;
 	
 	@ManyToOne
-	@JoinColumn(name="set_id",referencedColumnName="set_id")
-	private Set set;
-	
-	@ManyToOne
-	@JoinColumns({
-		@JoinColumn(name="product_id",referencedColumnName="product_id"),
-		@JoinColumn(name="lot_no",referencedColumnName="lot_no")})
+	@JoinColumn(name="product_id",referencedColumnName="product_id")
 	private ProductInv productInv;
 	
 	@NotNull
@@ -85,14 +77,6 @@ public class OrderProductSet implements Serializable {
 
 	public void setOrderId(Integer orderId) {
 		this.orderId = orderId;
-	}
-
-	public Set getSet() {
-		return set;
-	}
-
-	public void setSet(Set set) {
-		this.set = set;
 	}
 
 	public ProductInv getProductInv() {
@@ -168,7 +152,7 @@ public class OrderProductSet implements Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderProductSet [orderProductSetId=" + orderProductSetId + ", order=" + orderId + ", set=" + set + ", productInv="
+		return "OrderProductSet [orderProductSetId=" + orderProductSetId + ", order=" + orderId + ", productInv="
 				+ productInv + ", qty=" + qty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 	

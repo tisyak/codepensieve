@@ -1,5 +1,5 @@
 <%@page import="java.util.List"%>
-<%@page import="com.medsys.customer.model.Customer"%>
+<%@page import="com.medsys.orders.model.Orders"%>
 <%@page import="com.medsys.ui.util.UIActions"%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -7,49 +7,57 @@
  <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
 
-<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.EDIT_CUSTOMER%>"
-	var="editCustomer" />
-<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_DELETE_CUSTOMER%>"
-	var="deleteCustomer" />
-<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_CUSTOMER_DSC%>"
-	var="addCertificates" />
+<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.EDIT_ORDER%>"
+	var="editOrder" />
+<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_DELETE_ORDER%>"
+	var="deleteOrder" />
+	<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_DELETE_ORDER%>"
+	var="viewProducts" />
+	
 	
 	
 
 
-<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.SEARCH_CUSTOMER%>"
+<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.SEARCH_ORDERS%>"
 	var="action" />
- <form:form method="POST" action="${action}" modelAttribute="customerInfo" autocomplete="off">
+ <form:form method="POST" action="${action}" modelAttribute="order" autocomplete="off">
         <div class="form-group">
-            <label for="inputName">Name</label>
-            	<form:input path="name" cssClass="form-control" title="name" autocomplete="off" /> 
-				<form:errors path="name" cssClass="error" /> 
+            <label for="inputName">Order Number</label>
+            	<form:input path="orderNumber" cssClass="form-control" title="orderNumber" autocomplete="off" /> 
+				<form:errors path="orderNumber" cssClass="error" /> 
             
         </div>
       
         
          <div class="form-group">
-            <label for="inputPanNo">PAN</label>
-            	<form:input path="pan" cssClass="form-control" title="pan" autocomplete="off" /> 
-				<form:errors path="pan" cssClass="error" /> 
+            <label for="inputCustomer">Customer</label>
+            	<form:input path="customer.name" cssClass="form-control" title="customer" autocomplete="off" /> 
+				<form:errors path="customer" cssClass="error" /> 
             
         </div>
         
           <div class="form-group">
-            <label for="inputMobileNo">Mobile No</label>
-            	<form:input path="mobileNo" cssClass="form-control" title="mobileNo" autocomplete="off" /> 
-				<form:errors path="mobileNo" cssClass="error" /> 
+            <label for="inputOrderDate">Order Date</label>
+            	<form:input path="orderDate" cssClass="form-control" title="orderDate" autocomplete="off" /> 
+				<form:errors path="orderDate" cssClass="error" /> 
+            
+        </div>
+        
+            <div class="form-group">
+            <label for="inputDeliveryDate">Delivery Date</label>
+            	<form:input path="deliveryDate" cssClass="form-control" title="deliveryDate" autocomplete="off" /> 
+				<form:errors path="deliveryDate" cssClass="error" /> 
             
         </div>
       
-        <button type="submit" class="btn btn-primary">Search Customer</button>
+        <button type="submit" class="btn btn-primary">Search Order</button>
         <br>
         
     </form:form>
 
 
 <%
-	if(request.getAttribute("customerInfos")!=null){
+	if(request.getAttribute("orders")!=null){
 %>
 
 
@@ -62,24 +70,24 @@
 				<th style="width: 5%">
 					<!-- <input class="no-margin" type="checkbox"> -->
 				</th>
-				<th style="width: 25%">Name</th>
-				<th style="width: 20%" class="hidden-phone">Email</th>
-				<th style="width: 10%" class="hidden-phone">Mobile No</th>
-				<th style="width: 15%" class="hidden-phone">PAN No</th>
-				<th style="width: 15%" class="hidden-phone">Company/LLP Name</th>
+				<th style="width: 25%">Order Number</th>
+				<th style="width: 20%" class="hidden-phone">Customer</th>
+				<th style="width: 10%" class="hidden-phone">Order Date</th>
+				<th style="width: 15%" class="hidden-phone">Delivery Date</th>
 				<th style="width: 10%" class="hidden-phone">Actions</th>
 			</tr>
 		</thead>
 		<tbody>
 
 			<%
-				for (Customer customerInfo: (List<Customer>)request.getAttribute("customerInfos")) {
+				for (Orders order: (List<Orders>)request.getAttribute("orders")) {
 			%>
 			<tr>
 				<td><input class="no-margin" type="checkbox"></td>
-				<td><span class="name"><%=customerInfo.getName()%></span></td>
-				<td class="hidden-phone"><%=customerInfo.getEmail()%></td>
-				<td class="hidden-phone"><%=customerInfo.getMobileNo()%></td>
+				<td><span class="name"><%=order.getOrderNumber()%></span></td>
+				<td class="hidden-phone"><%=order.getCustomer().getName()%></td>
+				<td class="hidden-phone"><%=order.getOrderDate()%></td>
+				<td class="hidden-phone"><%=order.getDeliveryDate()%></td>
 				<td class="hidden-phone">
 					<div class="btn-group">
 						<button data-toggle="dropdown" class="btn btn-xs dropdown-toggle"
@@ -89,10 +97,9 @@
 
 
 						<ul class="dropdown-menu pull-right">
-							<li><a href="${editCustomer}?customerId=<%=customerInfo.getCustomerId()%>">Edit</a></li>
-							<li><a href="${addCertificates}?customerId=<%=customerInfo.getCustomerId()%>">Add Certificate Info</a></li>
-							<li><a href="${viewCertificates}?customerId=<%=customerInfo.getCustomerId()%>">View Certificates</a></li>
-							<li><a href="${deleteCustomer}?customerId=<%=customerInfo.getCustomerId()%>">Delete</a></li>
+							<li><a href="${editOrder}?orderId=<%=order.getOrderId()%>">Edit</a></li>
+							<li><a href="${viewProducts}?orderId=<%=order.getOrderId()%>">View Products</a></li>
+							<li><a href="${deleteOrder}?orderId=<%=order.getOrderId()%>">Delete</a></li>
 						</ul>
 					</div>
 				</td>

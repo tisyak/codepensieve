@@ -20,13 +20,20 @@ public enum MedsysUITiles {
 
 	SEARCH_ORDERS("orders.SearchOrders"),
 
-	ORDERS_LIST("orders.OrdersList"),
+	ORDERS_LIST("orders.SearchOrders"),
 
 	ADD_ORDER("orders.AddOrder"),
 
 	EDIT_ORDER("orders.EditOrder"),
 
 	CONFIRM_DELETE_ORDER("orders.DeleteOrder"),
+	
+	ADD_PRODUCTS_IN_ORDER("orders.AddProductsToOrder"),
+
+	EDIT_PRODUCTS_IN_ORDER("orders.EditProductsInOrder"),
+
+	DELETE_PRODUCTS_IN_ORDER("orders.DeleteProductsInOrder"),
+	
 
 	/** Admin User Management */
 	ADMIN_USERS_LIST("master.AdminUserList"),

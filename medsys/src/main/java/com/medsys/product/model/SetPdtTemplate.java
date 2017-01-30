@@ -1,5 +1,6 @@
 package com.medsys.product.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -10,17 +11,18 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.medsys.orders.model.Orders;
-
 @Entity
 @Table(name = "set")
-public class SetPdtTemplate {
+public class SetPdtTemplate implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -547583099563214158L;
+
 	static Logger logger = LoggerFactory.getLogger(Set.class);
 
 	@Id

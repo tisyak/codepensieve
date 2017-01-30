@@ -1,5 +1,6 @@
 package com.medsys.ui.controller;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -9,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -21,6 +24,7 @@ import com.medsys.adminuser.model.Roles;
 import com.medsys.customer.bd.CustomerBD;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.Orders;
+import com.medsys.product.bd.SetBD;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.UIConstants;
@@ -37,6 +41,9 @@ public class OrdersController  extends SuperController {
 	
 	@Autowired
 	private CustomerBD customerBD;
+	
+	@Autowired
+	private SetBD setBD;
 
 
 	@Autowired
@@ -99,12 +106,13 @@ public class OrdersController  extends SuperController {
 
 		logger.info("IN: Order/loadAdd-GET");
 		model.addAttribute("customerList",customerBD.getAllCustomers());
+		model.addAttribute("setList",setBD.getAllSet());
 		model.addAttribute("order", order);
 		return MedsysUITiles.ADD_ORDER.getTile();
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.ADD_ORDER, method = RequestMethod.POST)
-	public String addOrders(@Valid @ModelAttribute Orders order,
+	public String addOrders(@Valid @ModelAttribute Orders order,Model model,
 			BindingResult result, RedirectAttributes redirectAttrs) {
 
 		logger.info("IN: Order/add-POST");
@@ -117,14 +125,30 @@ public class OrdersController  extends SuperController {
 			redirectAttrs.addFlashAttribute("order", order);
 			return MedsysUITiles.ADD_ORDER.getTile();
 		} else {
+			logger.info("Order-add: " + order);
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			order.setUpdateBy(auth.getName());
+			order.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 			ordersBD.addOrder(order);
 			String message = "Order " + order.getOrderId()
 					+ " was successfully added";
-			redirectAttrs.addFlashAttribute("message", message);
-			return UIActions.REDIRECT + UIActions.LIST_ALL_ORDERS;
+			
+			logger.info("Order-add: " + message);
+			model.addAttribute("order", order);
+			return UIActions.FORWARD + UIActions.LOAD_ADD_PRODUCT_ORDER;
 		}
 	}
 
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_PRODUCT_ORDER, method = RequestMethod.POST)
+	public String loadAddProductsToOrder(@ModelAttribute Orders order,
+			Model model) {
+
+		logger.info("IN: Order/loadAddProductsToOrder-POST");
+		model.addAttribute("order", order);
+		return MedsysUITiles.ADD_PRODUCTS_IN_ORDER.getTile();
+	}
+	
+	
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.EDIT_ORDER, method = RequestMethod.POST)
 	public String loadEditOrdersPage(
 			Integer orderId,

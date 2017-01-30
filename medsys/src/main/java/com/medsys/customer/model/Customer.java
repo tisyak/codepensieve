@@ -13,13 +13,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
-import com.medsys.orders.model.OrderProductSet;
 
 @Entity
 @Table(name = "customer")
@@ -28,9 +26,10 @@ public class Customer {
 	static Logger logger = LoggerFactory.getLogger(Customer.class);
 
 	@Id
-	@GeneratedValue(generator = "uuid2")
-	@GenericGenerator(name = "uuid2", strategy = "uuid2")
-	@Column(name = "customer_id", columnDefinition = "uuid")
+	@GeneratedValue//(generator = "uuid2")
+	//@GenericGenerator(name = "uuid2", strategy = "uuid2")
+	@Column(name = "customer_id")
+	@org.hibernate.annotations.Type(type="pg-uuid")
 	private UUID customerId; 
 	
 	@NotBlank(message = "{error.field.empty}")

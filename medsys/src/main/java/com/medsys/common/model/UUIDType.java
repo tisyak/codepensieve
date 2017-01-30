@@ -61,6 +61,14 @@ public class UUIDType extends AbstractSingleColumnStandardBasicType<UUID> {
 					st.setObject(index, javaTypeDescriptor.unwrap(value,
 							UUID.class, options));
 				}
+
+				@Override
+				protected void doBind(CallableStatement st, X value, String name, WrapperOptions options)
+						throws SQLException {
+					st.setObject(name, javaTypeDescriptor.unwrap(value,
+							UUID.class, options));
+					
+				}
 			};
 		}
 

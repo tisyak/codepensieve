@@ -7,41 +7,31 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.medsys.common.model.Response;
-import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.OrderProductSet;
+import com.medsys.product.bd.SetBD;
+import com.medsys.product.model.SetPdtTemplate;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
 
 //TODO: Remove hardcoding!!
 @Controller
-@RequestMapping(value="/orderproduct")
-public class OrderProductSetController {
+public class SetController {
 	
-	static Logger logger = LoggerFactory.getLogger(OrderProductSetController.class);
+	static Logger logger = LoggerFactory.getLogger(SetController.class);
 	
 	@Autowired
-	private OrderBD orderBD;
+	private SetBD setBD;
+		
 	
-	@RequestMapping
-	public String getOrderProductSetPage() {
-		//TODO: Change to constant
-		return "AddProductsToOrder";
-	}
-	
-	
-	
-	@RequestMapping(value = "/list", produces="application/json")
-	public @ResponseBody JqgridResponse<OrderProductSet> records(
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE, produces="application/json")
+	public @ResponseBody JqgridResponse<SetPdtTemplate> records(
     		@RequestParam("_search") Boolean search,
     		@RequestParam(value="filters", required=false) String filters,
-    		@RequestParam(value="orderId", required=false) Integer orderId,
+    		@RequestParam(value="setId", required=false) Integer setId,
     		@RequestParam(value="page", required=false) Integer page,
     		@RequestParam(value="rows", required=false) Integer rows,
     		@RequestParam(value="sidx", required=false) String sidx,
@@ -55,10 +45,10 @@ public class OrderProductSetController {
 			
 		} 
 			
-		List<OrderProductSet> orderProducts = orderBD.getAllProductsInOrder(orderId);
+		List<SetPdtTemplate> setProducts = setBD.getAllProductsInSet(setId);
 		
-		JqgridResponse<OrderProductSet> response = new JqgridResponse<OrderProductSet>();
-		response.setRows(orderProducts);
+		JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();
+		response.setRows(setProducts);
 		
 		logger.debug("response: " + response);
 		/*
@@ -67,8 +57,8 @@ public class OrderProductSetController {
 			response.setPage(Integer.valueOf(pageOfOrderProducts.getNumber()+1).toString());
 		 */
 		
-		response.setRecords(Integer.valueOf(orderProducts.size()).toString());
-		response.setTotal(Integer.valueOf(orderProducts.size()).toString());
+		response.setRecords(Integer.valueOf(setProducts.size()).toString());
+		response.setTotal(Integer.valueOf(setProducts.size()).toString());
 		response.setPage(Integer.valueOf(1).toString());
 		
 		return response;
@@ -115,13 +105,13 @@ public class OrderProductSetController {
 		response.setPage(Integer.valueOf(users.getNumber()+1).toString());
 		return response;
 	}*/
-	
-	@RequestMapping(value="/get", produces="application/json")
+	/*
+	@RequestMapping(value="/orderproduct/get", produces="application/json")
 	public @ResponseBody OrderProductSet get(@RequestBody OrderProductSet orderProductSet) {
 		return orderBD.getProductInOrder(orderProductSet.getOrderProductSetId());
 	}
 
-	@RequestMapping(value="/create", produces="application/json", method=RequestMethod.POST)
+	@RequestMapping(value="/orderproduct/create", produces="application/json", method=RequestMethod.POST)
 	public @ResponseBody Response create(
 			@RequestParam Integer setId,
 			@RequestParam String productCode,
@@ -133,7 +123,7 @@ public class OrderProductSetController {
 		return response;
 	}
 	
-	@RequestMapping(value="/update", produces="application/json", method=RequestMethod.POST)
+	@RequestMapping(value="/orderproduct/update", produces="application/json", method=RequestMethod.POST)
 	public @ResponseBody Response update(
 			@RequestParam Integer orderProductSetId,
 			@RequestParam Integer qty) {
@@ -143,14 +133,14 @@ public class OrderProductSetController {
 		return response;
 	}
 	
-	@RequestMapping(value="/delete", produces="application/json", method=RequestMethod.POST)
+	@RequestMapping(value="/orderproduct/delete", produces="application/json", method=RequestMethod.POST)
 	public @ResponseBody Response delete(
 			@RequestParam Integer orderProductSetId) {
 
 		OrderProductSet orderProductSet = orderBD.getProductInOrder(orderProductSetId);
 		Response response = orderBD.deleteProductFromOrder(orderProductSet);
 		return response;
-	}
+	}*/
 	
 	public static List<OrderProductSet> map(Page<OrderProductSet> pageOfOrderProducts) {
 		List<OrderProductSet> orderProducts = new ArrayList<OrderProductSet>();

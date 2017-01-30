@@ -12,9 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
-import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +31,6 @@ public class ProductInv {
 	@JoinColumn(name="product_id",referencedColumnName="product_id")
 	private ProductMaster product;
 
-	@NotBlank(message = "{error.field.empty}")
-	@Size(max = 20, message = "{error.field.max}")
-	@Column(name = "lot_no", length = 20)
-	private String lotNo;
-	
 	@NotNull
 	@Column(name = "org_qty")
 	private Integer orgQty; 
@@ -88,14 +81,6 @@ public class ProductInv {
 
 	public void setProduct(ProductMaster product) {
 		this.product = product;
-	}
-
-	public String getLotNo() {
-		return lotNo;
-	}
-
-	public void setLotNo(String lotNo) {
-		this.lotNo = lotNo;
 	}
 
 	public Integer getOrgQty() {
@@ -176,7 +161,6 @@ public class ProductInv {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((lotNo == null) ? 0 : lotNo.hashCode());
 		result = prime * result + ((product == null) ? 0 : product.hashCode());
 		return result;
 	}
@@ -190,11 +174,6 @@ public class ProductInv {
 		if (getClass() != obj.getClass())
 			return false;
 		ProductInv other = (ProductInv) obj;
-		if (lotNo == null) {
-			if (other.lotNo != null)
-				return false;
-		} else if (!lotNo.equals(other.lotNo))
-			return false;
 		if (product == null) {
 			if (other.product != null)
 				return false;
@@ -205,7 +184,7 @@ public class ProductInv {
 
 	@Override
 	public String toString() {
-		return "ProductInv [productInvId=" + productInvId + ", product=" + product + ", lotNo=" + lotNo + ", orgQty="
+		return "ProductInv [productInvId=" + productInvId + ", product=" + product + ", orgQty="
 				+ orgQty + ", price=" + price + ", mrp=" + mrp + ", soldQty=" + soldQty + ", engagedQty=" + engagedQty
 				+ ", discardedQty=" + discardedQty + ", availableQty=" + availableQty + ", updateBy=" + updateBy
 				+ ", updateTimestamp=" + updateTimestamp + "]";
