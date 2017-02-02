@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.medsys.common.model.Response;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.OrderProductSet;
-import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
 
 //TODO: Remove hardcoding!!
@@ -59,8 +58,7 @@ public class OrderProductSetController {
 		
 		JqgridResponse<OrderProductSet> response = new JqgridResponse<OrderProductSet>();
 		response.setRows(orderProducts);
-		
-		logger.debug("response: " + response);
+				
 		/*
 		 	response.setRecords(Long.valueOf(pageOfOrderProducts.getTotalElements()).toString());
 			response.setTotal(Integer.valueOf(pageOfOrderProducts.getTotalPages()).toString());
@@ -68,8 +66,10 @@ public class OrderProductSetController {
 		 */
 		
 		response.setRecords(Integer.valueOf(orderProducts.size()).toString());
-		response.setTotal(Integer.valueOf(orderProducts.size()).toString());
+		response.setTotal(Integer.valueOf(1).toString());
 		response.setPage(Integer.valueOf(1).toString());
+		
+		logger.debug("response: " + response);
 		
 		return response;
 	}

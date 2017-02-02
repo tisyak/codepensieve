@@ -3,7 +3,7 @@ package com.medsys.company.dao;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;

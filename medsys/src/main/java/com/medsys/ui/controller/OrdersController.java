@@ -1,6 +1,7 @@
 package com.medsys.ui.controller;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -108,6 +109,17 @@ public class OrdersController  extends SuperController {
 		model.addAttribute("customerList",customerBD.getAllCustomers());
 		model.addAttribute("setList",setBD.getAllSet());
 		model.addAttribute("order", order);
+		/**
+		 * TODO: Remove this default population
+		 * */
+		order.setOrderDate(new Date());
+		order.setDeliveryDate(new Date());
+		order.setPatientName("TestPatient");
+		order.setRefSource("TestRef");
+		order.setOrderStatus("INIT");
+		/**
+		 * TODO: END of remove this default population
+		 * */
 		return MedsysUITiles.ADD_ORDER.getTile();
 	}
 
@@ -133,8 +145,8 @@ public class OrdersController  extends SuperController {
 			String message = "Order " + order.getOrderId()
 					+ " was successfully added";
 			
-			logger.info("Order-add: " + message);
-			model.addAttribute("order", order);
+			logger.info("Order-add: " + message + "\n Order: " + order);
+			redirectAttrs.addFlashAttribute("order", order);
 			return UIActions.FORWARD + UIActions.LOAD_ADD_PRODUCT_ORDER;
 		}
 	}
@@ -143,7 +155,8 @@ public class OrdersController  extends SuperController {
 	public String loadAddProductsToOrder(@ModelAttribute Orders order,
 			Model model) {
 
-		logger.info("IN: Order/loadAddProductsToOrder-POST");
+		logger.info("IN: Order/loadAddProductsToOrder-POST" + order);
+	
 		model.addAttribute("order", order);
 		return MedsysUITiles.ADD_PRODUCTS_IN_ORDER.getTile();
 	}

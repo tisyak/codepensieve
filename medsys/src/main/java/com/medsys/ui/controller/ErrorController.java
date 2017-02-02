@@ -27,7 +27,8 @@ public class ErrorController  extends SuperController {
 	public String loadError(HttpServletRequest request, Model model) {
 		model.addAttribute(UIConstants.MSG_FOR_SYSTEM_ERROR.getValue(),
 				EpSystemError.SYSTEM_INTERNAL_ERROR.getErrorCode());
-		return UIActions.FORWARD + UIActions.LOG_OUT;
+		//TODO reconsider
+		return MedsysUITiles.MESSAGE.getTile();
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_HTTP_ERROR, method = {
@@ -36,7 +37,8 @@ public class ErrorController  extends SuperController {
 		logger.error("Encountered http error: " + response.getStatus() + ". " );
 		model.addAttribute(UIConstants.MSG_FOR_SYSTEM_ERROR.getValue(),
 				EpSystemError.HTTP_ERROR.getErrorCode());
-		return UIActions.FORWARD + UIActions.LOG_OUT;
+		//TODO reconsider
+		return MedsysUITiles.MESSAGE.getTile();
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH

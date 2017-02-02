@@ -157,6 +157,7 @@ public class WelcomeController extends SuperController {
 		return UIActions.REDIRECT + UIActions.LOGIN +"?error=" + EpSystemError.INVALID_USER.getErrorCode();
 	}
 	
+	
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.CAPTCHA)
 	public ResponseEntity<byte[]> captchaImage(HttpServletRequest request)
 			throws Exception {

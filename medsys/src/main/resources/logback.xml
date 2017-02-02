@@ -78,7 +78,7 @@
   <logger name="ch.qos" level="WARN"/>
   <logger name="org.slf4j" level="OFF"/>
   <logger name="org.springframework" level="DEBUG"/>
-  <logger name="org.apache" level="DEBUG"/>
+  <logger name="org.apache" level="WARN"/>
   <logger name="org.jboss" level="WARN"/>
   <logger name="org.hibernate" level="DEBUG"/>
   <logger name="org.postgresql" level="WARN"/>

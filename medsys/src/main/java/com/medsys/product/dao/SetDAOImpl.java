@@ -2,7 +2,7 @@ package com.medsys.product.dao;
 
 import java.util.List;
 
-import org.hibernate.Query;
+import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
@@ -82,23 +82,23 @@ public class SetDAOImpl implements SetDAO {
 	@Override
 	public List<Set> searchForSet(Set set) {
 		logger.debug("SetDAOImpl.searchForSet() - [" + set.toString() + "]");
-		Query query = getCurrentSession()
+		Query<Set> query = getCurrentSession()
 				.createQuery("from Set where lower(setName) like :setName  order by setName asc");
 
 		if (set.getSetName() != null) {
-			query.setString("setName", "%" + set.getSetName().toLowerCase() + "%");
+			query.setParameter("setName", "%" + set.getSetName().toLowerCase() + "%");
 		} else {
-			query.setString("setName", set.getSetName());
+			query.setParameter("setName", set.getSetName());
 		}
 
 		logger.debug(query.toString());
-		if (query.list().size() == 0) {
+		if (query.getResultList().size() == 0) {
 			logger.debug("No sets found matching current search criteria.");
 			return null;
 		} else {
 
-			logger.debug("Search Set List Size: " + query.list().size());
-			List<Set> list = (List<Set>) query.list();
+			logger.debug("Search Set List Size: " + query.getResultList().size());
+			List<Set> list = (List<Set>) query.getResultList();
 			return list;
 		}
 	}
@@ -106,9 +106,11 @@ public class SetDAOImpl implements SetDAO {
 	@Override
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId) {
 		logger.debug("Fetching all products in Set: " + setId);
-		return getCurrentSession().createQuery(
-				"from SetPdtTemplate " + " where setId = " + setId + " order by product.productCode asc ")
-				.list();
+		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(
+				" from SetPdtTemplate as spt " )
+				.getResultList();
+		logger.debug("pdtList: " + pdtList);
+		return pdtList;
 	}
 
 	@Override

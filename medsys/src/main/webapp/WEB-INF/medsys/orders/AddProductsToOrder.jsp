@@ -1,4 +1,4 @@
-
+<%@page import="com.medsys.orders.model.Orders"%>
 <%@page import="com.medsys.ui.util.UIActions"%>
 
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
@@ -10,7 +10,7 @@
 <!-- JQGrid Header Files -->
 
 <link rel="stylesheet" type="text/css" media="screen"
-	href='<c:url value="/resources/css/ui-lightness/jquery-ui-min.css"/>' />
+	href='<c:url value="/resources/css/ui-lightness/jquery-ui.min.css"/>' />
 <link rel="stylesheet" type="text/css" media="screen"
 	href='<c:url value="/resources/css/ui.jqgrid.min.css"/>' />
 
@@ -18,7 +18,7 @@
 	src='<c:url value="/resources/js/jquery-ui.min.js"/>'></script>
 
 <script type='text/javascript'
-	src='<c:url value="/resources/js/jqgrid/grid.locale-en-min.js"/>'></script>
+	src='<c:url value="/resources/js/jqgrid/grid.locale-en.min.js"/>'></script>
 <script type='text/javascript'
 	src='<c:url value="/resources/js/jqgrid/jquery.jqgrid.min.js"/>'></script>
 <script type='text/javascript'
@@ -31,27 +31,42 @@
 <script src="<c:url value="/resources/js/datepicker.js"/>"></script>
 <link href="<c:url value="/resources/css/datepicker.css"/>" rel='stylesheet'>
 <!-- JQGrid Action URLs -->	
-	<c:url value="/setPdtTemplate/list" var="recordsUrl"/>
+<c:url value="/setPdtTemplate/list" var="recordsUrl"/>
 <c:url value="/orderproduct/create" var="addUrl"/>
 <c:url value="/orderproduct/update" var="editUrl"/>
 <c:url value="/orderproduct/delete" var="deleteUrl"/>
 <!--End of JQGrid Action URLs -->	
-
-
+<%
+	Orders order = (Orders)request.getAttribute("order");
+	pageContext.setAttribute("setId",order.getSet().getSetId());
+	pageContext.setAttribute("orderId",order.getOrderId());
+%>
 <script>
 	var dateErrMsg = 'Please enter a valid date';
+	
+	var data = {};
+	var headers = {};
+	//data[csrfParameter] = csrfToken;
+	data["setId"] = ${setId};
+	data["orderId"] =${orderId};
+	//headers[csrfHeader] = csrfToken; 
+	
+	alert("data for ajax submit: " + data);
+	
 	$(function() {
 		$("#grid").jqGrid({
 		   	url:'${recordsUrl}',
 			datatype: 'json',
+			data: data,
 			mtype: 'GET',
-		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Product Name', 'Qty', 'Role'],
+		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty', 'Role'],
 		   	colModel:[
-		   		{name:'orderProductSetId',index:'id', width:55, editable:false, editoptions:{readonly:true, size:20}, hidden:true},
-		   		{name:'setPdtId',index:'setPdtId', width:100, editable:true, editrules:{required:true}, editoptions:{size:10}, hidden:true},
-		   		{name:'product.productCode',index:'product.productCode', width:100, editable:true, editrules:{required:true}, editoptions:{size:20}},
-		   		{name:'product.productDesc',index:'product.productDesc', width:100, editable:true, editrules:{required:true}, editoptions:{size:250}},
-		   		{name:'qty',index:'qty', width:100, editable:true, editrules:{required:true}, editoptions:{size:5}},
+		   		{name:'orderProductSetId',index:'id',  hidden:true},
+		   		{name:'setPdtId',index:'setPdtId',hidden:true},
+		   		{name:'product.productCode',index:'product.productCode', width:50, editable:true, editrules:{required:true}, editoptions:{size:20}},
+				{name:'product.group.groupName',index:'product.group.groupName', width:100},
+		   		{name:'product.productDesc',index:'product.productDesc', width:200, editable:true, editrules:{required:true}, editoptions:{size:250}},
+		   		{name:'qty',index:'qty', width:50, editable:true, editrules:{required:true}, editoptions:{size:5}},				
 		   		{name:'role',index:'role', width:50, editable:true, editrules:{required:true}, 
 		   			edittype:"select", formatter:'select', stype: 'select', 
 		   			editoptions:{value:"1:Admin;2:Regular"},
@@ -61,17 +76,29 @@
 		   	postData: {},
 			rowNum:-1,
 		   	rowList:[],
-		   	height: 400,
+		   	height: 300,
 		   	autowidth: true,
 			rownumbers: true,
-		   //	pager:,
+		    pager: '#pager',
 		   	sortname: 'product.productCode',
 		    viewrecords: true,
 		    sortorder: "asc",
 		    caption:"Products",
 		    emptyrecords: "Empty records",
-		    loadonce: false,
+		    // this enables client side sorting!! Hence,enabled as true
+		    // previously this was false
+		    loadonce: true,
 		    loadComplete: function() {},
+			grouping: true,
+		   	groupingView : {
+		   		groupField : ['product.group.groupName'],
+		   		groupColumnShow : [true],
+		   		groupText : ['<b>{0}</b>'],
+		   		groupCollapse : false,
+				groupOrder: ['asc'],
+				groupSummary : [true],
+				groupDataSorted : true
+		   	},
 		    jsonReader : {
 		        root: "rows",
 		        page: "page",
@@ -84,7 +111,7 @@
 			
 			
 		});
-	/*	$("#grid").jqGrid('navGrid','#pager',
+		$("#grid").jqGrid('navGrid','#pager',
 				{edit:false, add:false, del:false, search:true},
 				{}, {}, {}, 
 				{ 	// search
@@ -123,7 +150,7 @@
 				title:"", 
 				cursor: "pointer"
 			} 
-		);*/
+		);
 		// Toolbar Search
 		$("#grid").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : true, defaultSearch:"cn"});
 	});
@@ -306,16 +333,9 @@
 		
 		<form:hidden path="set.setId" cssClass="form-control" title="set.setId"
 		autocomplete="off" />
-	<div class="form-group col-md-2">
-		<label for="inputOrderNumber">Order No</label>
-		<form:label path="orderNumber" cssClass="form-control"
-			title="orderNumber" />
-	</div>
-	
+	<div>
+
 	<!-- JQGrid HTML -->
-
-	<h1 id='banner'>Products</h1>
-
 	<div id='jqgrid'>
 		<table id='grid'></table>
 		<div id='pager'></div>
@@ -324,7 +344,7 @@
 	<div id='msgbox' title='' style='display: none'></div>
 
 	<!-- End of JQGrid HTML -->
-	
+	</div>
 	
 	<button type="submit" class="btn btn-primary">Add Order</button>
 	<c:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_ORDERS%>"

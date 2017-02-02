@@ -27,7 +27,7 @@ public class ProductGroup {
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 150, message = "{error.field.max}")
 	@Column(name = "group_name", length = 150)
-	private String group_name;
+	private String groupName;
 	
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 250, message = "{error.field.max}")
@@ -50,12 +50,12 @@ public class ProductGroup {
 		this.groupId = groupId;
 	}
 
-	public String getGroup_name() {
-		return group_name;
+	public String getGroupName() {
+		return groupName;
 	}
 
-	public void setGroup_name(String group_name) {
-		this.group_name = group_name;
+	public void setGroupName(String group_name) {
+		this.groupName = group_name;
 	}
 
 	public String getGroupDesc() {
@@ -84,7 +84,7 @@ public class ProductGroup {
 
 	@Override
 	public String toString() {
-		return "ProductGroup [groupId=" + groupId + ", group_name=" + group_name + ", groupDesc=" + groupDesc
+		return "ProductGroup [groupId=" + groupId + ", groupName=" + groupName + ", groupDesc=" + groupDesc
 				+ ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 

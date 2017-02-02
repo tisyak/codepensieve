@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Entity
-@Table(name = "set")
+@Table(name = "set_pdt_template")
 public class SetPdtTemplate implements Serializable {
 	/**
 	 * 

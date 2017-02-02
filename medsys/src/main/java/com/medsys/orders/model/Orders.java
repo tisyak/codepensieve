@@ -1,6 +1,7 @@
 package com.medsys.orders.model;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
@@ -86,6 +88,17 @@ public class Orders {
 	public static Logger getLogger() {
 		return logger;
 	}
+	
+	
+
+	public Orders() {
+		super();
+		Date date = new Date();
+		String modifiedDate= new SimpleDateFormat("yyMMdd").format(date);
+		this.setOrderNumber("RD-" + modifiedDate + "-" + RandomStringUtils.random(4, true, true));
+	}
+
+
 
 	public static void setLogger(Logger logger) {
 		Orders.logger = logger;
