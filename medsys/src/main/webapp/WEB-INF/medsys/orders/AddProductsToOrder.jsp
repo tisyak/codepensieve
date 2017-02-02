@@ -48,7 +48,7 @@
 	var headers = {};
 	//data[csrfParameter] = csrfToken;
 	data["setId"] = ${setId};
-	data["orderId"] =${orderId};
+	//data["orderId"] =${orderId};
 	//headers[csrfHeader] = csrfToken; 
 	
 	alert("data for ajax submit: " + data);
@@ -57,7 +57,7 @@
 		$("#grid").jqGrid({
 		   	url:'${recordsUrl}',
 			datatype: 'json',
-			data: data,
+			//data: data,
 			mtype: 'GET',
 		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty', 'Role'],
 		   	colModel:[
