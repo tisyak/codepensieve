@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,20 +14,27 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.OrderProductSet;
+import com.medsys.product.bd.SetBD;
+import com.medsys.product.model.SetPdtTemplate;
+import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
 
-//TODO: Remove hardcoding!!
+
 @Controller
-@RequestMapping(value="/orderproduct")
+@Secured(Roles.MASTER_ADMIN)
 public class OrderProductSetController {
 	
 	static Logger logger = LoggerFactory.getLogger(OrderProductSetController.class);
 	
 	@Autowired
 	private OrderBD orderBD;
+	
+	@Autowired
+	private SetBD setBD;
 	
 	@RequestMapping
 	public String getOrderProductSetPage() {
@@ -36,28 +44,60 @@ public class OrderProductSetController {
 	
 	
 	
-	@RequestMapping(value = "/list", produces="application/json")
-	public @ResponseBody JqgridResponse<OrderProductSet> records(
-    		@RequestParam("_search") Boolean search,
-    		@RequestParam(value="filters", required=false) String filters,
-    		@RequestParam(value="orderId", required=false) Integer orderId,
-    		@RequestParam(value="page", required=false) Integer page,
-    		@RequestParam(value="rows", required=false) Integer rows,
-    		@RequestParam(value="sidx", required=false) String sidx,
-    		@RequestParam(value="sord", required=false) String sord) {
+	@RequestMapping(value = UIActions.FORWARD_SLASH
+			+ UIActions.LIST_ALL_PRODUCT_ORDERS, produces = "application/json")
+	public @ResponseBody JqgridResponse<?> records(
+			@RequestParam("_search") Boolean search,
+			@RequestParam(value = "filters", required = false) String filters,
+			@RequestParam(value = "orderProductSetId", required = false) Integer orderProductSetId,
+			@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "rows", required = false) Integer rows,
+			@RequestParam(value = "sidx", required = false) String sidx,
+			@RequestParam(value = "sord", required = false) String sord,
+			@RequestParam(value="setId", required=false) Integer setId,
+			@RequestParam(value="orderId", required=false) Integer orderId
+    		/*@RequestParam(value="setId", required=false) Integer setId,
+    		@RequestParam(value="orderId", required=false) Integer orderId*/) {
 
-		//Pageable pageRequest = new PageRequest(page-1, rows);
-		logger.debug("list all products / search");
+		// Pageable pageRequest = new PageRequest(page-1, rows);
+		logger.debug("list all products / search in order : setId: " + setId + " ,orderID: " + orderId);
 		if (search == true) {
 			//TODO: enable search??
 			//return getFilteredRecords(filters, pageRequest);
 			
 		} 
-			
+		
 		List<OrderProductSet> orderProducts = orderBD.getAllProductsInOrder(orderId);
 		
-		JqgridResponse<OrderProductSet> response = new JqgridResponse<OrderProductSet>();
-		response.setRows(orderProducts);
+		logger.debug("Products in order: " + orderProducts);
+		
+		if(orderProducts==null || orderProducts.size() == 0){
+			List<SetPdtTemplate> setProducts = setBD.getAllProductsInSet(setId);
+			
+
+			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();
+			response.setRows(setProducts);
+			response.setRecords(Integer.valueOf(orderProducts.size()).toString());
+			response.setTotal(Integer.valueOf(1).toString());
+			response.setPage(Integer.valueOf(1).toString());
+			
+			logger.debug("First Time. Loading response from Set Template: " + response);
+			
+			return response;
+			
+		} else {
+		
+			JqgridResponse<OrderProductSet> response = new JqgridResponse<OrderProductSet>();
+			response.setRows(orderProducts);
+			
+			response.setRecords(Integer.valueOf(orderProducts.size()).toString());
+			response.setTotal(Integer.valueOf(1).toString());
+			response.setPage(Integer.valueOf(1).toString());
+			
+			logger.debug("Products already exist in order. Loading response from Order Product List: " + response);
+
+			return response;
+		}
 				
 		/*
 		 	response.setRecords(Long.valueOf(pageOfOrderProducts.getTotalElements()).toString());
@@ -65,13 +105,7 @@ public class OrderProductSetController {
 			response.setPage(Integer.valueOf(pageOfOrderProducts.getNumber()+1).toString());
 		 */
 		
-		response.setRecords(Integer.valueOf(orderProducts.size()).toString());
-		response.setTotal(Integer.valueOf(1).toString());
-		response.setPage(Integer.valueOf(1).toString());
 		
-		logger.debug("response: " + response);
-		
-		return response;
 	}
 	
 	/**
@@ -118,6 +152,8 @@ public class OrderProductSetController {
 	
 	@RequestMapping(value="/get", produces="application/json")
 	public @ResponseBody OrderProductSet get(@RequestBody OrderProductSet orderProductSet) {
+		logger.debug("Getting the product in order: " + orderProductSet);
+		
 		return orderBD.getProductInOrder(orderProductSet.getOrderProductSetId());
 	}
 
@@ -129,6 +165,9 @@ public class OrderProductSetController {
 			@RequestParam Integer qty) {
 		
 		OrderProductSet newOrderProductSet = new OrderProductSet(setId, productCode, lotNo, qty);
+		
+		logger.debug("Adding the product to order: " + newOrderProductSet);
+		
 		Response response = orderBD.addProductToOrder(newOrderProductSet);
 		return response;
 	}
@@ -139,6 +178,8 @@ public class OrderProductSetController {
 			@RequestParam Integer qty) {
 		
 		OrderProductSet orderProductSet = orderBD.getProductInOrder(orderProductSetId);
+		orderProductSet.setQty(qty);
+		logger.debug("Updating the product in order: " + orderProductSet);
 		Response response = orderBD.updateProuctInOrder(orderProductSet);
 		return response;
 	}
@@ -148,6 +189,7 @@ public class OrderProductSetController {
 			@RequestParam Integer orderProductSetId) {
 
 		OrderProductSet orderProductSet = orderBD.getProductInOrder(orderProductSetId);
+		logger.debug("Deleting the product in order: " + orderProductSet);
 		Response response = orderBD.deleteProductFromOrder(orderProductSet);
 		return response;
 	}

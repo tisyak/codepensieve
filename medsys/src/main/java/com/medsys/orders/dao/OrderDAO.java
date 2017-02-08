@@ -8,13 +8,13 @@ import com.medsys.orders.model.Orders;
  
 public interface OrderDAO {
  
-    public void addOrder(Orders order);
+    public Response addOrder(Orders order);
  
     public Orders getOrder(Integer orderId);
  
-    public void updateOrder(Orders order);
+    public Orders updateOrder(Orders order);
  
-    public void deleteOrder(Integer orderId);
+    public Response deleteOrder(Integer orderId);
  
     public List<Orders> getAllOrders();
 

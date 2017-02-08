@@ -29,16 +29,18 @@ public class SetController {
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE, produces = "application/json")
-	public @ResponseBody JqgridResponse<SetPdtTemplate> records(@RequestParam("_search") Boolean search,
+	public @ResponseBody JqgridResponse<SetPdtTemplate> records(
+			@RequestParam("_search") Boolean search,
 			@RequestParam(value = "filters", required = false) String filters,
-			@RequestParam(value = "setId", required = false) Integer setId,
+			@RequestParam(value = "orderProductSetId", required = false) Integer orderProductSetId,
 			@RequestParam(value = "page", required = false) Integer page,
 			@RequestParam(value = "rows", required = false) Integer rows,
 			@RequestParam(value = "sidx", required = false) String sidx,
-			@RequestParam(value = "sord", required = false) String sord) {
+			@RequestParam(value = "sord", required = false) String sord,
+			@RequestParam(value="setId", required=false) Integer setId) {
 
 		// Pageable pageRequest = new PageRequest(page-1, rows);
-		logger.debug("list all products / search");
+		logger.debug("list all products / search : setId: " + setId);
 		try {
 
 			if (search == true) {
@@ -46,7 +48,7 @@ public class SetController {
 				// return getFilteredRecords(filters, pageRequest);
 
 			}
-
+		
 			List<SetPdtTemplate> setProducts = setBD.getAllProductsInSet(setId);
 
 			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();

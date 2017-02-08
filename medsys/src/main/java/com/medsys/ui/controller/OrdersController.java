@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -125,7 +127,7 @@ public class OrdersController  extends SuperController {
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.ADD_ORDER, method = RequestMethod.POST)
 	public String addOrders(@Valid @ModelAttribute Orders order,Model model,
-			BindingResult result, RedirectAttributes redirectAttrs) {
+			BindingResult result, RedirectAttributes redirectAttrs, HttpServletRequest request) {
 
 		logger.info("IN: Order/add-POST");
 
@@ -145,19 +147,18 @@ public class OrdersController  extends SuperController {
 			String message = "Order " + order.getOrderId()
 					+ " was successfully added";
 			
-			logger.info("Order-add: " + message + "\n Order: " + order);
-			redirectAttrs.addFlashAttribute("order", order);
+			logger.info("Order-add: " + message + "\n Order: " + order + " setting the same in request");
+			//Unable to directly update the modelAttribute. Hence, setting orderId separately in request
+			request.setAttribute("updatedOrderId", order.getOrderId());
 			return UIActions.FORWARD + UIActions.LOAD_ADD_PRODUCT_ORDER;
 		}
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_PRODUCT_ORDER, method = RequestMethod.POST)
-	public String loadAddProductsToOrder(@ModelAttribute Orders order,
-			Model model) {
+	public String loadAddProductsToOrder(@RequestAttribute("updatedOrderId") Integer orderId, Model model) {
 
-		logger.info("IN: Order/loadAddProductsToOrder-POST" + order);
-	
-		model.addAttribute("order", order);
+		logger.info(" IN: Order/loadAddProductsToOrder-POST orderId : " + orderId);
+		model.addAttribute("order", ordersBD.getOrder(orderId));
 		return MedsysUITiles.ADD_PRODUCTS_IN_ORDER.getTile();
 	}
 	

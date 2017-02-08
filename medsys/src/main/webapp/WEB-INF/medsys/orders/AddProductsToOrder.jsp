@@ -44,36 +44,46 @@
 <script>
 	var dateErrMsg = 'Please enter a valid date';
 	
+	
+	
 	var data = {};
 	var headers = {};
 	//data[csrfParameter] = csrfToken;
 	data["setId"] = ${setId};
-	//data["orderId"] =${orderId};
+	data["orderId"] =${orderId};
 	//headers[csrfHeader] = csrfToken; 
 	
-	alert("data for ajax submit: " + data);
+	//alert("data for ajax submit: " + data);
 	
 	$(function() {
 		$("#grid").jqGrid({
 		   	url:'${recordsUrl}',
 			datatype: 'json',
-			//data: data,
-			mtype: 'GET',
-		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty', 'Role'],
+			mtype: 'POST',
+			postData: data,
+		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty', 'Actions'],
 		   	colModel:[
 		   		{name:'orderProductSetId',index:'id',  hidden:true},
 		   		{name:'setPdtId',index:'setPdtId',hidden:true},
-		   		{name:'product.productCode',index:'product.productCode', width:50, editable:true, editrules:{required:true}, editoptions:{size:20}},
+		   		{name:'product.productCode',index:'product.productCode', width:50, editable:false},
 				{name:'product.group.groupName',index:'product.group.groupName', width:100},
-		   		{name:'product.productDesc',index:'product.productDesc', width:200, editable:true, editrules:{required:true}, editoptions:{size:250}},
-		   		{name:'qty',index:'qty', width:50, editable:true, editrules:{required:true}, editoptions:{size:5}},				
-		   		{name:'role',index:'role', width:50, editable:true, editrules:{required:true}, 
-		   			edittype:"select", formatter:'select', stype: 'select', 
-		   			editoptions:{value:"1:Admin;2:Regular"},
-		   			formatoptions:{value:"1:Admin;2:Regular"}, 
-		   			searchoptions: {sopt:['eq'], value:":;1:Admin;2:Regular"}}
+		   		{name:'product.productDesc',index:'product.productDesc', width:200, editable:false,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
+		   		{name:'qty',index:'qty', width:50, editable:true, editrules:{required:true}, editoptions:{size:5}},
+				{
+					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',
+					formatoptions: {
+							//Allow enter and esc to be used for save / cancel of inline edit. 
+							//Currently,setting this to false
+                            keys: false,
+							// When the editformbutton parameter is set to true the form editing dialogue appear instead of in-line edit.
+                            editformbutton:false,
+							//if true will show edit icon, else will hide
+							editbutton : false, 
+							//if true will show delete icon, else will hide
+							delbutton : true 
+                    }
+				}
 		   	],
-		   	postData: {},
 			rowNum:-1,
 		   	rowList:[],
 		   	height: 300,
@@ -92,7 +102,7 @@
 			grouping: true,
 		   	groupingView : {
 		   		groupField : ['product.group.groupName'],
-		   		groupColumnShow : [true],
+		   		groupColumnShow : [false],
 		   		groupText : ['<b>{0}</b>'],
 		   		groupCollapse : false,
 				groupOrder: ['asc'],
@@ -106,7 +116,8 @@
 		        records: "records",
 		        repeatitems: false,
 		        cell: "cell",
-		        id: "setId"
+		        id: "orderProductSetId"
+		        
 		    }
 			
 			
@@ -132,7 +143,7 @@
 				} 
 		);
 		
-		$("#grid").navButtonAdd('#pager',
+	/*	$("#grid").navButtonAdd('#pager',
 				{ 	caption:"Edit", 
 					buttonicon:"ui-icon-pencil", 
 					onClickButton: editRow,
@@ -150,9 +161,11 @@
 				title:"", 
 				cursor: "pointer"
 			} 
-		);
-		// Toolbar Search
-		$("#grid").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : true, defaultSearch:"cn"});
+		);*/
+		// Toolbar Search -> The bar that appears just below header and above data for immediate filter ease
+		//commented because as of now looks confusing like it it addRow functionality
+		//$("#grid").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : true, defaultSearch:"cn"});
+		
 	});
 	function addRow() {
    		$("#grid").jqGrid('setColProp', 'productCode', {editoptions:{readonly:false, size:20}});
@@ -319,7 +332,25 @@
 		}
 	}
 	
-	
+	function startEdit() {
+            var grid = $("#grid");
+            var ids = grid.jqGrid('getDataIDs');
+			//Done in reverse manner so that focus remains on the first record for edit
+            for (var i = (ids.length -1); i >=0; i--) {
+                grid.editRow(ids[i]);
+            }
+			
+        };
+
+        function saveRows() {
+            var grid = $("#grid");
+            var ids = grid.jqGrid('getDataIDs');
+
+            for (var i = 0; i < ids.length; i++) {
+                grid.saveRow(ids[i]);
+            }
+        }
+
 </script>
 
 
@@ -334,11 +365,17 @@
 		<form:hidden path="set.setId" cssClass="form-control" title="set.setId"
 		autocomplete="off" />
 	<div>
+	 <br /><br />
 
+    <input type="button" value="Edit in Batch Mode" onclick="startEdit()" />
+    <input type="button" value="Save All Rows" onclick="saveRows()" />
+
+    <br /><br />
 	<!-- JQGrid HTML -->
 	<div id='jqgrid'>
-		<table id='grid'></table>
 		<div id='pager'></div>
+		<table id='grid'></table>
+		
 	</div>
 
 	<div id='msgbox' title='' style='display: none'></div>
@@ -346,10 +383,4 @@
 	<!-- End of JQGrid HTML -->
 	</div>
 	
-	<button type="submit" class="btn btn-primary">Add Order</button>
-	<c:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_ORDERS%>"
-		var="listAllOrdersAction" />
-
-	<button type="submit" formmethod="get" class="btn btn-default"
-		formaction="${listAllOrdersAction}">Cancel</button>
 </form:form>

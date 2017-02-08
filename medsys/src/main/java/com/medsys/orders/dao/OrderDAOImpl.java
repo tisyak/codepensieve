@@ -2,6 +2,7 @@ package com.medsys.orders.dao;
 
 import java.util.List;
 
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -29,11 +30,16 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public void addOrder(Orders order) {
+	public Response addOrder(Orders order) {
 		logger.debug("Saving order to DB.");
-		getCurrentSession().save(order);
-		getCurrentSession().flush();
+		try {
+			getCurrentSession().save(order);
+		} catch (HibernateException he) {
+			logger.debug("Unable to save object. Exception: " + he.getMessage());
+			return new Response(false, EpSystemError.DB_EXCEPTION);
+		}
 		logger.debug("Saved order: " + order);
+		return new Response(true, null);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -58,12 +64,19 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public void deleteOrder(Integer orderId) {
+	public Response deleteOrder(Integer orderId) {
+		try{
 		Orders order = getOrder(orderId);
 		if (order != null) {
 			getCurrentSession().delete(order);
+			logger.info("Delete of order with orderId: " + orderId + " successful");
+			return new Response(true, null);
 		} else {
 			throw new EmptyResultDataAccessException("Order [" + orderId + "] not found", 1);
+		}
+		}catch(HibernateException he){
+			logger.error("Delete of order with orderId: " + orderId + " failed.");
+			return new Response(false, EpSystemError.DB_EXCEPTION);
 		}
 	}
 
@@ -74,7 +87,7 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public void updateOrder(Orders order) {
+	public Orders updateOrder(Orders order) {
 		// TODO: Conditional based on OrderStatus to be included
 		Orders orderToUpdate = getOrder(order.getOrderId());
 		orderToUpdate.setCustomer(order.getCustomer());
@@ -85,6 +98,7 @@ public class OrderDAOImpl implements OrderDAO {
 		// TODO: Write product query
 		// orderToUpdate.setProducts(order.getCity());
 		getCurrentSession().update(orderToUpdate);
+		return orderToUpdate;
 	}
 
 	@Override

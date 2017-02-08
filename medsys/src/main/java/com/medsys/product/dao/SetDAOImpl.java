@@ -107,8 +107,8 @@ public class SetDAOImpl implements SetDAO {
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId) {
 		logger.debug("Fetching all products in Set: " + setId);
 		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(
-				" from SetPdtTemplate as spt " )
-				.getResultList();
+				" from SetPdtTemplate as spt where set.setId = " + setId
+				+ " order by product.productCode asc ").getResultList();
 		logger.debug("pdtList: " + pdtList);
 		return pdtList;
 	}

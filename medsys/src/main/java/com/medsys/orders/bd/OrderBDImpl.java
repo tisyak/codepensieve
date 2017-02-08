@@ -12,45 +12,46 @@ import com.medsys.common.model.Response;
 import com.medsys.orders.dao.OrderDAO;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
- 
+
 @Service
 @Transactional
 public class OrderBDImpl implements OrderBD {
-    static Logger logger = LoggerFactory.getLogger(OrderBDImpl.class);
-     
-    @Autowired
-    private OrderDAO orderDAO;
- 
-    @Override
-    public void addOrder(Orders user) {
-    	logger.debug("OrderBD: Adding order.");
-        orderDAO.addOrder(user);
-    }
- 
-    @Override
-    public Orders getOrder(Integer orderId)  {
-        return orderDAO.getOrder(orderId);
-    }
- 
-    @Override
-    public void updateOrder(Orders user)  {
-    	logger.debug("OrderBD: Updating order.");
-        orderDAO.updateOrder(user);
-    }
- 
-    @Override
-    public void deleteOrder(Integer orderId)  {
-        orderDAO.deleteOrder(orderId);
-    }
- 
-    @Override
-    public List<Orders> getAllOrders() {
-        return orderDAO.getAllOrders();
-    }
+	static Logger logger = LoggerFactory.getLogger(OrderBDImpl.class);
+
+	@Autowired
+	private OrderDAO orderDAO;
+
+	@Override
+	public Response addOrder(Orders user) {
+		logger.debug("OrderBD: Adding order.");
+		return orderDAO.addOrder(user);
+
+	}
+
+	@Override
+	public Orders getOrder(Integer orderId) {
+		return orderDAO.getOrder(orderId);
+	}
+
+	@Override
+	public Orders updateOrder(Orders user) {
+		logger.debug("OrderBD: Updating order.");
+		return orderDAO.updateOrder(user);
+	}
+
+	@Override
+	public Response deleteOrder(Integer orderId) {
+		return orderDAO.deleteOrder(orderId);
+	}
+
+	@Override
+	public List<Orders> getAllOrders() {
+		return orderDAO.getAllOrders();
+	}
 
 	@Override
 	public List<Orders> searchForOrders(Orders order) {
-		 return orderDAO.searchForOrders(order);
+		return orderDAO.searchForOrders(order);
 	}
 
 	@Override
@@ -83,6 +84,4 @@ public class OrderBDImpl implements OrderBD {
 		return orderDAO.deleteProductFromOrder(orderProductSet);
 	}
 
-
-   
 }

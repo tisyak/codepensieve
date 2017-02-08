@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.medsys.product.model.ProductInv;
+import com.medsys.product.model.ProductMaster;
 
 
 @Entity
@@ -40,7 +40,7 @@ public class OrderProductSet implements Serializable {
 	
 	@ManyToOne
 	@JoinColumn(name="product_id",referencedColumnName="product_id")
-	private ProductInv productInv;
+	private ProductMaster product;
 	
 	@NotNull
 	@Column(name = "qty")
@@ -79,12 +79,12 @@ public class OrderProductSet implements Serializable {
 		this.orderId = orderId;
 	}
 
-	public ProductInv getProductInv() {
-		return productInv;
+	public ProductMaster getProduct() {
+		return product;
 	}
 
-	public void setProductInv(ProductInv productInv) {
-		this.productInv = productInv;
+	public void setProduct(ProductMaster product) {
+		this.product = product;
 	}
 
 	public Integer getQty() {
@@ -118,7 +118,7 @@ public class OrderProductSet implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((orderId == null) ? 0 : orderId.hashCode());
-		result = prime * result + ((productInv == null) ? 0 : productInv.hashCode());
+		result = prime * result + ((product == null) ? 0 : product.hashCode());
 		result = prime * result + ((orderProductSetId == null) ? 0 : orderProductSetId.hashCode());
 		return result;
 	}
@@ -137,10 +137,10 @@ public class OrderProductSet implements Serializable {
 				return false;
 		} else if (!orderId.equals(other.orderId))
 			return false;
-		if (productInv == null) {
-			if (other.productInv != null)
+		if (product == null) {
+			if (other.product != null)
 				return false;
-		} else if (!productInv.equals(other.productInv))
+		} else if (!product.equals(other.product))
 			return false;
 		if (orderProductSetId == null) {
 			if (other.orderProductSetId != null)
@@ -152,8 +152,8 @@ public class OrderProductSet implements Serializable {
 
 	@Override
 	public String toString() {
-		return "OrderProductSet [orderProductSetId=" + orderProductSetId + ", order=" + orderId + ", productInv="
-				+ productInv + ", qty=" + qty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
+		return "OrderProductSet [orderProductSetId=" + orderProductSetId + ", order=" + orderId + ", product="
+				+ product + ", qty=" + qty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 	
 	
