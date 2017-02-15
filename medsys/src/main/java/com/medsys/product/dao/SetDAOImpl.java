@@ -38,17 +38,17 @@ public class SetDAOImpl implements SetDAO {
 	@Override
 	public Set getSet(Integer setId) {
 		logger.debug("SetDAOImpl.getSet() - [" + setId + "]");
-		Query query = getCurrentSession().createQuery("from Set where setId = " + setId + "");
+		Query<Set> query = getCurrentSession().createQuery("from Set where setId = " + setId + "");
 		// query.setParameter("setId", setId.toString());
 
 		logger.debug(query.toString());
-		if (query.list().size() == 0) {
+		if (query.getResultList().size() == 0) {
 			logger.debug("No user found.");
 			throw new EmptyResultDataAccessException("Set [" + setId + "] not found", 1);
 		} else {
 
-			logger.debug("Set List Size: " + query.list().size());
-			List<Set> list = (List<Set>) query.list();
+			logger.debug("Set List Size: " + query.getResultList().size());
+			List<Set> list = (List<Set>) query.getResultList();
 			Set set = (Set) list.get(0);
 
 			return set;
@@ -68,7 +68,7 @@ public class SetDAOImpl implements SetDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Set> getAllSet() {
-		return getCurrentSession().createQuery("from Set order by setName asc").list();
+		return getCurrentSession().createQuery("from Set order by setName asc").getResultList();
 	}
 
 	@Override
@@ -107,8 +107,7 @@ public class SetDAOImpl implements SetDAO {
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId) {
 		logger.debug("Fetching all products in Set: " + setId);
 		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(
-				" from SetPdtTemplate as spt where set.setId = " + setId
-				+ " order by product.productCode asc ").getResultList();
+				" from SetPdtTemplate as spt  where set_id = " + setId).getResultList();
 		logger.debug("pdtList: " + pdtList);
 		return pdtList;
 	}
@@ -125,18 +124,18 @@ public class SetDAOImpl implements SetDAO {
 	public SetPdtTemplate getProductInSet(Integer productId) {
 		logger.debug("Getting product having productId: " + productId);
 
-		Query query = getCurrentSession()
+		Query<SetPdtTemplate> query = getCurrentSession()
 				.createQuery("from SetPdtTemplate where productId = " + productId.toString() + "");
 		// query.setParameter("setId", setId.toString());
 
 		logger.debug(query.toString());
-		if (query.list().size() == 0) {
+		if (query.getResultList().size() == 0) {
 			logger.debug("Product not found in set.");
 			throw new EmptyResultDataAccessException("SetPdtTemplate [" + productId + "] not found", 1);
 		} else {
 
-			logger.debug("SetPdtTemplate List Size: " + query.list().size());
-			List<SetPdtTemplate> list = (List<SetPdtTemplate>) query.list();
+			logger.debug("SetPdtTemplate List Size: " + query.getResultList().size());
+			List<SetPdtTemplate> list = (List<SetPdtTemplate>) query.getResultList();
 			SetPdtTemplate product = (SetPdtTemplate) list.get(0);
 			return product;
 		}

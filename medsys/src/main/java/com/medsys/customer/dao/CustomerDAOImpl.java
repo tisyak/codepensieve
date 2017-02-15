@@ -3,9 +3,10 @@ package com.medsys.customer.dao;
 import java.util.List;
 import java.util.UUID;
 
-import org.hibernate.query.Query;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,19 +38,19 @@ public class CustomerDAOImpl implements CustomerDAO {
 	@Override
 	public Customer getCustomer(UUID customerId) throws UsernameNotFoundException {
 		logger.debug("CustomerDAOImpl.getCustomer() - [" + customerId + "]");
-		Query query = getCurrentSession().createQuery(
+		Query<Customer> query = getCurrentSession().createQuery(
 				"from Customer where customer_id = '"+customerId.toString() + "'");
 		//query.setParameter("customerId", customerId.toString());
 
 		logger.debug(query.toString());
-		if (query.list().size() == 0) {
+		if (query.getResultList().size() == 0) {
 			logger.debug("No user found.");
 			throw new UsernameNotFoundException("Customer [" + customerId
 					+ "] not found");
 		} else {
 			
-			logger.debug("Customer List Size: " + query.list().size());
-			List<Customer> list = (List<Customer>) query.list();
+			logger.debug("Customer List Size: " + query.getResultList().size());
+			List<Customer> list = query.getResultList();
 			Customer userObject = (Customer) list.get(0);
 
 			return userObject;
@@ -70,7 +71,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Customer> getAllCustomers() {
-		return getCurrentSession().createQuery("from Customer order by name asc").list();
+		return getCurrentSession().createQuery("from Customer order by name asc").getResultList();
 	}
 
 	@Override
@@ -91,29 +92,29 @@ public class CustomerDAOImpl implements CustomerDAO {
 	@Override
 	public List<Customer> searchForCustomers(Customer customer) {
 		logger.debug("CustomerDAOImpl.searchForCustomers() - [" + customer.toString() + "]");
-		Query query = getCurrentSession().createQuery(
+		Query<Customer> query = getCurrentSession().createQuery(
 				"from Customer where lower(name) like :name OR mobileNo like :mobileNo order by name asc");
 
 		if(customer.getName()!=null){
-			query.setString("name", "%"+customer.getName().toLowerCase()+"%");
+			query.setParameter("name", "%"+customer.getName().toLowerCase()+"%");
 		}else{
-			query.setString("name", customer.getName());
+			query.setParameter("name", customer.getName());
 		}
 	
 		if(customer.getMobileNo()!=null){
-			query.setString("mobileNo", "%"+customer.getMobileNo().toLowerCase()+"%");
+			query.setParameter("mobileNo", "%"+customer.getMobileNo().toLowerCase()+"%");
 		}else{
-			query.setString("mobileNo", customer.getMobileNo());
+			query.setParameter("mobileNo", customer.getMobileNo());
 		}
 		
 		logger.debug(query.toString());
-		if (query.list().size() == 0) {
+		if (query.getResultList().size() == 0) {
 			logger.debug("No customers found matching current search criteria.");
 			return null;
 		} else {
 			
-			logger.debug("Search Customer List Size: " + query.list().size());
-			List<Customer> list = (List<Customer>) query.list();
+			logger.debug("Search Customer List Size: " + query.getResultList().size());
+			List<Customer> list = (List<Customer>) query.getResultList();
 			return list;
 		}
 	}

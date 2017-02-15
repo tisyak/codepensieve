@@ -20,6 +20,7 @@ import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.SetPdtTemplate;
+import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
 
@@ -36,11 +37,11 @@ public class OrderProductSetController {
 	@Autowired
 	private SetBD setBD;
 	
-	@RequestMapping
+	/*@RequestMapping
 	public String getOrderProductSetPage() {
 		//TODO: Change to constant
-		return "AddProductsToOrder";
-	}
+		return MedsysUITiles.ADD_PRODUCTS_IN_ORDER.getTile();
+	}*/
 	
 	
 	

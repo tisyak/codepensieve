@@ -5,11 +5,13 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.slf4j.Logger;
@@ -30,12 +32,13 @@ public class SetPdtTemplate implements Serializable {
 	@Column(name = "set_pdt_id", columnDefinition = "serial")
 	private Integer setPdtId; 
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="set_id",referencedColumnName="set_id")
 	private Set set;
 		
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="product_id",referencedColumnName="product_id")
+	@OrderBy("productCode")
 	private ProductMaster product;
 	
 	@Column(name = "qty")

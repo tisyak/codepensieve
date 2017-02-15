@@ -31,8 +31,8 @@
 <script src="<c:url value="/resources/js/datepicker.js"/>"></script>
 <link href="<c:url value="/resources/css/datepicker.css"/>" rel='stylesheet'>
 <!-- JQGrid Action URLs -->	
-<c:url value="/setPdtTemplate/list" var="recordsUrl"/>
-<c:url value="/orderproduct/create" var="addUrl"/>
+<c:url value="/${UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE}" var="recordsUrl"/>
+<c:url value="/${UIActions.ADD_PRODUCT_ORDER}" var="addUrl"/>
 <c:url value="/orderproduct/update" var="editUrl"/>
 <c:url value="/orderproduct/delete" var="deleteUrl"/>
 <!--End of JQGrid Action URLs -->	
@@ -65,7 +65,7 @@
 		   	colModel:[
 		   		{name:'orderProductSetId',index:'id',  hidden:true},
 		   		{name:'setPdtId',index:'setPdtId',hidden:true},
-		   		{name:'product.productCode',index:'product.productCode', width:50, editable:false},
+		   		{name:'product.productCode',index:'product.productCode', width:50, editable:"hidden"},
 				{name:'product.group.groupName',index:'product.group.groupName', width:100},
 		   		{name:'product.productDesc',index:'product.productDesc', width:200, editable:false,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
 		   		{name:'qty',index:'qty', width:50, editable:true, editrules:{required:true}, editoptions:{size:5}},
@@ -133,144 +133,9 @@
 				}
 		);
 		
-		$("#grid").navButtonAdd('#pager',
-				{ 	caption:"Add", 
-					buttonicon:"ui-icon-plus", 
-					onClickButton: addRow,
-					position: "last", 
-					title:"", 
-					cursor: "pointer"
-				} 
-		);
-		
-	/*	$("#grid").navButtonAdd('#pager',
-				{ 	caption:"Edit", 
-					buttonicon:"ui-icon-pencil", 
-					onClickButton: editRow,
-					position: "last", 
-					title:"", 
-					cursor: "pointer"
-				} 
-		);
-		
-		$("#grid").navButtonAdd('#pager',
-			{ 	caption:"Delete", 
-				buttonicon:"ui-icon-trash", 
-				onClickButton: deleteRow,
-				position: "last", 
-				title:"", 
-				cursor: "pointer"
-			} 
-		);*/
-		// Toolbar Search -> The bar that appears just below header and above data for immediate filter ease
-		//commented because as of now looks confusing like it it addRow functionality
-		//$("#grid").jqGrid('filterToolbar',{stringResult: true,searchOnEnter : true, defaultSearch:"cn"});
-		
+	
 	});
-	function addRow() {
-   		$("#grid").jqGrid('setColProp', 'productCode', {editoptions:{readonly:false, size:20}});
-   		$("#grid").jqGrid('setColProp', 'qty', {editrules:{required:true}});
-   		
-		// Get the currently selected row
-		$('#grid').jqGrid('editGridRow','new',
-	    		{ 	url: '${addUrl}', 
-					editData: {},
-	                serializeEditData: function(data){ 
-	                    data.id = 0; 
-	                    return $.param(data);
-	                },
-				    recreateForm: true,
-				    beforeShowForm: function(form) {
-			            $('#pData').hide();  
-			            $('#nData').hide();
-			            $('#qty',form).addClass('ui-widget-content').addClass('ui-corner-all');
-				    },
-					beforeInitData: function(form) {},
-					closeAfterAdd: true,
-					reloadAfterSubmit:true,
-					afterSubmit : function(response, postdata) 
-					{ 
-				        var result = eval('(' + response.responseText + ')');
-						var errors = "";
-						
-				        if (result.success == false) {
-							for (var i = 0; i < result.message.length; i++) {
-								errors +=  result.message[i] + "<br/>";
-							}
-				        }  else {
-				        	$('#msgbox').text('Entry has been added successfully');
-							$('#msgbox').dialog( 
-									{	title: 'Success',
-										modal: true,
-										buttons: {"Ok": function()  {
-											$(this).dialog("close");} 
-										}
-									});
-		                }
-				    	// only used for adding new records
-				    	var newId = null;
-				    	
-						return [result.success, errors, newId];
-					}
-	    		});
-   		//$("#grid").jqGrid('setColProp', 'password', {hidden: true});
-	} // end of addRow
-	function editRow() {
-		$("#grid").jqGrid('setColProp', 'productCode', {editoptions:{readonly:false, size:20}});
-   		$("#grid").jqGrid('setColProp', 'qty', {editrules:{required:true}});
-   		
-		// Get the currently selected row
-		var row = $('#grid').jqGrid('getGridParam','selrow');
-		
-		if( row != null ) {
-		
-			$('#grid').jqGrid('editGridRow', row,
-				{	url: '${editUrl}', 
-					editData: {},
-			        recreateForm: true,
-			        beforeShowForm: function(form) {
-			            $('#pData').hide();  
-			            $('#nData').hide();
-			        },
-					beforeInitData: function(form) {},
-					closeAfterEdit: true,
-					reloadAfterSubmit:true,
-					afterSubmit : function(response, postdata) 
-					{ 
-			            var result = eval('(' + response.responseText + ')');
-						var errors = "";
-						
-			            if (result.success == false) {
-							for (var i = 0; i < result.message.length; i++) {
-								errors +=  result.message[i] + "<br/>";
-							}
-			            }  else {
-			            	$('#msgbox').text('Entry has been edited successfully');
-							$('#msgbox').dialog( 
-									{	title: 'Success',
-										modal: true,
-										buttons: {"Ok": function()  {
-											$(this).dialog("close");} 
-										}
-									});
-		                }
-				    	// only used for adding new records
-				    	var newId = null;
-			        	
-						return [result.success, errors, newId];
-					}
-				});
-		} else {
-			$('#msgbox').text('You must select a record first!');
-			$('#msgbox').dialog( 
-					{	title: 'Error',
-						modal: true,
-						buttons: {"Ok": function()  {
-							$(this).dialog("close");} 
-						}
-					});
-		}
-	}
+
 	
 	function deleteRow(obj, args) {
 		// Get the currently selected row
@@ -337,17 +202,20 @@
             var ids = grid.jqGrid('getDataIDs');
 			//Done in reverse manner so that focus remains on the first record for edit
             for (var i = (ids.length -1); i >=0; i--) {
-                grid.editRow(ids[i]);
+               grid.editRow(ids[i]);
             }
-			
-        };
+	};
 
         function saveRows() {
+			alert("Save rows called");
             var grid = $("#grid");
             var ids = grid.jqGrid('getDataIDs');
 
             for (var i = 0; i < ids.length; i++) {
-                grid.saveRow(ids[i]);
+                grid.jqGrid('saveRow',ids[i], 
+				{ 
+					url: '${addUrl}'
+				});
             }
         }
 

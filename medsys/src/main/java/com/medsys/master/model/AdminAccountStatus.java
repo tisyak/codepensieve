@@ -1,5 +1,6 @@
 package com.medsys.master.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -13,8 +14,13 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name="m_admin_account_status")
-public class AdminAccountStatus extends MasterData {
+public class AdminAccountStatus extends MasterData implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9155712973728121376L;
+
 	@Id
 	@NotNull(message = "{error.status.code.null}")
     @NotEmpty(message = "{error.status.code.empty}")
