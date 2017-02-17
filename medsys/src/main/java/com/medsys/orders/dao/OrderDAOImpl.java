@@ -138,7 +138,7 @@ public class OrderDAOImpl implements OrderDAO {
 	public Response addProductToOrder(OrderProductSet newOrderProductSet) {
 		logger.debug("Adding product to Order: " + newOrderProductSet);
 		getCurrentSession().save(newOrderProductSet);
-		// TODO: change return appropriately
+		logger.debug("Saved product in order: " + newOrderProductSet);
 		return new Response(true, null);
 	}
 

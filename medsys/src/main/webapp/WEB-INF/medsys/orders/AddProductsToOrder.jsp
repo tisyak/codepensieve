@@ -61,14 +61,18 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty', 'Actions'],
+		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Avl. Qty', 'Actions'],
 		   	colModel:[
 		   		{name:'orderProductSetId',index:'id',  hidden:true},
 		   		{name:'setPdtId',index:'setPdtId',hidden:true},
 		   		{name:'product.productCode',index:'product.productCode', width:50, editable:"hidden"},
 				{name:'product.group.groupName',index:'product.group.groupName', width:100},
 		   		{name:'product.productDesc',index:'product.productDesc', width:200, editable:false,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
-		   		{name:'qty',index:'qty', width:50, editable:true, editrules:{required:true}, editoptions:{size:5}},
+		   		{name:'qty',index:'qty', width:50, editable:true, editrules:{required:true}, editoptions:{size:5}, 
+					cellattr: function(rowId, cellValue, rawObject, cm, item) {if(!(typeof(item)  === "undefined")){
+							if((cellValue > item.availableQty)){return ' style="color:red;font-weight:bold;background-color:yellow;"' };
+						}}},
+		   		{name:'availableQty',index:'availableQty', width:50, editable:false},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',
 					formatoptions: {
@@ -207,14 +211,15 @@
 	};
 
         function saveRows() {
-			alert("Save rows called");
+			//alert("Save rows called");
             var grid = $("#grid");
             var ids = grid.jqGrid('getDataIDs');
 
             for (var i = 0; i < ids.length; i++) {
                 grid.jqGrid('saveRow',ids[i], 
 				{ 
-					url: '${addUrl}'
+					url: '${addUrl}',
+					extraparam:{orderId:'${orderId}'}
 				});
             }
         }
@@ -235,7 +240,7 @@
 	<div>
 	 <br /><br />
 
-    <input type="button" value="Edit in Batch Mode" onclick="startEdit()" />
+    <input type="button" value="Edit" onclick="startEdit()" />
     <input type="button" value="Save All Rows" onclick="saveRows()" />
 
     <br /><br />

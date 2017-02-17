@@ -2,9 +2,9 @@ package com.medsys.product.dao;
 
 import java.util.List;
 
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +107,8 @@ public class SetDAOImpl implements SetDAO {
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId) {
 		logger.debug("Fetching all products in Set: " + setId);
 		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(
-				" from SetPdtTemplate as spt  where set_id = " + setId).getResultList();
+				" from SetPdtTemplate as spt "
+				+ " where set_id = " + setId).getResultList();
 		logger.debug("pdtList: " + pdtList);
 		return pdtList;
 	}

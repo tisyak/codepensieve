@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
@@ -27,7 +28,7 @@ public class OrderProductSet implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 4745389593451287026L;
-
+	
 	static Logger logger = LoggerFactory.getLogger(OrderProductSet.class);
 	
 	@Id
@@ -46,6 +47,9 @@ public class OrderProductSet implements Serializable {
 	@Column(name = "qty")
 	private Integer qty; 
 	
+	@Transient
+	private Integer availableQty; 
+	
 	/** The update by. */
 	@Column(name = "update_by")
 	private String updateBy;
@@ -59,8 +63,11 @@ public class OrderProductSet implements Serializable {
 	public OrderProductSet() {
 	}
 
-	public OrderProductSet(Integer setId, String productCode, String lotNo, Integer qty) {
-		// TODO Complete this Constructor
+	public OrderProductSet(Integer orderId, ProductMaster product, Integer qty) {
+		this.orderId = orderId;
+		this.product =  product;
+		this.qty = qty;
+
 	}
 
 	public Integer getOrderProductSetId() {
@@ -93,6 +100,14 @@ public class OrderProductSet implements Serializable {
 
 	public void setQty(Integer qty) {
 		this.qty = qty;
+	}
+
+	public Integer getAvailableQty() {
+		return availableQty;
+	}
+
+	public void setAvailableQty(Integer availableQty) {
+		this.availableQty = availableQty;
 	}
 
 	public String getUpdateBy() {
@@ -153,7 +168,7 @@ public class OrderProductSet implements Serializable {
 	@Override
 	public String toString() {
 		return "OrderProductSet [orderProductSetId=" + orderProductSetId + ", order=" + orderId + ", product="
-				+ product + ", qty=" + qty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
+				+ product + ", qty=" + qty + ", availableQty=" + availableQty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 	
 	

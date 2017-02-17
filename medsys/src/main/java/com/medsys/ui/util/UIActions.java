@@ -73,6 +73,7 @@ public class UIActions {
     public static final String SEARCH_PRODUCT_ORDERS="orderproduct/search";
     public static final String LOAD_ADD_PRODUCT_ORDER="orderproduct/loadAdd";
     public static final String ADD_PRODUCT_ORDER="orderproduct/add";
+    public static final String GET_PRODUCT_ORDER="orderproduct/get";
     public static final String EDIT_PRODUCT_ORDER="orderproduct/edit";
     public static final String SAVE_PRODUCT_ORDER="orderproduct/save";
     public static final String LOAD_DELETE_PRODUCT_ORDER="orderproduct/loadDelete";

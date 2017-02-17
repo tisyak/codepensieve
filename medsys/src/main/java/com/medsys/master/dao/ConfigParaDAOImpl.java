@@ -12,9 +12,8 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
-import com.medsys.master.model.ConfigPara;
-
 import com.medsys.adminuser.dao.AdminUserDAOImpl;
+import com.medsys.master.model.ConfigPara;
 
 @Repository
 public class ConfigParaDAOImpl implements ConfigParaDAO {

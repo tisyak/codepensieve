@@ -5,11 +5,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.product.dao.SetDAO;
+import com.medsys.product.model.ProductInv;
 import com.medsys.product.model.Set;
 import com.medsys.product.model.SetPdtTemplate;
  
@@ -20,6 +22,9 @@ public class SetBDImpl implements SetBD {
      
     @Autowired
     private SetDAO setDAO;
+    
+    @Autowired
+    private ProductInvBD productInvBD;
  
     @Override
     public void addSet(Set user) {
@@ -56,7 +61,20 @@ public class SetBDImpl implements SetBD {
 	@Override
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId) {
 		logger.debug("Get All products in Set: " + setId);
-		return setDAO.getAllProductsInSet(setId);
+		List<SetPdtTemplate> setPdtTemplates =  setDAO.getAllProductsInSet(setId);
+		
+		for(SetPdtTemplate pdtTemplate: setPdtTemplates){
+			try{
+				ProductInv productInv = productInvBD.getProduct(pdtTemplate.getProduct().getProductId());
+				pdtTemplate.setAvailableQty(productInv.getAvailableQty());
+			}catch(EmptyResultDataAccessException e){ 
+				logger.debug("Product "+ pdtTemplate.getProduct().getProductCode() +" not found in Inventory");
+				pdtTemplate.setAvailableQty(0);
+			}
+			
+		}
+		
+		return setPdtTemplates;
 	}
 
 	@Override

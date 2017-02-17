@@ -1,4 +1,5 @@
 package com.medsys.ui.controller;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,9 +21,10 @@ import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.OrderProductSet;
+import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.bd.SetBD;
+import com.medsys.product.model.ProductMaster;
 import com.medsys.product.model.SetPdtTemplate;
-import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
 
@@ -37,13 +41,8 @@ public class OrderProductSetController {
 	@Autowired
 	private SetBD setBD;
 	
-	/*@RequestMapping
-	public String getOrderProductSetPage() {
-		//TODO: Change to constant
-		return MedsysUITiles.ADD_PRODUCTS_IN_ORDER.getTile();
-	}*/
-	
-	
+	@Autowired
+	private ProductMasterBD productMasterBD;
 	
 	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.LIST_ALL_PRODUCT_ORDERS, produces = "application/json")
@@ -151,29 +150,32 @@ public class OrderProductSetController {
 		return response;
 	}*/
 	
-	@RequestMapping(value="/get", produces="application/json")
+	@RequestMapping(value=UIActions.GET_PRODUCT_ORDER, produces="application/json")
 	public @ResponseBody OrderProductSet get(@RequestBody OrderProductSet orderProductSet) {
 		logger.debug("Getting the product in order: " + orderProductSet);
 		
 		return orderBD.getProductInOrder(orderProductSet.getOrderProductSetId());
 	}
 
-	@RequestMapping(value="/create", produces="application/json", method=RequestMethod.POST)
+	@RequestMapping(value=UIActions.ADD_PRODUCT_ORDER, produces="application/json", method=RequestMethod.POST)
 	public @ResponseBody Response create(
-			@RequestParam Integer setId,
-			@RequestParam String productCode,
-			@RequestParam String lotNo,
-			@RequestParam Integer qty) {
+			@RequestParam(value = "orderId", required = true) Integer orderId,
+			@RequestParam(value = "product.productCode", required = true) String productCode,
+			@RequestParam(value = "qty", required = true) Integer qty) {
 		
-		OrderProductSet newOrderProductSet = new OrderProductSet(setId, productCode, lotNo, qty);
+		
+		ProductMaster product = productMasterBD.getProductByCode(productCode);
+		OrderProductSet newOrderProductSet = new OrderProductSet(orderId, product, qty);
 		
 		logger.debug("Adding the product to order: " + newOrderProductSet);
-		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		newOrderProductSet.setUpdateBy(auth.getName());
+		newOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		Response response = orderBD.addProductToOrder(newOrderProductSet);
 		return response;
 	}
 	
-	@RequestMapping(value="/update", produces="application/json", method=RequestMethod.POST)
+	@RequestMapping(value=UIActions.EDIT_PRODUCT_ORDER, produces="application/json", method=RequestMethod.POST)
 	public @ResponseBody Response update(
 			@RequestParam Integer orderProductSetId,
 			@RequestParam Integer qty) {
@@ -185,7 +187,7 @@ public class OrderProductSetController {
 		return response;
 	}
 	
-	@RequestMapping(value="/delete", produces="application/json", method=RequestMethod.POST)
+	@RequestMapping(value=UIActions.DELETE_PRODUCT_ORDER, produces="application/json", method=RequestMethod.POST)
 	public @ResponseBody Response delete(
 			@RequestParam Integer orderProductSetId) {
 

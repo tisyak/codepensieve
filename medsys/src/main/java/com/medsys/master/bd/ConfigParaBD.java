@@ -5,9 +5,8 @@ package com.medsys.master.bd;
 
 import java.util.List;
 
-import com.medsys.master.model.ConfigPara;
-
 import com.medsys.common.model.Response;
+import com.medsys.master.model.ConfigPara;
 
 
 /**

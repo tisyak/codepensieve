@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,20 +31,23 @@ public class SetPdtTemplate implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "set_pdt_id", columnDefinition = "serial")
-	private Integer setPdtId; 
-	
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="set_id",referencedColumnName="set_id")
+	private Integer setPdtId;
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "set_id", referencedColumnName = "set_id")
 	private Set set;
-		
-	@ManyToOne(fetch=FetchType.EAGER)
-	@JoinColumn(name="product_id",referencedColumnName="product_id")
+
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "product_id", referencedColumnName = "product_id")
 	@OrderBy("productCode")
 	private ProductMaster product;
-	
+
 	@Column(name = "qty")
-	private Integer qty; 
-	
+	private Integer qty;
+
+	@Transient
+	private Integer availableQty;
+
 	/** The update by. */
 	@Column(name = "update_by")
 	private String updateBy;
@@ -84,6 +88,14 @@ public class SetPdtTemplate implements Serializable {
 		this.qty = qty;
 	}
 
+	public Integer getAvailableQty() {
+		return availableQty;
+	}
+
+	public void setAvailableQty(Integer availableQty) {
+		this.availableQty = availableQty;
+	}
+
 	public String getUpdateBy() {
 		return updateBy;
 	}
@@ -103,9 +115,8 @@ public class SetPdtTemplate implements Serializable {
 	@Override
 	public String toString() {
 		return "SetPdtTemplate [setPdtId=" + setPdtId + ", set=" + set + ", product=" + product + ", qty=" + qty
-				+ ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
+				+ ", availableQty=" + availableQty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp
+				+ "]";
 	}
-	
-	
 
 }

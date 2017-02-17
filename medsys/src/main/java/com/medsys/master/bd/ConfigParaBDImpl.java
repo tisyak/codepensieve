@@ -13,10 +13,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.medsys.common.model.Response;
 import com.medsys.master.dao.ConfigParaDAO;
 import com.medsys.master.model.ConfigPara;
-
-import com.medsys.common.model.Response;
 import com.medsys.util.EpSystemError;
 
 
