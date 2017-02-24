@@ -66,6 +66,21 @@ public class WebAppConfig extends WebMvcConfigurerAdapter {
 	        return tilesConfigurer;		
 	}
 	
+    
+    /**
+     * Setup xml view resolver.
+     *
+     * @return the xml based view resolver
+     */
+    /*@Bean
+    public XmlViewResolver setupXMLViewResolver() {
+    	XmlViewResolver resolver = new XmlViewResolver();
+    	Resource resource = new ClassPathResource("jasper-views.xml");  
+    	resolver.setLocation(resource);
+        return resolver;
+    }
+    */
+    
     // Maps resources path to webapp/resources
     /* (non-Javadoc)
      * @see org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter#addResourceHandlers(org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry)

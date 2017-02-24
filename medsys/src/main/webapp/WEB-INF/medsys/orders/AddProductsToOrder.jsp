@@ -35,6 +35,11 @@
 <c:url value="/${UIActions.ADD_PRODUCT_ORDER}" var="addUrl"/>
 <c:url value="/orderproduct/update" var="editUrl"/>
 <c:url value="/orderproduct/delete" var="deleteUrl"/>
+
+<c:url value="/${UIActions.GET_ORDER_REPORT}" var="downloadUrl"/>
+<c:url value="/${UIActions.GET_TOKEN}" var="downloadTokenUrl"/>
+<c:url value="/${UIActions.GET_PROGRESS}" var="downloadProgressUrl"/>
+
 <!--End of JQGrid Action URLs -->	
 <%
 	Orders order = (Orders)request.getAttribute("order");
@@ -137,6 +142,28 @@
 				}
 		);
 		
+		$("#grid").navButtonAdd('#pager',
+				{ 	caption:"Pdf", 
+					buttonicon:"ui-icon-arrowreturn-1-s", 
+					onClickButton: downloadPdf,
+					position: "last", 
+					title:"", 
+					cursor: "pointer"
+				} 
+			);
+		
+		$("#grid").navButtonAdd('#pager',
+				{ 	caption:"Excel", 
+					buttonicon:"ui-icon-arrowreturn-1-s", 
+					onClickButton: downloadXls,
+					position: "last", 
+					title:"", 
+					cursor: "pointer"
+				} 
+			);
+		
+		
+		
 	
 	});
 
@@ -224,6 +251,46 @@
             }
         }
 
+        
+        function downloadXls() {download('xls');}
+    	
+    	function downloadPdf() {download('pdf');}
+    	
+    	function download(type) {
+    		// Retrieve download token
+    		// When token is received, proceed with download
+    		$.get('${downloadTokenUrl}', function(response) {
+    			// Store token
+    			var token = response.message[0];
+    			
+    			// Show progress dialog
+    			$('#msgbox').text('Processing download...');
+    			$('#msgbox').dialog( 
+    					{	title: 'Download',
+    						modal: true,
+    						buttons: {"Close": function()  {
+    							$(this).dialog("close");} 
+    						}
+    					});
+    			
+    			// Start download
+    			window.location = '${downloadUrl}'+'?token='+token+'&type='+type+'&orderId='+${orderId};
+    			// Check periodically if download has started
+    			var frequency = 1000;
+    			var timer = setInterval(function() {
+    				$.get('${downloadProgressUrl}', {token: token}, 
+    						function(response) {
+    							// If token is not returned, download has started
+    							// Close progress dialog if started
+    							if (response.message[0] != token) {
+    								$('#msgbox').dialog('close');
+    								clearInterval(timer);
+    							}
+    					});
+    			}, frequency);
+    			
+    		});
+    	}
 </script>
 
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.medsys.exception.SysException;
 import com.medsys.product.dao.ProductInvDAO;
 import com.medsys.product.model.ProductInv;
  
@@ -17,43 +18,59 @@ public class ProductInvBDImpl implements ProductInvBD {
     static Logger logger = LoggerFactory.getLogger(ProductInvBDImpl.class);
      
     @Autowired
-    private ProductInvDAO productMasterDAO;
+    private ProductInvDAO productInvDAO;
  
     @Override
     public void addProduct(ProductInv user) {
     	logger.debug("ProductInvBD: Adding product.");
-        productMasterDAO.addProduct(user);
+        productInvDAO.addProduct(user);
     }
  
     @Override
     public ProductInv getProduct(Integer productId)  {
-        return productMasterDAO.getProduct(productId);
+        return productInvDAO.getProduct(productId);
     }
     
     @Override
     public ProductInv getProductByCode(String productCode)  {
-        return productMasterDAO.getProductByCode(productCode);
+        return productInvDAO.getProductByCode(productCode);
     }
- 
+     
     @Override
-    public void updateProductInv(ProductInv product)  {
-    	logger.debug("ProductInvBD: Updating product.");
-        productMasterDAO.updateProductInv(product);
-    }
- 
-    @Override
-    public void deleteProductFromInv(Integer productId)  {
-        productMasterDAO.deleteProductFromInv(productId);
-    }
+	public void discardProduct(String productCode, Integer discardQty) throws SysException {
+    	logger.debug("ProductInvBD: Discarding product.");
+        productInvDAO.discardProduct(productCode, discardQty);
+		
+	}
+
+	@Override
+	public void engageProduct(String productCode, Integer engageQty) throws SysException {
+		logger.debug("ProductInvBD: Engaging product.");
+        productInvDAO.engageProduct(productCode, engageQty);
+	}
+
+	@Override
+	public void disengageProduct(String productCode, Integer releaseQty) throws SysException {
+		logger.debug("ProductInvBD: Releasing product.");
+        productInvDAO.disengageProduct(productCode, releaseQty);
+	}
+
+	@Override
+	public void sellProduct(String productCode, Integer saleQty) throws SysException {
+		logger.debug("ProductInvBD: update product sale.");
+        productInvDAO.sellProduct(productCode, saleQty);
+	}
  
     @Override
     public List<ProductInv> getAllProductInv() {
-        return productMasterDAO.getAllProduct();
+        return productInvDAO.getAllProduct();
     }
 
 	@Override
 	public List<ProductInv> searchForProductInv(ProductInv product) {
-		 return productMasterDAO.searchForProduct(product);
+		 return productInvDAO.searchForProduct(product);
 	}
+
+	
    
 }

@@ -27,7 +27,7 @@ public class CheckPatternValidator implements
 
 	/** The errors. */
 	private ResourceBundle errors = ResourceBundle
-			.getBundle("citizen/field-error-messages");
+			.getBundle("field-error-messages");
 
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory

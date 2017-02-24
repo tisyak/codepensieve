@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -21,13 +22,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.medsys.adminuser.model.Roles;
+import com.medsys.common.model.ReportsResponse;
 import com.medsys.customer.bd.CustomerBD;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.SetBD;
+import com.medsys.ui.jasper.service.OrdersReportDownloadService;
+import com.medsys.ui.jasper.util.TokenService;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.UIConstants;
@@ -48,6 +54,11 @@ public class OrdersController  extends SuperController {
 	@Autowired
 	private SetBD setBD;
 
+	@Autowired
+	private OrdersReportDownloadService ordersReportDownloadService;
+	
+	@Autowired
+	private TokenService tokenService;
 
 	@Autowired
 	private MessageSource messageSource;
@@ -233,7 +244,30 @@ public class OrdersController  extends SuperController {
 		model.addAttribute("message", message);
 		return UIActions.REDIRECT + UIActions.LIST_ALL_ORDERS;
 	}
+			
+	@RequestMapping(value= UIActions.FORWARD_SLASH
+			+ UIActions.GET_PROGRESS)
+	public @ResponseBody ReportsResponse checkDownloadProgress(@RequestParam String token) {
+		String tokenCheck = tokenService.check(token);
+		logger.debug("returning tokenCheck: " + tokenCheck);
+		return new ReportsResponse(true, tokenCheck);
+	}
 	
-
+	@RequestMapping(value= UIActions.FORWARD_SLASH
+			+ UIActions.GET_TOKEN)
+	public @ResponseBody ReportsResponse getDownloadToken() {
+		String token = tokenService.generate();
+		logger.debug("returning generated token: " + token);
+		return new ReportsResponse(true, token);
+	}
 	
+	@RequestMapping(value= UIActions.FORWARD_SLASH
+			+ UIActions.GET_ORDER_REPORT)
+	public void download(@RequestParam String type,
+			@RequestParam String token, 
+			@RequestParam Integer orderId,
+			HttpServletResponse response) {
+		logger.debug("Requesting download of type: " + type + " with token: " + token);
+		ordersReportDownloadService.download(type, token,orderId, response);
+	}
 }

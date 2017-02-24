@@ -24,6 +24,10 @@ public class UIActions {
     
     public static final String REFRESH_MASTER_CACHE="refreshMasterCache";
     
+    public static final String GET_PROGRESS="/download/progress";
+    public static final String GET_TOKEN="/download/token";
+    
+    
     public static final String LOAD_ADMIN_DASHBOARD="dashboard/admin";
     
     public static final String LIST_ADMIN_USERS="adminuser/list";
@@ -67,6 +71,7 @@ public class UIActions {
     public static final String SAVE_ORDER="orders/save";
     public static final String LOAD_DELETE_ORDER="orders/loadDelete";
     public static final String DELETE_ORDER="orders/delete";
+    public static final String GET_ORDER_REPORT="orders/download";
     
     public static final String LIST_ALL_PRODUCT_ORDERS="orderproduct/list";
     public static final String LOAD_SEARCH_PRODUCT_ORDERS="orderproduct/loadSearch";

@@ -9,9 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
+import com.medsys.exception.SysException;
 import com.medsys.orders.dao.OrderDAO;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
+import com.medsys.product.bd.ProductInvBD;
+import com.medsys.util.EpSystemError;
 
 @Service
 @Transactional
@@ -20,6 +23,9 @@ public class OrderBDImpl implements OrderBD {
 
 	@Autowired
 	private OrderDAO orderDAO;
+
+	@Autowired
+	private ProductInvBD productInvBD;
 
 	@Override
 	public Response addOrder(Orders user) {
@@ -61,9 +67,16 @@ public class OrderBDImpl implements OrderBD {
 	}
 
 	@Override
+	@Transactional
 	public Response addProductToOrder(OrderProductSet newOrderProductSet) {
 		logger.debug("ADD product to Order: " + newOrderProductSet);
-		return orderDAO.addProductToOrder(newOrderProductSet);
+		// Managing product inventory before adding product to the order
+		try {
+			productInvBD.engageProduct(newOrderProductSet.getProduct().getProductCode(), newOrderProductSet.getQty());
+			return orderDAO.addProductToOrder(newOrderProductSet);
+		} catch (SysException e) {
+			return new Response(false, e.getErrorCode());
+		}
 	}
 
 	@Override
@@ -73,15 +86,45 @@ public class OrderBDImpl implements OrderBD {
 	}
 
 	@Override
-	public Response updateProuctInOrder(OrderProductSet orderProductSet) {
+	@Transactional
+	public Response updateProductInOrder(OrderProductSet orderProductSet) {
+
 		logger.debug("UPDATE orderProductSet: " + orderProductSet);
-		return orderDAO.updateProuctInOrder(orderProductSet);
+		OrderProductSet orgOrderProductSet = getProductInOrder(orderProductSet.getOrderProductSetId());
+
+		if (!orgOrderProductSet.getProduct().getProductId().equals(orderProductSet.getProduct().getProductId())) {
+			return new Response(false, EpSystemError.ORDER_PRODUCT_ID_MISMATCH);
+		}
+		if (orgOrderProductSet.getQty() != orderProductSet.getQty()) {
+
+			// Managing product inventory before updating product to the order
+			try {
+				productInvBD.disengageProduct(orgOrderProductSet.getProduct().getProductCode(),
+						orgOrderProductSet.getQty());
+				productInvBD.engageProduct(orderProductSet.getProduct().getProductCode(), orderProductSet.getQty());
+				return orderDAO.updateProuctInOrder(orderProductSet);
+			} catch (SysException e) {
+				return new Response(false, e.getErrorCode());
+			}
+		} else {
+			logger.debug("Quantities are same ... Nothing to update! Returning success.");
+			return new Response(true, null);
+		}
+
 	}
 
 	@Override
 	public Response deleteProductFromOrder(OrderProductSet orderProductSet) {
 		logger.debug("DELETE orderProductSet: " + orderProductSet);
-		return orderDAO.deleteProductFromOrder(orderProductSet);
+
+		// Managing product inventory before updating product to the order
+		try {
+			productInvBD.disengageProduct(orderProductSet.getProduct().getProductCode(), orderProductSet.getQty());
+			return orderDAO.deleteProductFromOrder(orderProductSet);
+		} catch (SysException e) {
+			return new Response(false, e.getErrorCode());
+		}
+
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.medsys.product.dao;
 
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -10,8 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.medsys.exception.SysException;
 import com.medsys.product.model.ProductInv;
+import com.medsys.util.EpSystemError;
 
 @Repository
 public class ProductInvDAOImpl implements ProductInvDAO {
@@ -29,6 +34,36 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 	public void addProduct(ProductInv product) {
 		logger.debug("Saving product to DB.");
 		getCurrentSession().save(product);
+	}
+	
+	@Override
+	public void addProductByCode(String productCode, Integer qty, BigDecimal price, String updateBy, Timestamp updateTimestamp) {
+		logger.debug("Adding "+ qty + " of product by Code: "+ productCode+" to inventory.");
+		ProductInv productInv = null;
+		try{			
+			logger.debug("Checking for existing product in inventory.");
+			productInv =  getProductByCode(productCode);
+			logger.debug("Found existing product in inventory. Appending qty to it.");
+			Integer orgQty = productInv.getOrgQty();
+			Integer availableQty = productInv.getAvailableQty();
+			productInv.setOrgQty(orgQty + qty);
+			productInv.setAvailableQty(availableQty + qty);
+			productInv.setPrice(price);
+			productInv.setUpdateBy(updateBy);
+			productInv.setUpdateTimestamp(updateTimestamp);
+			
+		} catch(EmptyResultDataAccessException e){
+			logger.debug("No existing product found in inventory. Creating new product inventory instance.");
+			productInv = new ProductInv();
+			productInv.setOrgQty(qty);
+			productInv.setAvailableQty(qty);
+			productInv.setPrice(price);
+			productInv.setUpdateBy(updateBy);
+			productInv.setUpdateTimestamp(updateTimestamp);
+			
+		}
+		
+		addProduct(productInv);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -70,6 +105,8 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 		}
 	}
 
+	/*Currently delete feature disabled in system
+	 * 
 	@Override
 	public void deleteProductFromInv(Integer productId) {
 		ProductInv product = getProduct(productId);
@@ -78,7 +115,7 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 		} else {
 			throw new EmptyResultDataAccessException("ProductInv [" + productId + "] not found", 1);
 		}
-	}
+	}*/
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -86,13 +123,78 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 		return getCurrentSession().createQuery("from ProductInv order by productName asc").getResultList();
 	}
 
-	@Override
-	public void updateProductInv(ProductInv product) {
-		ProductInv productToUpdate = getProduct(product.getProductInvId());
-		//TODO: Change this update properly!!!
-		getCurrentSession().update(productToUpdate);
+	private void updateProductInv(ProductInv product) {		
+		getCurrentSession().update(product);
 	}
-
+	
+	@Override
+	@Transactional
+	public void discardProduct(String productCode, Integer discardQty) throws SysException{
+		logger.debug("Discard "+ discardQty +" of product having id: "+ productCode);
+		ProductInv productToUpdate = getProductByCode(productCode);
+		Integer availableQty = productToUpdate.getAvailableQty();
+		Integer discardedQty = productToUpdate.getDiscardedQty();
+		if(availableQty >= discardQty) {
+			productToUpdate.setAvailableQty(availableQty - discardQty);
+			productToUpdate.setDiscardedQty(discardedQty + discardQty);
+			updateProductInv(productToUpdate);
+		} else {
+			logger.error("Discard qty "+ discardQty +" exceeds available qty "+ availableQty +" of product having code: "+ productCode);
+			throw new SysException("Product Code", productToUpdate.getProduct().getProductCode(), EpSystemError.PI_DSCRD_QTY_EXCEEDS_AVBL);
+		}
+		
+	}
+	
+	@Override
+	@Transactional
+	public void engageProduct(String productCode, Integer engageQty) throws SysException{
+		logger.debug("Engage "+ engageQty +" of product having id: "+  productCode);
+		ProductInv productToUpdate = getProductByCode(productCode);
+		Integer availableQty = productToUpdate.getAvailableQty();
+		if(availableQty >= engageQty) {
+			productToUpdate.setAvailableQty(availableQty - engageQty);
+			productToUpdate.setEngagedQty(productToUpdate.getEngagedQty() + engageQty);
+			updateProductInv(productToUpdate);
+		} else {
+			logger.error("Engage qty "+ engageQty +" exceeds available qty "+ availableQty +" of product having code: "+ productCode);
+			throw new SysException("Product Code", productToUpdate.getProduct().getProductCode(), EpSystemError.PI_ENGG_QTY_EXCEEDS_AVBL);
+		}		
+	}
+	
+	@Override
+	@Transactional
+	public void disengageProduct(String productCode, Integer releaseQty) throws SysException{
+		logger.debug("Release "+ releaseQty +" of product having id: "+  productCode);
+		ProductInv productToUpdate = getProductByCode(productCode);
+		Integer availableQty = productToUpdate.getAvailableQty();
+		Integer engageQty = productToUpdate.getEngagedQty();
+		if(engageQty <= releaseQty) {
+			productToUpdate.setEngagedQty(engageQty - releaseQty);
+			productToUpdate.setAvailableQty(availableQty + releaseQty);
+			updateProductInv(productToUpdate);
+		} else {
+			logger.error("Release qty "+ releaseQty +" exceeds engaged qty "+ engageQty +" of product having code: "+ productCode);
+			throw new SysException("Product Code", productToUpdate.getProduct().getProductCode(), EpSystemError.PI_RLES_QTY_EXCEEDS_ENGG);
+		}		
+	}
+	
+	@Override
+	@Transactional
+	public void sellProduct(String productCode,Integer saleQty) throws SysException{
+		logger.debug("Updating sale qty "+ saleQty +" of product having id: "+ productCode);
+		ProductInv productToUpdate = getProductByCode(productCode);
+		Integer availableQty = productToUpdate.getAvailableQty();
+		if(availableQty >= saleQty) {
+			productToUpdate.setAvailableQty(availableQty - saleQty);
+			productToUpdate.setSoldQty(productToUpdate.getSoldQty() + saleQty);
+			updateProductInv(productToUpdate);
+		} else {
+			logger.error("Sale qty "+ saleQty +" exceeds available qty "+ availableQty +" of product having code: "+ productCode);
+			throw new SysException("Product Code", productToUpdate.getProduct().getProductCode(), EpSystemError.PI_SALE_QTY_EXCEEDS_AVBL);
+		}
+		
+	}
+		
 	@Override
 	public List<ProductInv> searchForProduct(ProductInv product) {
 		logger.debug("ProductInvDAOImpl.searchForProduct() - [" + product.toString() + "]");

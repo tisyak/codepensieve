@@ -89,7 +89,7 @@ public enum MedsysUITiles {
 	private final String tilesName;
 
 	/**
-	 * Instantiates a new citizen ui tiles.
+	 * Instantiates a new  ui tiles.
 	 *
 	 * @param tilesName
 	 *            the tiles name

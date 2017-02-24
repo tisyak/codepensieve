@@ -5,9 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -82,14 +82,9 @@ public class Orders {
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
 	
-	 @OneToMany( mappedBy = "orderId", cascade = CascadeType.ALL)
+	 @OneToMany( fetch = FetchType.EAGER, mappedBy = "orderId")
 	 List<OrderProductSet> products;
 
-	public static Logger getLogger() {
-		return logger;
-	}
-	
-	
 
 	public Orders() {
 		super();
@@ -197,6 +192,7 @@ public class Orders {
 	public List<OrderProductSet> getProducts() {
 		return products;
 	}
+	
 
 	public void setProducts(List<OrderProductSet> products) {
 		this.products = products;

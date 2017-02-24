@@ -31,7 +31,7 @@ public class SysException extends Exception {
 
     /** The errors. */
     private static ResourceBundle errors = ResourceBundle
-            .getBundle("citizen/system-error-messages");
+            .getBundle("system-error-messages");
 
     /**
      * Instantiates a new MEDSYS exception.

@@ -55,9 +55,7 @@ public class OrderProductSetController {
 			@RequestParam(value = "sidx", required = false) String sidx,
 			@RequestParam(value = "sord", required = false) String sord,
 			@RequestParam(value="setId", required=false) Integer setId,
-			@RequestParam(value="orderId", required=false) Integer orderId
-    		/*@RequestParam(value="setId", required=false) Integer setId,
-    		@RequestParam(value="orderId", required=false) Integer orderId*/) {
+			@RequestParam(value="orderId", required=false) Integer orderId) {
 
 		// Pageable pageRequest = new PageRequest(page-1, rows);
 		logger.debug("list all products / search in order : setId: " + setId + " ,orderID: " + orderId);
@@ -78,6 +76,7 @@ public class OrderProductSetController {
 			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();
 			response.setRows(setProducts);
 			response.setRecords(Integer.valueOf(orderProducts.size()).toString());
+			//Single page to display all products part of the set chosen for order.
 			response.setTotal(Integer.valueOf(1).toString());
 			response.setPage(Integer.valueOf(1).toString());
 			
@@ -91,6 +90,7 @@ public class OrderProductSetController {
 			response.setRows(orderProducts);
 			
 			response.setRecords(Integer.valueOf(orderProducts.size()).toString());
+			//Single page to display all products part of the set chosen for order.
 			response.setTotal(Integer.valueOf(1).toString());
 			response.setPage(Integer.valueOf(1).toString());
 			
@@ -98,14 +98,7 @@ public class OrderProductSetController {
 
 			return response;
 		}
-				
-		/*
-		 	response.setRecords(Long.valueOf(pageOfOrderProducts.getTotalElements()).toString());
-			response.setTotal(Integer.valueOf(pageOfOrderProducts.getTotalPages()).toString());
-			response.setPage(Integer.valueOf(pageOfOrderProducts.getNumber()+1).toString());
-		 */
-		
-		
+	
 	}
 	
 	/**
@@ -183,7 +176,7 @@ public class OrderProductSetController {
 		OrderProductSet orderProductSet = orderBD.getProductInOrder(orderProductSetId);
 		orderProductSet.setQty(qty);
 		logger.debug("Updating the product in order: " + orderProductSet);
-		Response response = orderBD.updateProuctInOrder(orderProductSet);
+		Response response = orderBD.updateProductInOrder(orderProductSet);
 		return response;
 	}
 	
