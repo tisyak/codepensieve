@@ -31,7 +31,7 @@
 <script src="<c:url value="/resources/js/datepicker.js"/>"></script>
 <link href="<c:url value="/resources/css/datepicker.css"/>" rel='stylesheet'>
 <!-- JQGrid Action URLs -->	
-<c:url value="/${UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE}" var="recordsUrl"/>
+<c:url value="/${UIActions.LIST_ALL_PRODUCT_ORDERS}" var="recordsUrl"/>
 <c:url value="/${UIActions.ADD_PRODUCT_ORDER}" var="addUrl"/>
 <c:url value="/orderproduct/update" var="editUrl"/>
 <c:url value="/orderproduct/delete" var="deleteUrl"/>
@@ -104,11 +104,11 @@
 		    sortorder: "asc",
 		    caption:"Products",
 		    emptyrecords: "Empty records",
-		    // this enables client side sorting!! Hence,enabled as true
-		    // previously this was false
-		    loadonce: true,
+		    // Hence,enabled as true. This enables client side sorting!! 
+		    // Need refresh after save /edit. Hence setting this as false
+		    loadonce: false,
 		    loadComplete: function() {},
-			grouping: true,
+		    grouping: true,
 		   	groupingView : {
 		   		groupField : ['product.group.groupName'],
 		   		groupColumnShow : [false],
@@ -246,7 +246,8 @@
                 grid.jqGrid('saveRow',ids[i], 
 				{ 
 					url: '${addUrl}',
-					extraparam:{orderId:'${orderId}'}
+					extraparam:{orderId:'${orderId}'},
+					reloadAfterSubmit:true
 				});
             }
         }
