@@ -16,9 +16,9 @@ import com.medsys.orders.model.OrderProductSet;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.SetPdtTemplate;
 import com.medsys.ui.util.UIActions;
+import com.medsys.ui.util.UIConstants;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
 
-//TODO: Remove hardcoding!!
 @Controller
 public class SetController {
 
@@ -29,15 +29,14 @@ public class SetController {
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE, produces = "application/json")
-	public @ResponseBody JqgridResponse<SetPdtTemplate> records(
-			@RequestParam("_search") Boolean search,
+	public @ResponseBody JqgridResponse<SetPdtTemplate> records(@RequestParam("_search") Boolean search,
 			@RequestParam(value = "filters", required = false) String filters,
 			@RequestParam(value = "orderProductSetId", required = false) Integer orderProductSetId,
 			@RequestParam(value = "page", required = false) Integer page,
 			@RequestParam(value = "rows", required = false) Integer rows,
 			@RequestParam(value = "sidx", required = false) String sidx,
 			@RequestParam(value = "sord", required = false) String sord,
-			@RequestParam(value="setId", required=false) Integer setId) {
+			@RequestParam(value = "setId", required = false) Integer setId) {
 
 		// Pageable pageRequest = new PageRequest(page-1, rows);
 		logger.debug("list all products / search : setId: " + setId);
@@ -48,36 +47,27 @@ public class SetController {
 				// return getFilteredRecords(filters, pageRequest);
 
 			}
-		
+
 			List<SetPdtTemplate> setProducts = setBD.getAllProductsInSet(setId);
 
 			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();
 			response.setRows(setProducts);
 
 			logger.debug("response: " + response);
-			/*
-			 * response.setRecords(Long.valueOf(pageOfOrderProducts.
-			 * getTotalElements()).toString());
-			 * response.setTotal(Integer.valueOf(pageOfOrderProducts.
-			 * getTotalPages()).toString());
-			 * response.setPage(Integer.valueOf(pageOfOrderProducts.getNumber()+
-			 * 1).toString());
-			 */
-
 			response.setRecords(Integer.valueOf(setProducts.size()).toString());
 			response.setTotal(Integer.valueOf(setProducts.size()).toString());
-			response.setPage(Integer.valueOf(1).toString());
-
+			response.setPage(UIConstants.PAGE_SINGLE.getValue());
 			return response;
+
 		} catch (Exception e) {
 			logger.error("Exception in AJAX call for product list: " + e.getMessage());
 			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();
-			
+
 			response.setRows(null);
-			response.setRecords("0");
-			response.setTotal("0");
-			response.setPage("1");
-			
+			response.setRecords(UIConstants.RECORDS_ZERO.getValue());
+			response.setTotal(UIConstants.TOTAL_ZERO.getValue());
+			response.setPage(UIConstants.PAGE_SINGLE.getValue());
+
 			logger.debug("Exception sending null response: " + response);
 			return response;
 		}
@@ -116,51 +106,7 @@ public class SetController {
 	 * response.setPage(Integer.valueOf(users.getNumber()+1).toString()); return
 	 * response; }
 	 */
-	/*
-	 * @RequestMapping(value="/orderproduct/get", produces="application/json")
-	 * public @ResponseBody OrderProductSet get(@RequestBody OrderProductSet
-	 * orderProductSet) { return
-	 * orderBD.getProductInOrder(orderProductSet.getOrderProductSetId()); }
-	 * 
-	 * @RequestMapping(value="/orderproduct/create",
-	 * produces="application/json", method=RequestMethod.POST)
-	 * public @ResponseBody Response create(
-	 * 
-	 * @RequestParam Integer setId,
-	 * 
-	 * @RequestParam String productCode,
-	 * 
-	 * @RequestParam String lotNo,
-	 * 
-	 * @RequestParam Integer qty) {
-	 * 
-	 * OrderProductSet newOrderProductSet = new OrderProductSet(setId,
-	 * productCode, lotNo, qty); Response response =
-	 * orderBD.addProductToOrder(newOrderProductSet); return response; }
-	 * 
-	 * @RequestMapping(value="/orderproduct/update",
-	 * produces="application/json", method=RequestMethod.POST)
-	 * public @ResponseBody Response update(
-	 * 
-	 * @RequestParam Integer orderProductSetId,
-	 * 
-	 * @RequestParam Integer qty) {
-	 * 
-	 * OrderProductSet orderProductSet =
-	 * orderBD.getProductInOrder(orderProductSetId); Response response =
-	 * orderBD.updateProuctInOrder(orderProductSet); return response; }
-	 * 
-	 * @RequestMapping(value="/orderproduct/delete",
-	 * produces="application/json", method=RequestMethod.POST)
-	 * public @ResponseBody Response delete(
-	 * 
-	 * @RequestParam Integer orderProductSetId) {
-	 * 
-	 * OrderProductSet orderProductSet =
-	 * orderBD.getProductInOrder(orderProductSetId); Response response =
-	 * orderBD.deleteProductFromOrder(orderProductSet); return response; }
-	 */
-
+	
 	public static List<OrderProductSet> map(Page<OrderProductSet> pageOfOrderProducts) {
 		List<OrderProductSet> orderProducts = new ArrayList<OrderProductSet>();
 		for (OrderProductSet orderProduct : pageOfOrderProducts) {

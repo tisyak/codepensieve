@@ -5,6 +5,22 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<script src="<c:url value="/resources/js/jquery-ui.min.js"/>"></script>
+
+<script>
+ $( function() {
+    $( "#orderDate" ).datepicker({
+		dateFormat: "dd-M-yy"
+	});
+  } );
+  
+   $( function() {
+    $( "#deliveryDate" ).datepicker( {
+		dateFormat: "dd-M-yy"
+	});
+  } );
+</script>
+
 
 
 <!-- JQGrid Header Files -->
@@ -19,13 +35,12 @@
 	src='<c:url value="/resources/js/jqgrid/jquery.jqgrid.min.js"/>'></script>
 
 
-
 <!-- End of JQGrid Header Files -->
 
 <script src="<c:url value="/resources/js/moment.min.js"/>"></script>
 <!-- JQGrid Action URLs -->	
 <c:url value="/${UIActions.LIST_ALL_PRODUCT_ORDERS}" var="recordsUrl"/>
-<c:url value="/${UIActions.ADD_PRODUCT_ORDER}" var="addUrl"/>
+<c:url value="/${UIActions.EDIT_PRODUCT_ORDER}" var="saveUrl"/>
 <c:url value="/orderproduct/update" var="editUrl"/>
 <c:url value="/orderproduct/delete" var="deleteUrl"/>
 
@@ -56,7 +71,7 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Avl. Qty', 'Actions'],
+		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Adnl.Avl. Qty', 'Actions'],
 		   	colModel:[
 		   		{name:'orderProductSetId',index:'id',  hidden:true},
 		   		{name:'setPdtId',index:'setPdtId',hidden:true},
@@ -236,7 +251,7 @@
             for (var i = 0; i < ids.length; i++) {
                 grid.jqGrid('saveRow',ids[i], 
 				{ 
-					url: '${addUrl}',
+					url: '${saveUrl}',
 					extraparam:{orderId:'${orderId}'}
 				});
             }
@@ -286,23 +301,94 @@
 </script>
 
 
-<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.ADD_ORDER%>"
+<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.SAVE_ORDER%>"
 	var="action" />
-<form:form method="POST" action="${action}" modelAttribute="order"
+<form:form class="form-horizontal" method="POST" action="${action}" modelAttribute="order"
 	autocomplete="off">
 
-	<form:hidden path="orderId" cssClass="form-control" title="orderId"
-		autocomplete="off" />
+	<form:hidden path="orderId" title="orderId" />
+
+	<div class="form-group">
+		<label class="col-sm-2" for="inputCustomerName">Order From</label>
+		<div class="col-sm-5">
+	
 		
-		<form:hidden path="set.setId" cssClass="form-control" title="set.setId"
-		autocomplete="off" />
+		<form:select class="form-control" path="customer.customerId">	
+		<form:option value="" label="--  Select  --" />
+			<c:forEach items="${customerList}" var="customer">
+				<form:option value="${customer.customerId}">${customer.name}</form:option>
+			</c:forEach>
+		</form:select>
+		<form:errors path="customer.customerId" cssClass="error" />
+		</div>
+		
+		<label class="col-sm-1" for="inputOrderNumber">Order No</label>
+		<div class="col-sm-4">
+		<form:input disabled="true" path="orderNumber" cssClass="form-control"
+			title="orderNumber" />
+			<form:hidden path="orderNumber" title="orderNumber" />
+			</div>
+	</div>	
+	
+
+	<div class="form-group">
+		<label class="col-sm-2" for="inputReferredBy">Referred By</label>
+		<div class="col-sm-5">
+		<form:input path="refSource" cssClass="form-control" title="refSource"
+			autocomplete="off" />
+			</div>
+		<form:errors path="refSource" cssClass="error" />
+		<label class="col-sm-1" for="inputOrderDate">Order Dt</label>
+		<div class="col-sm-4">
+		<form:input path="orderDate" placeholder="Order Date"
+			cssClass="form-control" />
+			</div>
+	</div>
+
+
+	<div class="form-group">
+	<label  class="col-sm-2" for="inputSetName">Order for Set</label>
+	<div class="col-sm-5">
+		<form:select disabled="true" class="form-control"  path="set.setId">	
+		<form:option value="" label="--  Select Set --" />
+			<c:forEach items="${setList}" var="setItem">
+				<form:option value="${setItem.setId}">${setItem.setName}</form:option>
+			</c:forEach>
+		</form:select>
+		</div>
+		<form:hidden path="set.setId" />
+		<form:errors path="set.setId" cssClass="error" />
+		<label  class="col-sm-1"  for="inputDeliveryDate">Delivery Dt</label>
+		<div class="col-sm-4">
+		<form:input path="deliveryDate" placeholder="Delivery Date"
+			cssClass="form-control" />
+			</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2" for="inputOrderNumber">Order Status</label>
+		<div class="col-sm-5">
+		<form:input disabled="true" path="orderStatus" cssClass="form-control"
+			title="orderStatus" />
+			<form:hidden path="orderStatus" title="orderStatus" />
+			</div>
+	</div>
+	
+	
 	<div>
-	 <br /><br />
+	
+	<c:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_ORDERS%>"
+		var="listAllOrdersAction" />
 
-    <input type="button" value="Edit" onclick="startEdit()" />
-    <input type="button" value="Save All Rows" onclick="saveRows()" />
+	<button type="submit"  formmethod="post" class="btn btn-primary"
+		formaction="${action}">Save Order</button>
+	<button type="submit"  formmethod="get" class="btn btn-default"
+		formaction="${listAllOrdersAction}">Cancel</button>
+		 <br />  <br />
+    <input type="button" value="Edit Products in Order" onclick="startEdit()" />
+    <input type="button" value="Save Products to Order" onclick="saveRows()" />
 
-    <br /><br />
+   <br />  <br />
 	<!-- JQGrid HTML -->
 	<div id='jqgrid'>
 		<div id='pager'></div>
@@ -315,4 +401,7 @@
 	<!-- End of JQGrid HTML -->
 	</div>
 	
+	
+		
+		
 </form:form>

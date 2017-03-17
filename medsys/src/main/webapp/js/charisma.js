@@ -162,12 +162,6 @@ function docReady() {
     //popover
     $('[data-toggle="popover"]').popover();
 
-
-    //star rating
-    $('.raty').raty({
-        score: 4 //default stars
-    });
-
     //uploadify - multiple uploads
     $('#file_upload').uploadify({
         'swf': 'misc/uploadify.swf',

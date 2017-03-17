@@ -136,7 +136,6 @@ public class RootConfig implements TransactionManagementConfigurer{
 	 * dataSource; }
 	 */
 
-	// TODO: change to JNDI lookup
 	/**
 	 * Data source.
 	 *

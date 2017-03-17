@@ -194,6 +194,25 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 		}
 		
 	}
+	
+	@Override
+	@Transactional
+	public void cancelProductSale(String productCode,Integer cancelledQty) throws SysException{
+		logger.debug("Cancelling sale qty "+ cancelledQty +" of product having id: "+ productCode);
+		ProductInv productToUpdate = getProductByCode(productCode);
+		Integer availableQty = productToUpdate.getAvailableQty();
+		Integer soldQty = productToUpdate.getSoldQty();
+		if(soldQty >= cancelledQty) {
+			productToUpdate.setSoldQty(soldQty - cancelledQty);
+			productToUpdate.setAvailableQty(availableQty + cancelledQty);
+			updateProductInv(productToUpdate);
+		} else {
+			logger.error("Sale Cancel qty "+ cancelledQty +" exceeds sold qty "+ soldQty +" of product having code: "+ productCode);
+			throw new SysException("Product Code", productToUpdate.getProduct().getProductCode(), EpSystemError.PI_CANCEL_QTY_EXCEEDS_SOLD);
+		}
+		
+	}
+	
 		
 	@Override
 	public List<ProductInv> searchForProduct(ProductInv product) {

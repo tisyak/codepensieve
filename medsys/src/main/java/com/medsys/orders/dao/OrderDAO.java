@@ -26,7 +26,7 @@ public interface OrderDAO {
 
 	public OrderProductSet getProductInOrder(Integer orderProductSetId);
 
-	public Response updateProuctInOrder(OrderProductSet orderProductSet);
+	public Response updateProductInOrder(OrderProductSet orderProductSet);
 
 	public Response deleteProductFromOrder(OrderProductSet orderProductSet);
 	

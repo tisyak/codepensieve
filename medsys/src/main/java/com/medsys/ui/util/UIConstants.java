@@ -17,6 +17,12 @@ public enum UIConstants {
 
     JCAPTCHARESPONSE("j_captcha_response"),
 
+    /***************************** JQGrid Constants ************************************/
+    
+    RECORDS_ZERO("0"),
+    TOTAL_ZERO("0"),
+    PAGE_SINGLE("1"),
+    
        
     /***************************** ENCODED URL MANIPULTATION CONSTANTS ***********************************. */
     /**

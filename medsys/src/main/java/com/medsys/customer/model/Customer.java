@@ -155,7 +155,6 @@ public class Customer {
 		return "Customer [customerId=" + customerId + ", name=" + name
 				+ ", email=" + email + ", mobileNo=" + mobileNo + ", address="
 				+ address + ", city=" + city + ", pincode=" + pincode
-				+ ", contacts=" + contacts
 				+ "]";
 	}
 

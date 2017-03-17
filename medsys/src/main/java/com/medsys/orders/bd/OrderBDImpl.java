@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ import com.medsys.orders.dao.OrderDAO;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.ProductInvBD;
+import com.medsys.product.model.ProductInv;
 import com.medsys.util.EpSystemError;
 
 @Service
@@ -63,7 +65,20 @@ public class OrderBDImpl implements OrderBD {
 	@Override
 	public List<OrderProductSet> getAllProductsInOrder(Integer orderId) {
 		logger.debug("Get All products in Order: " + orderId);
-		return orderDAO.getAllProductsInOrder(orderId);
+		List<OrderProductSet> orderProducts = orderDAO.getAllProductsInOrder(orderId);
+		for(OrderProductSet product: orderProducts){
+			try{
+				ProductInv productInv = productInvBD.getProduct(product.getProduct().getProductId());
+				product.setAvailableQty(productInv.getAvailableQty());
+			}catch(EmptyResultDataAccessException e){ 
+				logger.debug("Product "+ product.getProduct().getProductCode() +" not found in Inventory");
+				product.setAvailableQty(0);
+			}
+			
+		}
+		
+		return orderProducts;
+		
 	}
 
 	@Override
@@ -102,7 +117,7 @@ public class OrderBDImpl implements OrderBD {
 				productInvBD.disengageProduct(orgOrderProductSet.getProduct().getProductCode(),
 						orgOrderProductSet.getQty());
 				productInvBD.engageProduct(orderProductSet.getProduct().getProductCode(), orderProductSet.getQty());
-				return orderDAO.updateProuctInOrder(orderProductSet);
+				return orderDAO.updateProductInOrder(orderProductSet);
 			} catch (SysException e) {
 				return new Response(false, e.getErrorCode());
 			}

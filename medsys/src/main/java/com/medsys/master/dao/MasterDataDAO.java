@@ -11,11 +11,11 @@ public interface MasterDataDAO {
 	
 	public void add(MasterData masterData) throws DuplicateKeyException;
 	 
-    public MasterData get(Class subClass,String id) throws EmptyResultDataAccessException;
+    public MasterData get(Class subClass,Integer id) throws EmptyResultDataAccessException;
  
     public void update(Class subClass,MasterData masterData) throws EmptyResultDataAccessException;
  
-    public void delete(Class subClass,String id) throws EmptyResultDataAccessException;
+    public void delete(Class subClass,Integer id) throws EmptyResultDataAccessException;
  
     public List<MasterData> getAll(String modelName);
     

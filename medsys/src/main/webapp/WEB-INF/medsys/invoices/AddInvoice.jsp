@@ -1,9 +1,25 @@
-<%@page import="com.medsys.orders.model.Orders"%>
+<%@page import="com.medsys.orders.model.Invoice"%>
 <%@page import="com.medsys.ui.util.UIActions"%>
 
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<script src="<c:url value="/resources/js/jquery-ui.min.js"/>"></script>
+
+<script>
+ $( function() {
+    $( "#invoiceDate" ).datepicker({
+		dateFormat: "dd-M-yy"
+	});
+  } );
+  
+   $( function() {
+    $( "#deliveryDate" ).datepicker( {
+		dateFormat: "dd-M-yy"
+	});
+  } );
+</script>
 
 
 
@@ -19,33 +35,32 @@
 	src='<c:url value="/resources/js/jqgrid/jquery.jqgrid.min.js"/>'></script>
 
 
-
 <!-- End of JQGrid Header Files -->
 
 <script src="<c:url value="/resources/js/moment.min.js"/>"></script>
 <!-- JQGrid Action URLs -->	
-<c:url value="/${UIActions.LIST_ALL_PRODUCT_ORDERS}" var="recordsUrl"/>
-<c:url value="/${UIActions.ADD_PRODUCT_ORDER}" var="addUrl"/>
-<c:url value="/orderproduct/update" var="editUrl"/>
-<c:url value="/orderproduct/delete" var="deleteUrl"/>
+<c:url value="/${UIActions.LIST_ALL_PRODUCT_INVOICES}" var="recordsUrl"/>
+<c:url value="/${UIActions.EDIT_PRODUCT_INVOICE}" var="saveUrl"/>
+<c:url value="/invoiceproduct/update" var="editUrl"/>
+<c:url value="/invoiceproduct/delete" var="deleteUrl"/>
 
-<c:url value="/${UIActions.GET_ORDER_REPORT}" var="downloadUrl"/>
+<c:url value="/${UIActions.GET_INVOICE_REPORT}" var="downloadUrl"/>
 <c:url value="/${UIActions.GET_TOKEN}" var="downloadTokenUrl"/>
 <c:url value="/${UIActions.GET_PROGRESS}" var="downloadProgressUrl"/>
 
 <!--End of JQGrid Action URLs -->	
 <%
-	Orders order = (Orders)request.getAttribute("order");
-	pageContext.setAttribute("setId",order.getSet().getSetId());
-	pageContext.setAttribute("orderId",order.getOrderId());
+	Invoice invoice = (Invoice)request.getAttribute("invoice");
+	pageContext.setAttribute("orderId",invoice.getOrderId());
+	pageContext.setAttribute("invoiceId",invoice.getInvoiceId());
 %>
 <script>
 		
 	var data = {};
 	var headers = {};
 	//data[csrfParameter] = csrfToken;
-	data["setId"] = ${setId};
-	data["orderId"] =${orderId};
+	data["orderId"] = ${orderId};
+	data["invoiceId"] =${invoiceId};
 	//headers[csrfHeader] = csrfToken; 
 	
 	//alert("data for ajax submit: " + data);
@@ -56,9 +71,9 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Avl. Qty', 'Actions'],
+		   	colNames:['invoiceProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Adnl.Avl. Qty', 'Actions'],
 		   	colModel:[
-		   		{name:'orderProductSetId',index:'id',  hidden:true},
+		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
 		   		{name:'setPdtId',index:'setPdtId',hidden:true},
 		   		{name:'product.productCode',index:'product.productCode', width:50, editable:"hidden"},
 				{name:'product.group.groupName',index:'product.group.groupName', width:100},
@@ -116,7 +131,7 @@
 		        records: "records",
 		        repeatitems: false,
 		        cell: "cell",
-		        id: "orderProductSetId"
+		        id: "invoiceProductSetId"
 		        
 		    }
 			
@@ -236,8 +251,8 @@
             for (var i = 0; i < ids.length; i++) {
                 grid.jqGrid('saveRow',ids[i], 
 				{ 
-					url: '${addUrl}',
-					extraparam:{orderId:'${orderId}'}
+					url: '${saveUrl}',
+					extraparam:{invoiceId:'${invoiceId}'}
 				});
             }
 			grid.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
@@ -266,7 +281,7 @@
     					});
     			
     			// Start download
-    			window.location = '${downloadUrl}'+'?token='+token+'&type='+type+'&orderId='+${orderId};
+    			window.location = '${downloadUrl}'+'?token='+token+'&type='+type+'&invoiceId='+${invoiceId};
     			// Check periodically if download has started
     			var frequency = 1000;
     			var timer = setInterval(function() {
@@ -286,23 +301,110 @@
 </script>
 
 
-<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.ADD_ORDER%>"
+<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.SAVE_INVOICE%>"
 	var="action" />
-<form:form method="POST" action="${action}" modelAttribute="order"
+<form:form class="form-horizontal" method="POST" action="${action}" modelAttribute="invoice"
 	autocomplete="off">
 
-	<form:hidden path="orderId" cssClass="form-control" title="orderId"
-		autocomplete="off" />
+	<form:hidden path="invoiceId" title="invoiceId" />
+
+	<div class="form-group">
+		<label class="col-sm-2" for="inputOrderNumber">Invoice For Order</label>
+		<div class="col-sm-5">
+	
 		
-		<form:hidden path="set.setId" cssClass="form-control" title="set.setId"
-		autocomplete="off" />
+		<form:select class="form-control" path="order.orderId">	
+		<form:option value="" label="--  Select Order No --" />
+			<c:forEach items="${orderList}" var="order">
+				<form:option value="${order.orderId}">${order.orderNumber}</form:option>
+			</c:forEach>
+		</form:select>
+		<form:errors path="order.orderId" cssClass="error" />
+		</div>
+		
+		<label class="col-sm-1" for="inputInvoiceNo">Invoice No</label>
+		<div class="col-sm-4">
+		<form:input disabled="true" path="invoiceNo" cssClass="form-control"
+			title="invoiceNo" />
+			<form:hidden path="invoiceNo" title="invoiceNo" />
+			</div>
+	</div>	
+	
+
+	<div class="form-group">
+	
+	<label  class="col-sm-2" for="inputSetName">Invoice To</label>
+			<div class="col-sm-5">
+	
+		
+		<form:select class="form-control" path="customer.customerId">	
+		<form:option value="" label="--  Select  --" />
+			<c:forEach items="${customerList}" var="customer">
+				<form:option value="${customer.customerId}">${customer.name}</form:option>
+			</c:forEach>
+		</form:select>
+		<form:errors path="customer.customerId" cssClass="error" />
+		</div>
+	
+		<label class="col-sm-1" for="inputInvoiceDate">Invoice Dt</label>
+		<div class="col-sm-4">
+		<form:input path="invoiceDate" placeholder="Invoice Date"
+			cssClass="form-control" />
+			</div>
+	</div>
+
+
+	<div class="form-group">
+		<label class="col-sm-2" for="inputReferredBy">Referred By</label>
+		<div class="col-sm-5">
+		<form:input path="refSource" cssClass="form-control" title="refSource"
+			autocomplete="off" />
+			</div>
+		<form:errors path="refSource" cssClass="error" />
+		<label  class="col-sm-1"  for="inputPaymentTerms">Payment Terms</label>
+		<div class="col-sm-4">
+		<form:select class="form-control" path="paymentTerms.code">	
+		<form:option value="" label="--  Select  --" />
+			<c:forEach items="${paymentTermsList}" var="paymentTerms">
+				<form:option value="${paymentTerms.code}">${paymentTerms.desc}</form:option>
+			</c:forEach>
+		</form:select>
+		<form:errors path="paymentTerms.code" cssClass="error" />
+			</div>
+	</div>
+	
+	<div class="form-group">
+		<label class="col-sm-2" for="inputPatientName">PatientName</label>
+		<div class="col-sm-5">
+		<form:input path="patientName" cssClass="form-control" title="patientName"
+			autocomplete="off" />
+			</div>
+		<form:errors path="patientName" cssClass="error" />
+		<label class="col-sm-1" for="inputInvoiceNumber">Invoice Status</label>
+		<div class="col-sm-4">
+		<form:input path="invoiceStatus" cssClass="form-control"
+			title="invoiceStatus" />
+			<form:hidden path="invoiceStatus" title="invoiceStatus" />
+			</div>
+	</div>
+	
+
+	
+	
 	<div>
-	 <br /><br />
+	
+	<c:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_INVOICES%>"
+		var="listAllInvoiceAction" />
 
-    <input type="button" value="Edit" onclick="startEdit()" />
-    <input type="button" value="Save All Rows" onclick="saveRows()" />
+	<button type="submit"  formmethod="post" class="btn btn-primary"
+		formaction="${action}">Save Invoice</button>
+	<button type="submit"  formmethod="get" class="btn btn-default"
+		formaction="${listAllInvoiceAction}">Cancel</button>
+		 <br />  <br />
+    <input type="button" value="Edit Products in Invoice" onclick="startEdit()" />
+    <input type="button" value="Save Products to Invoice" onclick="saveRows()" />
 
-    <br /><br />
+   <br />  <br />
 	<!-- JQGrid HTML -->
 	<div id='jqgrid'>
 		<div id='pager'></div>
@@ -315,4 +417,7 @@
 	<!-- End of JQGrid HTML -->
 	</div>
 	
+	
+		
+		
 </form:form>

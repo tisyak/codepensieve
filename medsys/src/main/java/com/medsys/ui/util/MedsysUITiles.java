@@ -29,12 +29,21 @@ public enum MedsysUITiles {
 	CONFIRM_DELETE_ORDER("orders.DeleteOrder"),
 	
 	ADD_PRODUCTS_IN_ORDER("orders.AddProductsToOrder"),
-
-	EDIT_PRODUCTS_IN_ORDER("orders.EditProductsInOrder"),
-
-	DELETE_PRODUCTS_IN_ORDER("orders.DeleteProductsInOrder"),
 	
+	
+	/** INVOICE MANAGEMENT */
 
+	SEARCH_INVOICES("invoices.SearchInvoices"),
+
+	INVOICES_LIST("invoices.SearchInvoices"),
+
+	ADD_INVOICE("invoices.AddInvoice"),
+
+	EDIT_INVOICE("invoices.EditInvoice"),
+
+	CONFIRM_DELETE_INVOICE("invoices.DeleteInvoice"),
+	
+	
 	/** Admin User Management */
 	ADMIN_USERS_LIST("master.AdminUserList"),
 

@@ -25,6 +25,8 @@ public interface ProductInvBD {
 	
 	public List<ProductInv> searchForProductInv(ProductInv product);
 
+	void cancelProductSale(String productCode, Integer cancelQty) throws SysException;
+
 	
 
 }

@@ -32,9 +32,9 @@ import com.medsys.util.EpSystemError;
 
 @Controller
 @Secured(Roles.MASTER_ADMIN)
-public class OrderProductSetController {
+public class InvoiceProductController {
 
-	static Logger logger = LoggerFactory.getLogger(OrderProductSetController.class);
+	static Logger logger = LoggerFactory.getLogger(InvoiceProductController.class);
 
 	@Autowired
 	private OrderBD orderBD;

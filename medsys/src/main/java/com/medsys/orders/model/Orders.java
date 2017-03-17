@@ -24,56 +24,53 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.medsys.customer.model.Customer;
+import com.medsys.master.model.OrderStatusMaster;
 import com.medsys.product.model.Set;
 
 @Entity
 @Table(name = "orders")
 public class Orders {
-	
-	
+
 	static Logger logger = LoggerFactory.getLogger(Orders.class);
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "order_id", columnDefinition = "serial")
-	private Integer orderId; 
-	
+	private Integer orderId;
+
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 20, message = "{error.field.max}")
 	@Column(name = "order_number", length = 20)
 	private String orderNumber;
-			
+
 	@ManyToOne
-	@JoinColumn(columnDefinition="uuid", name="customer_id",referencedColumnName="customer_id")
+	@JoinColumn(columnDefinition = "uuid", name = "customer_id", referencedColumnName = "customer_id")
 	private Customer customer;
-	
+
 	@Size(max = 100, message = "{error.field.max}")
 	@Column(name = "patient_name", length = 100)
 	private String patientName;
-	
+
 	@Size(max = 250, message = "{error.field.max}")
 	@Column(name = "reference_source", length = 250)
 	private String refSource;
-	
+
 	@Column(name = "order_date")
-	@Type(type="date")
-	private Date orderDate; 
-	
+	@Type(type = "date")
+	private Date orderDate;
+
 	@Column(name = "delivery_date")
-	@Type(type="date")
-	private Date deliveryDate; 
-	
-	@NotBlank(message = "{error.field.empty}")
-	@Size(max = 20, message = "{error.field.max}")
-	@Column(name = "order_status", length = 20)
-	private String orderStatus; 
-	
+	@Type(type = "date")
+	private Date deliveryDate;
 
 	@ManyToOne
-	@JoinColumn(name="set_id",referencedColumnName="set_id")
+	@JoinColumn(name = "order_status_id", referencedColumnName = "order_status_id")
+	private OrderStatusMaster orderStatus; 
+
+	@ManyToOne
+	@JoinColumn(name = "set_id", referencedColumnName = "set_id")
 	private Set set;
-	
-	
+
 	/** The update by. */
 	@Column(name = "update_by")
 	private String updateBy;
@@ -81,19 +78,20 @@ public class Orders {
 	/** The update timestamp. */
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
-	
-	 @OneToMany( fetch = FetchType.EAGER, mappedBy = "orderId")
-	 List<OrderProductSet> products;
 
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "orderId")
+	List<OrderProductSet> products;
 
-	public Orders() {
+	public Orders() {}
+
+	public Orders(boolean generateOrderNumber) {
 		super();
-		Date date = new Date();
-		String modifiedDate= new SimpleDateFormat("yyMMdd").format(date);
-		this.setOrderNumber("RD-" + modifiedDate + "-" + RandomStringUtils.random(4, true, true));
+		if (generateOrderNumber) {
+			Date date = new Date();
+			String modifiedDate = new SimpleDateFormat("yyMMdd").format(date);
+			this.setOrderNumber("RD-" + modifiedDate + "-" + RandomStringUtils.random(4, true, true));
+		}
 	}
-
-
 
 	public static void setLogger(Logger logger) {
 		Orders.logger = logger;
@@ -155,14 +153,13 @@ public class Orders {
 		this.deliveryDate = deliveryDate;
 	}
 
-	public String getOrderStatus() {
+	public OrderStatusMaster getOrderStatus() {
 		return orderStatus;
 	}
 
-	public void setOrderStatus(String orderStatus) {
+	public void setOrderStatus(OrderStatusMaster orderStatus) {
 		this.orderStatus = orderStatus;
 	}
-
 
 	public Set getSet() {
 		return set;
@@ -187,17 +184,15 @@ public class Orders {
 	public void setUpdateTimestamp(Timestamp updateTimestamp) {
 		this.updateTimestamp = updateTimestamp;
 	}
-	
-	
+
 	public List<OrderProductSet> getProducts() {
 		return products;
 	}
-	
 
 	public void setProducts(List<OrderProductSet> products) {
 		this.products = products;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -237,6 +232,4 @@ public class Orders {
 				+ updateBy + ", updateTimestamp=" + updateTimestamp + ", products=" + products + "]";
 	}
 
-
-			
 }

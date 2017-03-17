@@ -5,28 +5,34 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<script src="<c:url value="/resources/js/jquery-ui.min.js"/>"></script>
 
-<script src="<c:url value="/resources/js/moment.min.js"/>"></script>
-<script src="<c:url value="/resources/js/datepicker.js"/>"></script>
-<link href="<c:url value="/resources/css/datepicker.css"/>" rel='stylesheet'>
+<script>
+ $( function() {
+    $( "#orderDate" ).datepicker({
+		dateFormat: "dd-M-yy"
+	});
+  } );
+  
+   $( function() {
+    $( "#deliveryDate" ).datepicker( {
+		dateFormat: "dd-M-yy"
+	});
+  } );
+</script>
 
 <spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.ADD_ORDER%>"
 	var="action" />
-<form:form method="POST" action="${action}" modelAttribute="order"
+<form:form class="form-horizontal" method="POST" action="${action}" modelAttribute="order"
 	autocomplete="off">
 
 	<form:hidden path="orderId" cssClass="form-control" title="orderId"
 		autocomplete="off" />
 
-	<div class="form-group col-md-6">
-		<label for="inputOrderNumber">Order No</label>
-		<form:input path="orderNumber" cssClass="form-control"
-			title="orderNumber" />
-	</div>
-	
-	<div class="form-group col-md-6">
-		<label for="inputCustomerName">Order From</label>
-		<form:select path="customer.customerId" cssClass="resizedSelect">	
+	<div class="form-group">
+		<label class="col-sm-2" for="inputCustomerName">Order From</label>
+		<div class="col-sm-5">
+		<form:select class="form-control" path="customer.customerId">	
 		<form:option value="" label="--  Select  --" />
 			<c:forEach items="${customerList}" var="customer">
 				<form:option value="${customer.customerId}">${customer.name}</form:option>
@@ -34,42 +40,56 @@
 		</form:select>
 		<form:hidden path="customer.customerId" />
 		<form:errors path="customer.customerId" cssClass="error" />
+		</div>
+		
+		<label class="col-sm-1" for="inputOrderNumber">Order No</label>
+		<div class="col-sm-4">
+		<form:input disabled="true" path="orderNumber" cssClass="form-control"
+			title="orderNumber" />
+			</div>
+	</div>	
+	
 
-	</div>
-
-	<div class="form-group col-md-6">
-		<label for="inputReferredBy">Referred By</label>
+	<div class="form-group">
+		<label class="col-sm-2" for="inputReferredBy">Referred By</label>
+		<div class="col-sm-5">
 		<form:input path="refSource" cssClass="form-control" title="refSource"
 			autocomplete="off" />
+			</div>
 		<form:errors path="refSource" cssClass="error" />
-	</div>
-
-	<div class="form-group col-md-6">
+		<label class="col-sm-1" for="inputOrderDate">Order Dt</label>
+		<div class="col-sm-4">
 		<form:input path="orderDate" placeholder="Order Date"
 			cssClass="form-control" />
+			</div>
 	</div>
-	<div class="form-group col-md-6">
-		<form:input path="deliveryDate" placeholder="Delivery Date"
-			cssClass="form-control" />
-	</div>
-	
-	<div class="form-group col-md-6">
-		<label for="inputSetName">Order for Set</label>
-		<form:select path="set.setId" cssClass="resizedSelect">	
+
+
+	<div class="form-group">
+	<label  class="col-sm-2" for="inputSetName">Order for Set</label>
+	<div class="col-sm-5">
+		<form:select class="form-control"  path="set.setId">	
 		<form:option value="" label="--  Select Set --" />
 			<c:forEach items="${setList}" var="set">
 				<form:option value="${set.setId}">${set.setName}</form:option>
 			</c:forEach>
 		</form:select>
+		</div>
 		<form:hidden path="set.setId" />
 		<form:errors path="set.setId" cssClass="error" />
-
+		<label  class="col-sm-1"  for="inputDeliveryDate">Delivery Dt</label>
+		<div class="col-sm-4">
+		<form:input path="deliveryDate" placeholder="Delivery Date"
+			cssClass="form-control" />
+			</div>
 	</div>
 	
-	<div class="form-group col-md-6">
-		<label for="inputOrderNumber">Order Status</label>
-		<form:input path="orderStatus" cssClass="form-control"
+	<div class="form-group">
+		<label class="col-sm-2" for="inputOrderNumber">Order Status</label>
+		<div class="col-sm-5">
+		<form:input disabled="true" path="orderStatus" cssClass="form-control"
 			title="orderStatus" />
+			</div>
 	</div>
 
 	

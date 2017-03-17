@@ -27,7 +27,7 @@ public interface MasterDataBD {
      * @param paraname the paraname
      * @return the config para
      */
-    public MasterData get(Class subClass,String id);
+    public MasterData get(Class subClass,Integer id);
  
     /**
      * Update config para.
@@ -41,7 +41,7 @@ public interface MasterDataBD {
      *
      * @param paraname the paraname
      */
-    public Response delete(Class subClass,String id);
+    public Response delete(Class subClass,Integer id);
  
     /**
      * Gets the config paras.

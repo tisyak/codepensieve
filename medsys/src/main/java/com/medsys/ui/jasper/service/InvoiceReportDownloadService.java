@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.medsys.orders.bd.OrderJasperDatasourceService;
+import com.medsys.orders.bd.InvoiceJasperDatasourceService;
 import com.medsys.ui.jasper.util.ExporterService;
 import com.medsys.ui.jasper.util.TokenService;
 
@@ -25,13 +25,13 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 @Service
 //TODO: Change this to factory method
-public class OrdersReportDownloadService {
+public class InvoiceReportDownloadService {
 
-	public static final String CHALLAN_TEMPLATE = "/jasper/Challan.jrxml";
-	static Logger logger = LoggerFactory.getLogger(OrdersReportDownloadService.class);
+	public static final String INVOICE_TEMPLATE = "/jasper/Invoice.jrxml";
+	static Logger logger = LoggerFactory.getLogger(InvoiceReportDownloadService.class);
 
 	@Autowired
-	private OrderJasperDatasourceService datasource;
+	private InvoiceJasperDatasourceService datasource;
 	
 	@Autowired
 	private ExporterService exporter;
@@ -39,15 +39,15 @@ public class OrdersReportDownloadService {
 	@Autowired
 	private TokenService tokenService;
 	
-	public void download(String type, String token, Integer orderId, HttpServletResponse response) {
+	public void download(String type, String token, Integer invoiceId, HttpServletResponse response) {
 		 
 		try {
 			// 1. Add report parameters
 			HashMap<String, Object> params = new HashMap<String, Object>(); 
-			params.put("Title", "Delivery Challan");
+			params.put("Title", "Invoice");
 			logger.debug("Setting title for file.");
 			// 2.  Retrieve template
-			InputStream reportStream = this.getClass().getResourceAsStream(CHALLAN_TEMPLATE); 
+			InputStream reportStream = this.getClass().getResourceAsStream(INVOICE_TEMPLATE); 
 			logger.debug("Obtaining the .jrxml inputstream.");
 			 
 			// 3. Convert template to JasperDesign
@@ -60,7 +60,7 @@ public class OrdersReportDownloadService {
 			 
 			// 5. Create the JasperPrint object
 			// Make sure to pass the JasperReport, report parameters, and data source
-			JasperPrint jp = JasperFillManager.fillReport(jr, params, datasource.getOrderData(orderId));
+			JasperPrint jp = JasperFillManager.fillReport(jr, params, datasource.getInvoiceData(invoiceId));
 			logger.debug("Pass the JasperReport, report parameters, and data source tp JasperPrint Object.");
 			 
 			// 6. Create an output byte stream where data will be written

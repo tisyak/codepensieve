@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "m_tax")
-public class TaxMaster {
+public class TaxMaster extends MasterData{
 	
 	static Logger logger = LoggerFactory.getLogger(TaxMaster.class);
 
@@ -102,7 +102,17 @@ public class TaxMaster {
 				+ ", taxDesc=" + taxDesc + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 
+	@Override
+	public Integer getUniqueId() {
+		return taxId;
+	}
 
+	@Override
+	public String getKeyColumnName() {
+		return "taxType";
+	}
+
+	
 	
 	
 }

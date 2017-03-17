@@ -43,7 +43,7 @@ public class MasterDataBDImpl implements MasterDataBD {
      * .util.ConfigParaKey)
      */
     @Override
-    public MasterData get(Class subClass,String id) {
+    public MasterData get(Class subClass,Integer id) {
 
     	try{
     		return masterDataDAO.get(subClass,id);
@@ -87,7 +87,7 @@ public class MasterDataBDImpl implements MasterDataBD {
 	 * @see com.medsys.master.bd.MasterConfigBD#deleteConfigPara(java.lang.String)
 	 */
 	@Override
-	public Response delete(Class subClass,String id) {
+	public Response delete(Class subClass,Integer id) {
 		try{
     		masterDataDAO.delete(subClass,id);
     		return new Response(true, null);

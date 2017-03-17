@@ -54,11 +54,12 @@
 <link href="<c:url value="/resources/css/animate.min.css"/>"
 	rel='stylesheet'>
 <link href="<c:url value="/resources/css/style.css"/>" rel='stylesheet'>
-
+<link rel="stylesheet" type="text/css" media="screen"
+	href='<c:url value="/resources/css/ui-lightness/jquery-ui.min.css"/>' />
 <!-- jQuery -->
 <script
 	src="<c:url value="/resources/bower_components/jquery/jquery.min.js"/>"></script>
-
+<script src="<c:url value="/resources/js/jquery-ui.min.js"/>"></script>
 
 
 <!-- external javascript -->
@@ -84,8 +85,6 @@
 <script
 	src="<c:url value="/resources/bower_components/responsive-tables/responsive-tables.js"/>"></script>
 
-<!-- star rating plugin -->
-<script src="<c:url value="/resources/js/jquery.raty.min.js"/>"></script>
 
 <!-- autogrowing textarea plugin -->
 <script src="<c:url value="/resources/js/jquery.autogrow-textarea.js"/>"></script>

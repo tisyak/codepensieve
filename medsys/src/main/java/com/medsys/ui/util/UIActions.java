@@ -80,10 +80,8 @@ public class UIActions {
     public static final String ADD_PRODUCT_ORDER="orderproduct/add";
     public static final String GET_PRODUCT_ORDER="orderproduct/get";
     public static final String EDIT_PRODUCT_ORDER="orderproduct/edit";
-    public static final String SAVE_PRODUCT_ORDER="orderproduct/save";
     public static final String LOAD_DELETE_PRODUCT_ORDER="orderproduct/loadDelete";
     public static final String DELETE_PRODUCT_ORDER="orderproduct/delete";
-    
     
     public static final String LIST_ALL_INVOICES="invoices/list";
     public static final String LOAD_SEARCH_INVOICES="invoices/loadSearch";
@@ -94,6 +92,17 @@ public class UIActions {
     public static final String SAVE_INVOICE="invoices/save";
     public static final String LOAD_DELETE_INVOICE="invoices/loadDelete";
     public static final String DELETE_INVOICE="invoices/delete";
+    public static final String GET_INVOICE_REPORT="invoices/download";
+    
+    public static final String LIST_ALL_PRODUCT_INVOICES="invoiceproduct/list";
+    public static final String LOAD_SEARCH_PRODUCT_INVOICES="invoiceproduct/loadSearch";
+    public static final String SEARCH_PRODUCT_INVOICES="invoiceproduct/search";
+    public static final String LOAD_ADD_PRODUCT_INVOICE="invoiceproduct/loadAdd";
+    public static final String ADD_PRODUCT_INVOICE="invoiceproduct/add";
+    public static final String GET_PRODUCT_INVOICE="invoiceproduct/get";
+    public static final String EDIT_PRODUCT_INVOICE="invoiceproduct/edit";
+    public static final String LOAD_DELETE_PRODUCT_INVOICE="invoiceproduct/loadDelete";
+    public static final String DELETE_PRODUCT_INVOICE="invoiceproduct/delete";
    
     public static final String LOAD_ADD_CUSTOMER_DSC="customer/dsc/loadAdd";
     public static final String ADD_CUSTOMER_DSC="customer/dsc/add";

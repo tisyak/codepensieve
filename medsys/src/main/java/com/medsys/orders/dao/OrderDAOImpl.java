@@ -2,6 +2,8 @@ package com.medsys.orders.dao;
 
 import java.util.List;
 
+import javax.persistence.TemporalType;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -65,16 +67,16 @@ public class OrderDAOImpl implements OrderDAO {
 
 	@Override
 	public Response deleteOrder(Integer orderId) {
-		try{
-		Orders order = getOrder(orderId);
-		if (order != null) {
-			getCurrentSession().delete(order);
-			logger.info("Delete of order with orderId: " + orderId + " successful");
-			return new Response(true, null);
-		} else {
-			throw new EmptyResultDataAccessException("Order [" + orderId + "] not found", 1);
-		}
-		}catch(HibernateException he){
+		try {
+			Orders order = getOrder(orderId);
+			if (order != null) {
+				getCurrentSession().delete(order);
+				logger.info("Delete of order with orderId: " + orderId + " successful");
+				return new Response(true, null);
+			} else {
+				throw new EmptyResultDataAccessException("Order [" + orderId + "] not found", 1);
+			}
+		} catch (HibernateException he) {
 			logger.error("Delete of order with orderId: " + orderId + " failed.");
 			return new Response(false, EpSystemError.DB_EXCEPTION);
 		}
@@ -83,7 +85,7 @@ public class OrderDAOImpl implements OrderDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Orders> getAllOrders() {
-		return getCurrentSession().createQuery("from Orders order by name asc").getResultList();
+		return getCurrentSession().createQuery("from Orders order by orderDate desc").getResultList();
 	}
 
 	@Override
@@ -95,8 +97,8 @@ public class OrderDAOImpl implements OrderDAO {
 		orderToUpdate.setDeliveryDate(order.getDeliveryDate());
 		orderToUpdate.setPatientName(order.getPatientName());
 		orderToUpdate.setRefSource(order.getRefSource());
-		// TODO: Write product query
-		// orderToUpdate.setProducts(order.getCity());
+		orderToUpdate.setUpdateBy(order.getUpdateBy());
+		orderToUpdate.setUpdateTimestamp(order.getUpdateTimestamp());
 		getCurrentSession().update(orderToUpdate);
 		return orderToUpdate;
 	}
@@ -104,34 +106,51 @@ public class OrderDAOImpl implements OrderDAO {
 	@Override
 	public List<Orders> searchForOrders(Orders order) {
 		logger.debug("OrderDAOImpl.searchForOrders() - [" + order.toString() + "]");
-		Query<Orders> query = getCurrentSession()
-				.createQuery("from Orders where lower(name) like :name OR mobileNo like :mobileNo order by name asc");
+		Query<Orders> query = getCurrentSession().createQuery(
+				"from Orders where lower(orderNumber) like :orderNo OR lower(customer.name) like :custName "
+				+ " OR orderDate = :orderDate "
+						+ " order by orderNumber asc");
 
-		/*
-		 * if(order.getName()!=null){ query.setString("name",
-		 * "%"+order.getName().toLowerCase()+"%"); }else{
-		 * query.setString("name", order.getName()); }
-		 * 
-		 * if(order.getMobileNo()!=null){ query.setString("mobileNo",
-		 * "%"+order.getMobileNo().toLowerCase()+"%"); }else{
-		 * query.setString("mobileNo", order.getMobileNo()); }
-		 * 
-		 * logger.debug(query.toString()); if (query.list().size() == 0) {
-		 * logger.debug("No orders found matching current search criteria.");
-		 * return null; } else {
-		 */
+		if (order.getOrderNumber() != null) {
+			query.setParameter("orderNo", "%" + order.getOrderNumber().toLowerCase() + "%");
+		} else {
+			query.setParameter("orderNo", order.getOrderNumber());
+		}
+		
+		if (order.getOrderDate() != null) {
+			query.setParameter("orderDate",  order.getOrderDate(),TemporalType.DATE);
+		} else {
+			query.setParameter("orderDate", null);
+		}
 
-		logger.debug("Search Orders List Size: " + query.getResultList().size());
-		List<Orders> list = (List<Orders>) query.getResultList();
-		return list;
-		/* } */
+		if (order.getCustomer() != null && order.getCustomer().getName() != null) {
+			query.setParameter("custName", "%" + order.getCustomer().getName().toLowerCase() + "%");
+		} else {
+			query.setParameter("custName", null);
+		}
+
+		logger.debug(query.toString());
+
+		if (query.getResultList().size() == 0) {
+			logger.debug("No orders found matching current search criteria.");
+			return null;
+
+		} else {
+
+			logger.debug("Search Orders List Size: " + query.getResultList().size());
+			List<Orders> list = (List<Orders>) query.getResultList();
+			return list;
+		}
 	}
 
 	@Override
 	public List<OrderProductSet> getAllProductsInOrder(Integer orderId) {
 		logger.debug("Fetching all products in Order: " + orderId);
-		return getCurrentSession().createQuery("from OrderProductSet " + " where orderId = " + orderId
-				+ " order by productInv.product.productCode asc ").getResultList();
+		getCurrentSession().flush();
+		return getCurrentSession()
+				.createQuery(
+						"from OrderProductSet " + " where orderId = " + orderId + " order by product.productCode asc ")
+				.getResultList();
 	}
 
 	@Override
@@ -164,9 +183,11 @@ public class OrderDAOImpl implements OrderDAO {
 	}
 
 	@Override
-	public Response updateProuctInOrder(OrderProductSet orderProductSet) {
+	public Response updateProductInOrder(OrderProductSet orderProductSet) {
 		OrderProductSet orderProductSetToUpdate = getProductInOrder(orderProductSet.getOrderProductSetId());
 		orderProductSetToUpdate.setQty(orderProductSet.getQty());
+		orderProductSetToUpdate.setUpdateBy(orderProductSet.getUpdateBy());
+		orderProductSetToUpdate.setUpdateTimestamp(orderProductSet.getUpdateTimestamp());
 		getCurrentSession().update(orderProductSetToUpdate);
 		// TODO: change return appropriately
 		return new Response(true, null);

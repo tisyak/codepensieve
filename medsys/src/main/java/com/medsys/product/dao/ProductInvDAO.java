@@ -22,6 +22,8 @@ public interface ProductInvDAO {
 	public void disengageProduct(String productCode, Integer releaseQty) throws SysException;
 
 	public void sellProduct(String productCode, Integer saleQty) throws SysException;
+	
+	void cancelProductSale(String productCode, Integer cancelledQty) throws SysException;
 
 	public List<ProductInv> getAllProduct();
 
@@ -29,5 +31,7 @@ public interface ProductInvDAO {
 
 	void addProductByCode(String productCode, Integer qty, BigDecimal price, String updateBy,
 			Timestamp updateTimestamp);
+
+	
 
 }

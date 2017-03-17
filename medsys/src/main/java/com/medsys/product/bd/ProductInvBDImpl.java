@@ -61,6 +61,13 @@ public class ProductInvBDImpl implements ProductInvBD {
         productInvDAO.sellProduct(productCode, saleQty);
 	}
  
+	
+	@Override
+	public void cancelProductSale(String productCode, Integer cancelQty) throws SysException {
+		logger.debug("ProductInvBD: cancel product sale.");
+        productInvDAO.cancelProductSale(productCode, cancelQty);
+	}
+ 
     @Override
     public List<ProductInv> getAllProductInv() {
         return productInvDAO.getAllProduct();
