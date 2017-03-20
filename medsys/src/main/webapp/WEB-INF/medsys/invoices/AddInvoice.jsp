@@ -1,5 +1,6 @@
 <%@page import="com.medsys.orders.model.Invoice"%>
 <%@page import="com.medsys.ui.util.UIActions"%>
+<%@page import="java.util.ArrayList"%>
 
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
@@ -53,6 +54,9 @@
 	Invoice invoice = (Invoice)request.getAttribute("invoice");
 	pageContext.setAttribute("orderId",invoice.getOrder().getOrderId());
 	pageContext.setAttribute("invoiceId",invoice.getInvoiceId());
+	pageContext.setAttribute("vatTypeList",(ArrayList<String>)request.getAttribute("vatTypeList"));
+	pageContext.setAttribute("setList",(ArrayList<String>)request.getAttribute("setList"));
+	pageContext.setAttribute("pdtGroupList",(ArrayList<String>)request.getAttribute("pdtGroupList"));
 %>
 <script>
 		
@@ -61,6 +65,9 @@
 	//data[csrfParameter] = csrfToken;
 	data["orderId"] = ${orderId};
 	data["invoiceId"] =${invoiceId};
+	var vatTypeList = ${vatTypeList};
+	var setList = ${setList};
+	var pdtGroupList = ${pdtGroupList};
 	//headers[csrfHeader] = csrfToken; 
 	
 	//alert("data for ajax submit: " + data);
@@ -71,18 +78,18 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['invoiceProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Adnl.Avl. Qty', 'Actions'],
+		   	colNames:['invoiceProductId','Set', 'Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','VAT','Total', 'Actions'],
 		   	colModel:[
 		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
-		   		{name:'setPdtId',index:'setPdtId',hidden:true},
+		   		{name:'setId',index:'setId',  hidden: true, editable: true, editrules: { edithidden: true }, editoptions: { value: setList}},
+		   		{name:'groupId',index:'groupId',  hidden: true, editable: true, editrules: { edithidden: true }, editoptions: { value: pdtGroupList}},
 		   		{name:'product.productCode',index:'product.productCode', width:50, editable:"hidden"},
 				{name:'product.group.groupName',index:'product.group.groupName', width:100},
 		   		{name:'product.productDesc',index:'product.productDesc', width:200, editable:false,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
-		   		{name:'qty',index:'qty', width:50, editable:true, editrules:{required:true}, editoptions:{size:5}, 
-					cellattr: function(rowId, cellValue, rawObject, cm, item) {if(!(typeof(item)  === "undefined")){
-							if((cellValue > item.availableQty)){return ' style="color:red;font-weight:bold;background-color:yellow;"' };
-						}}},
-		   		{name:'availableQty',index:'availableQty', width:50, editable:false},
+		   		{name:'ratePerUnit',index:'ratePerUnit', width:10},
+		   		{name:'qty',index:'qty', width:10, editable:true, editrules:{required:true}, editoptions:{size:5} },
+		   		{name:'VAT',index:'vatType', width:15,editoptions: { value: vatTypeList}},
+		   		{name:'Total',index:'totalPrice', width:10},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',
 					formatoptions: {
@@ -113,7 +120,39 @@
 		    loadonce: true,
 			forceClientSorting: true,
 			navOptions: { reloadGridOptions: { fromServer: true } },
-		    loadComplete: function() {},
+			footerrow: true,
+			loadComplete: function () {
+			    var $this = $(this),
+			        sum = $this.jqGrid("getCol", "totalPrice", false, "sum"),
+			        $footerRow = $(this.grid.sDiv).find("tr.footrow"),
+			        localData = $this.jqGrid("getGridParam", "data"),
+			        totalRows = localData.length,
+			        totalSum = 0,
+			        $newFooterRow,
+			        i;
+
+			    $newFooterRow = $(this.grid.sDiv).find("tr.myfootrow");
+			    if ($newFooterRow.length === 0) {
+			        // add second row of the footer if it's not exist
+			        $newFooterRow = $footerRow.clone();
+			        $newFooterRow.removeClass("footrow")
+			            .addClass("myfootrow ui-widget-content");
+			        $newFooterRow.children("td").each(function () {
+			            this.style.width = ""; // remove width from inline CSS
+			        });
+			        $newFooterRow.insertAfter($footerRow);
+			    }
+			    $this.jqGrid("footerData", "set", {invdate: "Total (page):", totalPrice: sum});
+
+			    // calculate the value for the second footer row
+			    for (i = 0; i < totalRows; i++) {
+			        totalSum += parseInt(localData[i].totalPrice, 10);
+			    }
+			    $newFooterRow.find(">td[aria-describedby=" + this.id + "_invdate]")
+			        .text("Grand Total:");
+			    $newFooterRow.find(">td[aria-describedby=" + this.id + "_amount]")
+			        .text($.fmatter.util.NumberFormat(totalSum, $.jgrid.formatter.number));
+			}
 		    grouping: true,
 		   	groupingView : {
 		   		groupField : ['product.group.groupName'],
@@ -124,6 +163,7 @@
 				groupSummary : [true],
 				groupDataSorted : true
 		   	},
+		  
 		    jsonReader : {
 		        root: "rows",
 		        page: "page",
@@ -131,15 +171,23 @@
 		        records: "records",
 		        repeatitems: false,
 		        cell: "cell",
-		        id: "invoiceProductSetId"
+		        id: "invoiceProductId"
 		        
 		    }
 			
 			
 		});
 		$("#grid").jqGrid('navGrid','#pager',
-				{edit:false, add:false, del:false, search:true},
-				{}, {}, {}, 
+				{edit:false, add:true, del:false, search:true, cloneToTop: true },
+				{}, 
+				// options for the Add Dialog
+                {
+                    closeAfterAdd: true,
+                    recreateForm: true,
+                    errorTextFormat: function (data) {
+                        return 'Error: ' + data.responseText
+                    }
+                }, {}, 
 				{ 	// search
 					sopt:['cn', 'eq', 'ne', 'lt', 'gt', 'bw', 'ew'],
 					closeOnEscape: true, 
