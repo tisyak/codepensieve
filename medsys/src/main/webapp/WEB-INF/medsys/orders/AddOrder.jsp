@@ -46,6 +46,7 @@
 		<div class="col-sm-4">
 		<form:input disabled="true" path="orderNumber" cssClass="form-control"
 			title="orderNumber" />
+			<form:hidden path="orderNumber" />
 			</div>
 	</div>	
 	

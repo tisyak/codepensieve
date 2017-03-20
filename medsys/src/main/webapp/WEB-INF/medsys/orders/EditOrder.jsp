@@ -366,11 +366,11 @@
 	</div>
 	
 	<div class="form-group">
-		<label class="col-sm-2" for="inputOrderNumber">Order Status</label>
+		<label class="col-sm-2" for="inputOrderStatus">Order Status</label>
 		<div class="col-sm-5">
-		<form:input disabled="true" path="orderStatus" cssClass="form-control"
+		<form:input disabled="true" path="orderStatus.orderStatusDesc" cssClass="form-control"
 			title="orderStatus" />
-			<form:hidden path="orderStatus" title="orderStatus" />
+			<form:hidden path="orderStatus.orderStatusId" title="orderStatus" />
 			</div>
 	</div>
 	

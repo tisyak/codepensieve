@@ -28,7 +28,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.google.common.base.Objects;
-import com.medsys.master.model.AdminAccountStatus;
 
 @Entity
 @Table(name = "ADMIN_USERS")
@@ -70,9 +69,8 @@ public class AdminUser implements UserDetails {
 	@Transient
 	private String oldPassword;
 
-	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "account_status_code", referencedColumnName = "status_code")
-	private AdminAccountStatus adminAccountStatus;
+	@Column(name = "account_status_code")
+	private String adminAccountStatus;
 
 	/** The update timestamp. */
 	@Column(name = "reg_timestamp")
@@ -161,7 +159,7 @@ public class AdminUser implements UserDetails {
 	}
 
 	public boolean getEnabled() {
-		if (!this.adminAccountStatus.getStatusCode().equals("D")) {
+		if (!this.adminAccountStatus.equals("D")) {
 			this.enabled = true;
 		} else {
 			this.enabled = false;
@@ -172,7 +170,7 @@ public class AdminUser implements UserDetails {
 	}
 
 	public void setEnabled(boolean enabled) {
-		if (!this.adminAccountStatus.getStatusCode().equals("D")) {
+		if (!this.adminAccountStatus.equals("D")) {
 			this.enabled = true;
 		} else {
 			this.enabled = false;
@@ -257,7 +255,7 @@ public class AdminUser implements UserDetails {
 
 	@Override
 	public boolean isEnabled() {
-		if (!this.adminAccountStatus.getStatusCode().equals("D")) {
+		if (!this.adminAccountStatus.equals("D")) {
 			return true;
 		} else {
 			return false;
@@ -284,11 +282,11 @@ public class AdminUser implements UserDetails {
 		this.oldPassword = oldPassword;
 	}
 
-	public AdminAccountStatus getAdminAccountStatus() {
+	public String getAdminAccountStatus() {
 		return adminAccountStatus;
 	}
 
-	public void setAdminAccountStatus(AdminAccountStatus adminAccountStatus) {
+	public void setAdminAccountStatus(String adminAccountStatus) {
 		this.adminAccountStatus = adminAccountStatus;
 	}
 

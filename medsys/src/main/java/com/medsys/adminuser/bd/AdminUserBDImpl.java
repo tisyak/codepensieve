@@ -16,7 +16,6 @@ import com.medsys.adminuser.dao.AdminUserDAO;
 import com.medsys.adminuser.model.AdminResponse;
 import com.medsys.adminuser.model.AdminUser;
 import com.medsys.common.model.Response;
-import com.medsys.master.bd.ConfigParaBD;
 //import com.medsys.user.model.User;
 //import com.medsys.user.model.UserResponse;
 import com.medsys.util.ConvertSHA2;
@@ -30,10 +29,6 @@ public class AdminUserBDImpl implements AdminUserBD {
     @Autowired
     private AdminUserDAO userDAO;
 
-    
-    @Autowired
-    ConfigParaBD masterConfigBD;
- 
     @Override
     public AdminResponse addUser(AdminUser user) {
        return userDAO.addUser(user);

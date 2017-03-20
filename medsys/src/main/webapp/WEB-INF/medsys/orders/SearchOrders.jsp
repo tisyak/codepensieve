@@ -1,6 +1,7 @@
+<%@page import="com.medsys.master.model.OrderStatusCode"%>
 <%@page import="java.util.List"%>
 <%@page import="com.medsys.orders.model.Orders"%>
-<%@page import="com.medsys.orders.model.OrderStatus"%>
+<%@page import="com.medsys.master.model.OrderStatusCode"%>
 <%@page import="com.medsys.ui.util.UIActions"%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -111,14 +112,14 @@
 
 						<ul class="dropdown-menu pull-right">
 							<%
-								if (order.getOrderStatus().equals(OrderStatus.ACTIVE.getCode())) {
+								if (order.getOrderStatus().getOrderStatusCode().equals(OrderStatusCode.ACTIVE.getCode())) {
 							%>
 							<li><a href="${editOrder}?orderId=<%=order.getOrderId()%>">Edit</a></li>
 							<%
 								}
 							%>
 							<%
-								if (order.getOrderStatus().equals(OrderStatus.INITIALIZED.getCode())) {
+								if (order.getOrderStatus().getOrderStatusCode().equals(OrderStatusCode.EMPTY.getCode())) {
 							%>
 							<c:url value="/${UIActions.LOAD_ADD_PRODUCT_ORDER}"
 								var="addProductsToOrderUrl" />
@@ -129,8 +130,8 @@
 								}
 							%>
 							<%
-								if (order.getOrderStatus().equals(OrderStatus.INITIALIZED.getCode())
-									|| order.getOrderStatus().equals(OrderStatus.ACTIVE.getCode())) {
+								if (order.getOrderStatus().getOrderStatusCode().equals(OrderStatusCode.EMPTY.getCode())
+									|| order.getOrderStatus().getOrderStatusCode().equals(OrderStatusCode.ACTIVE.getCode())) {
 							%>
 							<li><a href="${deleteOrder}?orderId=<%=order.getOrderId()%>">Delete</a></li>
 							<%

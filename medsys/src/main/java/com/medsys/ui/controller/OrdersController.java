@@ -27,8 +27,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.ReportsResponse;
 import com.medsys.customer.bd.CustomerBD;
+import com.medsys.master.bd.MasterDataBD;
+import com.medsys.master.model.OrderStatusCode;
+import com.medsys.master.model.OrderStatusMaster;
 import com.medsys.orders.bd.OrderBD;
-import com.medsys.orders.model.OrderStatus;
 import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.SetBD;
 import com.medsys.ui.jasper.service.OrdersReportDownloadService;
@@ -52,12 +54,12 @@ public class OrdersController extends SuperController {
 
 	@Autowired
 	private SetBD setBD;
+	
+	@Autowired
+	private MasterDataBD masterDataBD;
 
 	@Autowired
 	private OrdersReportDownloadService ordersReportDownloadService;
-
-	@Autowired
-	private TokenService tokenService;
 
 	@RequestMapping(value = { UIActions.FORWARD_SLASH + UIActions.LIST_ALL_ORDERS }, method = RequestMethod.GET)
 	public String listOfOrders(Model model) {
@@ -118,7 +120,7 @@ public class OrdersController extends SuperController {
 		model.addAttribute("setList", setBD.getAllSet());
 		order = new Orders(true);
 		model.addAttribute("order", order);
-		order.setOrderStatus(OrderStatus.INITIALIZED.getCode());
+		order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class, OrderStatusCode.EMPTY.getCode()));
 		return MedsysUITiles.ADD_ORDER.getTile();
 	}
 
@@ -218,20 +220,6 @@ public class OrdersController extends SuperController {
 		String message = "Order with orderId: " + orderId + " was successfully deleted";
 		model.addAttribute("message", message);
 		return UIActions.REDIRECT + UIActions.LIST_ALL_ORDERS;
-	}
-
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_PROGRESS)
-	public @ResponseBody ReportsResponse checkDownloadProgress(@RequestParam String token) {
-		String tokenCheck = tokenService.check(token);
-		logger.debug("returning tokenCheck: " + tokenCheck);
-		return new ReportsResponse(true, tokenCheck);
-	}
-
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_TOKEN)
-	public @ResponseBody ReportsResponse getDownloadToken() {
-		String token = tokenService.generate();
-		logger.debug("returning generated token: " + token);
-		return new ReportsResponse(true, token);
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_ORDER_REPORT)

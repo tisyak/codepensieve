@@ -51,7 +51,7 @@
 <!--End of JQGrid Action URLs -->	
 <%
 	Invoice invoice = (Invoice)request.getAttribute("invoice");
-	pageContext.setAttribute("orderId",invoice.getOrderId());
+	pageContext.setAttribute("orderId",invoice.getOrder().getOrderId());
 	pageContext.setAttribute("invoiceId",invoice.getInvoiceId());
 %>
 <script>

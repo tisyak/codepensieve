@@ -18,5 +18,7 @@ public interface MasterDataDAO {
     public void delete(Class subClass,Integer id) throws EmptyResultDataAccessException;
  
     public List<MasterData> getAll(String modelName);
+
+	public MasterData getbyCode(Class subClass, String code);
     
 }

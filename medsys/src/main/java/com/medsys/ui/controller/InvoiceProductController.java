@@ -1,5 +1,6 @@
 package com.medsys.ui.controller;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +21,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
-import com.medsys.orders.bd.OrderBD;
-import com.medsys.orders.model.OrderProductSet;
+import com.medsys.master.bd.MasterDataBD;
+import com.medsys.master.model.TaxMaster;
+import com.medsys.orders.bd.InvoiceBD;
+import com.medsys.orders.model.InvoiceProduct;
 import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.ProductMaster;
@@ -37,67 +40,50 @@ public class InvoiceProductController {
 	static Logger logger = LoggerFactory.getLogger(InvoiceProductController.class);
 
 	@Autowired
-	private OrderBD orderBD;
+	private InvoiceBD invoiceBD;
 
 	@Autowired
-	private SetBD setBD;
+	private MasterDataBD masterDataBD;
 
 	@Autowired
 	private ProductMasterBD productMasterBD;
 
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LIST_ALL_PRODUCT_ORDERS, produces = "application/json")
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LIST_ALL_PRODUCT_INVOICES, produces = "application/json")
 	public @ResponseBody JqgridResponse<?> records(@RequestParam("_search") Boolean search,
 			@RequestParam(value = "filters", required = false) String filters,
-			@RequestParam(value = "orderProductSetId", required = false) Integer orderProductSetId,
+			@RequestParam(value = "invoiceProductSetId", required = false) Integer invoiceProductSetId,
 			@RequestParam(value = "page", required = false) Integer page,
 			@RequestParam(value = "rows", required = false) Integer rows,
 			@RequestParam(value = "sidx", required = false) String sidx,
 			@RequestParam(value = "sord", required = false) String sord,
 			@RequestParam(value = "setId", required = false) Integer setId,
-			@RequestParam(value = "orderId", required = false) Integer orderId) {
+			@RequestParam(value = "invoiceId", required = false) Integer invoiceId) {
 
 		// Pageable pageRequest = new PageRequest(page-1, rows);
-		logger.debug("list all products / search in order : setId: " + setId + " ,orderID: " + orderId);
+		logger.debug("list all products / search in invoice : setId: " + setId + " ,invoiceID: " + invoiceId);
 		if (search == true) {
 			// TODO: enable search??
 			// return getFilteredRecords(filters, pageRequest);
 
 		}
 
-		List<OrderProductSet> orderProducts = orderBD.getAllProductsInOrder(orderId);
+		List<InvoiceProduct> invoiceProducts = invoiceBD.getAllProductsInInvoice(invoiceId);
 
-		logger.debug("Products in order: " + orderProducts);
+		logger.debug("Products in invoice: " + invoiceProducts);
 
-		if (orderProducts == null || orderProducts.size() == 0) {
-			List<SetPdtTemplate> setProducts = setBD.getAllProductsInSet(setId);
+			JqgridResponse<InvoiceProduct> response = new JqgridResponse<InvoiceProduct>();
+			response.setRows(invoiceProducts);
 
-			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();
-			response.setRows(setProducts);
-			response.setRecords(Integer.valueOf(orderProducts.size()).toString());
+			response.setRecords(Integer.valueOf(invoiceProducts.size()).toString());
 			// Single page to display all products part of the set chosen for
-			// order.
+			// invoice.
 			response.setTotal(Integer.valueOf(1).toString());
 			response.setPage(Integer.valueOf(1).toString());
 
-			logger.debug("First Time. Loading response from Set Template: " + response);
+			logger.debug("Products already exist in invoice. Loading response from Invoice Product List: " + response);
 
 			return response;
-
-		} else {
-
-			JqgridResponse<OrderProductSet> response = new JqgridResponse<OrderProductSet>();
-			response.setRows(orderProducts);
-
-			response.setRecords(Integer.valueOf(orderProducts.size()).toString());
-			// Single page to display all products part of the set chosen for
-			// order.
-			response.setTotal(Integer.valueOf(1).toString());
-			response.setPage(Integer.valueOf(1).toString());
-
-			logger.debug("Products already exist in order. Loading response from Order Product List: " + response);
-
-			return response;
-		}
+		
 
 	}
 
@@ -105,7 +91,7 @@ public class InvoiceProductController {
 	 * Helper method for returning filtered records
 	 */
 	/*
-	 * public JqgridResponse<OrderProductSet> getFilteredRecords(String filters,
+	 * public JqgridResponse<InvoiceProduct> getFilteredRecords(String filters,
 	 * Pageable pageRequest) { String qUsername = null; String qFirstName =
 	 * null; String qLastName = null; Integer qRole = null;
 	 * 
@@ -135,62 +121,73 @@ public class InvoiceProductController {
 	 * response; }
 	 */
 
-	@RequestMapping(value = UIActions.GET_PRODUCT_ORDER, produces = "application/json")
-	public @ResponseBody OrderProductSet get(@RequestBody OrderProductSet orderProductSet) {
-		logger.debug("Getting the product in order: " + orderProductSet);
+	@RequestMapping(value = UIActions.GET_PRODUCT_INVOICE, produces = "application/json")
+	public @ResponseBody InvoiceProduct get(@RequestBody InvoiceProduct invoiceProductSet) {
+		logger.debug("Getting the product in invoice: " + invoiceProductSet);
 
-		return orderBD.getProductInOrder(orderProductSet.getOrderProductSetId());
+		return invoiceBD.getProductInInvoice(invoiceProductSet.getInvoiceProductId());
 	}
 
-	@RequestMapping(value = UIActions.ADD_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response create(@RequestParam(value = "orderId", required = true) Integer orderId,
+	@RequestMapping(value = UIActions.ADD_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
+	public @ResponseBody Response create(@RequestParam(value = "invoiceId", required = true) Integer invoiceId,
 			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam(value = "qty", required = true) Integer qty) {
+			@RequestParam(value = "qty", required = true) Integer qty,
+			@RequestParam(value = "ratePerUnit", required = true) BigDecimal ratePerUnit,
+			@RequestParam(value = "vatTypeId", required = true) Integer vatTypeId,
+			@RequestParam(value = "vatAmount", required = true) BigDecimal vatAmount,
+			@RequestParam(value = "totalPrice", required = true) BigDecimal totalPrice) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
-		OrderProductSet newOrderProductSet = new OrderProductSet(orderId, product, qty);
-
-		logger.debug("Adding the product to order: " + newOrderProductSet);
+		InvoiceProduct newInvoiceProduct = new InvoiceProduct();
+		newInvoiceProduct.setInvoiceId(invoiceId);
+		newInvoiceProduct.setProduct(product);
+		newInvoiceProduct.setQty(qty);
+		newInvoiceProduct.setRatePerUnit(ratePerUnit);
+		newInvoiceProduct.setVatType((TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId));
+		newInvoiceProduct.setVatAmount(vatAmount);
+		newInvoiceProduct.setTotalPrice(totalPrice);
+		
+		logger.debug("Adding the product to invoice: " + newInvoiceProduct);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		newOrderProductSet.setUpdateBy(auth.getName());
-		newOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
-		Response response = orderBD.addProductToOrder(newOrderProductSet);
+		newInvoiceProduct.setUpdateBy(auth.getName());
+		newInvoiceProduct.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
+		Response response = invoiceBD.addProductToInvoice(newInvoiceProduct);
 		return response;
 	}
 
-	@RequestMapping(value = UIActions.EDIT_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
+	@RequestMapping(value = UIActions.EDIT_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response update(@RequestParam Integer id,
-			@RequestParam(value = "orderId", required = true) Integer orderId,
+			@RequestParam(value = "invoiceId", required = true) Integer invoiceId,
 			@RequestParam(value = "product.productCode", required = true) String productCode,
 			@RequestParam Integer qty) {
 
-		OrderProductSet orderProductSet = orderBD.getProductInOrder(id);
-		if (orderProductSet.getOrderId().equals(orderId)
-				&& orderProductSet.getProduct().getProductCode().equals(productCode)) {
-			orderProductSet.setQty(qty);
-			logger.debug("Updating the product in order: " + orderProductSet);
-			Response response = orderBD.updateProductInOrder(orderProductSet);
+		InvoiceProduct invoiceProductSet = invoiceBD.getProductInInvoice(id);
+		if (invoiceProductSet.getInvoiceId().equals(invoiceId)
+				&& invoiceProductSet.getProduct().getProductCode().equals(productCode)) {
+			invoiceProductSet.setQty(qty);
+			logger.debug("Updating the product in invoice: " + invoiceProductSet);
+			Response response = invoiceBD.updateProductInInvoice(invoiceProductSet);
 			return response;
 		} else {
-			logger.debug("Error in updating the product in order: " + orderProductSet + ".\nThe orderId and prodcutCodes in request do not match with System data") ;
+			logger.debug("Error in updating the product in invoice: " + invoiceProductSet + ".\nThe invoiceId and prodcutCodes in request do not match with System data") ;
 			return new Response(false, EpSystemError.SYSTEM_INTERNAL_ERROR);
 		}
 	}
 
-	@RequestMapping(value = UIActions.DELETE_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer orderProductSetId) {
+	@RequestMapping(value = UIActions.DELETE_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
+	public @ResponseBody Response delete(@RequestParam Integer invoiceProductSetId) {
 
-		OrderProductSet orderProductSet = orderBD.getProductInOrder(orderProductSetId);
-		logger.debug("Deleting the product in order: " + orderProductSet);
-		Response response = orderBD.deleteProductFromOrder(orderProductSet);
+		InvoiceProduct invoiceProductSet = invoiceBD.getProductInInvoice(invoiceProductSetId);
+		logger.debug("Deleting the product in invoice: " + invoiceProductSet);
+		Response response = invoiceBD.deleteProductFromInvoice(invoiceProductSet);
 		return response;
 	}
 
-	public static List<OrderProductSet> map(Page<OrderProductSet> pageOfOrderProducts) {
-		List<OrderProductSet> orderProducts = new ArrayList<OrderProductSet>();
-		for (OrderProductSet orderProduct : pageOfOrderProducts) {
-			orderProducts.add(orderProduct);
+	public static List<InvoiceProduct> map(Page<InvoiceProduct> pageOfInvoiceProducts) {
+		List<InvoiceProduct> invoiceProducts = new ArrayList<InvoiceProduct>();
+		for (InvoiceProduct invoiceProduct : pageOfInvoiceProducts) {
+			invoiceProducts.add(invoiceProduct);
 		}
-		return orderProducts;
+		return invoiceProducts;
 	}
 }

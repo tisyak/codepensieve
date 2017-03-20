@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "m_order_status")
-public class OrderStatusMaster {
+public class OrderStatusMaster extends MasterData  {
 	
 	static Logger logger = LoggerFactory.getLogger(OrderStatusMaster.class);
 
@@ -113,6 +113,16 @@ public class OrderStatusMaster {
 		return "OrderStatusMaster [orderStatusId=" + orderStatusId + ", orderStatusCode=" + orderStatusCode
 				+ ", orderStatusDesc=" + orderStatusDesc + ", updateBy=" + updateBy + ", updateTimestamp="
 				+ updateTimestamp + "]";
+	}
+
+	@Override
+	public Integer getUniqueId() {
+		return this.getOrderStatusId();
+	}
+
+	@Override
+	public String getKeyColumnName() {
+		return "orderStatusCode";
 	}
 
 }

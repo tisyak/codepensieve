@@ -1,5 +1,6 @@
 package com.medsys.orders.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
@@ -22,7 +23,7 @@ import com.medsys.product.model.ProductMaster;
 
 @Entity
 @Table(name = "invoice_product")
-public class InvoiceProduct {
+public class InvoiceProduct  implements Serializable  {
 
 	static Logger logger = LoggerFactory.getLogger(InvoiceProduct.class);
 

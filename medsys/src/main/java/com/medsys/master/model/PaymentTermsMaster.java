@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "m_payment_terms")
-public class PaymentTermsMaster {
+public class PaymentTermsMaster  extends MasterData {
 	
 	static Logger logger = LoggerFactory.getLogger(PaymentTermsMaster.class);
 
@@ -119,6 +119,16 @@ public class PaymentTermsMaster {
 		return "PaymentTermsMaster [paymentTermsId=" + paymentTermsId + ", paymentTermsCode=" + paymentTermsCode
 				+ ", paymentTermsDesc=" + paymentTermsDesc + ", updateBy=" + updateBy + ", updateTimestamp="
 				+ updateTimestamp + "]";
+	}
+
+	@Override
+	public Integer getUniqueId() {
+		return this.getPaymentTermsId();
+	}
+
+	@Override
+	public String getKeyColumnName() {
+		return "paymentTermsCode";
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,38 @@ public class MasterDataDAOImpl implements MasterDataDAO {
 	@Override
 	public List<MasterData> getAll(String modelName) {
 		return getCurrentSession().createQuery("from " + modelName).getResultList();
+	}
+
+	@Override
+	public MasterData getbyCode(Class subClass, String code) {
+		logger.debug("MasterDataDAOImpl.getbyCode() - [" + code + "]");
+		MasterData masterdata;
+		try {
+			masterdata = (MasterData) subClass.newInstance();
+
+			Query<MasterData> query = getCurrentSession().createQuery(
+					"from " + subClass.getName() + " where " + masterdata.getKeyColumnName() + " = '" + code + "'");
+
+			logger.debug(query.toString());
+			if (query.getResultList().size() == 0) {
+				logger.debug("No user found.");
+				throw new EmptyResultDataAccessException(
+						"MasterData [" + subClass.getName() + "] with code [" + code + "]+ not found", 1);
+			} else {
+
+				logger.debug("MasterData found. ");
+				MasterData masterData = (MasterData) query.getSingleResult();
+
+				return masterData;
+			}
+
+		} catch (InstantiationException e) {
+			throw new EmptyResultDataAccessException("MasterData [" + subClass.getName() + "] with code [" + code
+					+ "]+ not found. InstantiationException: " + e.getMessage(), 1);
+		} catch (IllegalAccessException e) {
+			throw new EmptyResultDataAccessException("MasterData [" + subClass.getName() + "] with code [" + code
+					+ "]+ not found. IllegalAccessException: " + e.getMessage(), 1);
+		}
 	}
 
 }

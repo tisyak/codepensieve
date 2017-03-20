@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -18,11 +20,15 @@ import org.hibernate.validator.constraints.NotEmpty;
  * The Class ConfigPara.
  */
 @Entity
-@Table(name="config_para")
+@Table(name="m_config_para")
 public class ConfigPara extends MasterData {
 
-	/** The paraname. */
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "para_id", columnDefinition = "serial")
+	private Integer paraId; 
+	
+	/** The paraname. */
 	@NotNull(message = "{error.config.paraname.null}")
     @NotEmpty(message = "{error.config.paraname.empty}")
 	@Column(name="para_name")
@@ -166,8 +172,13 @@ public class ConfigPara extends MasterData {
 	}
 
 	@Override
-	public String getUniqueId() {
-		return paraname;
+	public Integer getUniqueId() {
+		return this.paraId;
+	}
+
+	@Override
+	public String getKeyColumnName() {
+		return "paraId";
 	}
 	
 	

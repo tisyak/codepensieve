@@ -18,95 +18,82 @@ import com.medsys.master.dao.MasterDataDAO;
 import com.medsys.master.model.MasterData;
 import com.medsys.util.EpSystemError;
 
-
 /**
  * The Class MasterConfigBDImpl.
  */
 @Service
 @Transactional
 public class MasterDataBDImpl implements MasterDataBD {
-	
-	 
-    /** The Constant logger. */
-    private static final Logger logger = LoggerFactory
-            .getLogger(MasterDataBDImpl.class);
-    
-    /** The master config dao. */
-    @Autowired
-    MasterDataDAO masterDataDAO;
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.medsys.common.bd.MasterConfigBD#getConfigPara(in.cdac.epramaan
-     * .util.ConfigParaKey)
-     */
-    @Override
-    public MasterData get(Class subClass,Integer id) {
 
-    	try{
-    		return masterDataDAO.get(subClass,id);
-    	}catch(EmptyResultDataAccessException e){
-    		logger.error("ConfigPara: " + id + " does not exist!");
-            return null;
-    	}
-    }
+	/** The Constant logger. */
+	private static final Logger logger = LoggerFactory.getLogger(MasterDataBDImpl.class);
 
-	/* (non-Javadoc)
-	 * @see com.medsys.master.bd.MasterConfigBD#addConfigPara(com.medsys.master.model.ConfigPara)
-	 */
+	/** The master config dao. */
+	@Autowired
+	MasterDataDAO masterDataDAO;
+
+	@Override
+	public MasterData get(Class subClass, Integer id) {
+
+		try {
+			return masterDataDAO.get(subClass, id);
+		} catch (EmptyResultDataAccessException e) {
+			logger.error("MasterData: " + id + " does not exist!");
+			return null;
+		}
+	}
+
 	@Override
 	public Response add(MasterData masterData) {
-		try{
-    		masterDataDAO.add(masterData);
-    		return new Response(true, null);
-    	}catch(DuplicateKeyException e){
-    		logger.error("ConfigPara: " + masterData.getUniqueId() + " already exists. Cannot create duplicate!");
-            return new Response(false, EpSystemError.DUPLICATE_RECORD);
-    	}
-		
+		try {
+			masterDataDAO.add(masterData);
+			return new Response(true, null);
+		} catch (DuplicateKeyException e) {
+			logger.error("MasterData: " + masterData.getUniqueId() + " already exists. Cannot create duplicate!");
+			return new Response(false, EpSystemError.DUPLICATE_RECORD);
+		}
+
 	}
 
-	/* (non-Javadoc)
-	 * @see com.medsys.master.bd.MasterConfigBD#updateConfigPara(com.medsys.master.model.ConfigPara)
-	 */
 	@Override
-	public Response update(Class subClass,MasterData masterData) {
-		try{
-    		masterDataDAO.update(subClass,masterData);
-    		return new Response(true, null);
-    	}catch(EmptyResultDataAccessException e){
-    		logger.error("ConfigPara: " + masterData.getUniqueId() + " does not exist!");
-            return new Response(false, EpSystemError.NO_RECORD_FOUND);
-    	}
-		
+	public Response update(Class subClass, MasterData masterData) {
+		try {
+			masterDataDAO.update(subClass, masterData);
+			return new Response(true, null);
+		} catch (EmptyResultDataAccessException e) {
+			logger.error("MasterData: " + masterData.getUniqueId() + " does not exist!");
+			return new Response(false, EpSystemError.NO_RECORD_FOUND);
+		}
+
 	}
 
-	/* (non-Javadoc)
-	 * @see com.medsys.master.bd.MasterConfigBD#deleteConfigPara(java.lang.String)
-	 */
 	@Override
-	public Response delete(Class subClass,Integer id) {
-		try{
-    		masterDataDAO.delete(subClass,id);
-    		return new Response(true, null);
-    	}catch(EmptyResultDataAccessException e){
-    		logger.error("ConfigPara: " + id + " does not exist!");
-            return new Response(false, EpSystemError.NO_RECORD_FOUND);
-    	}
-		
+	public Response delete(Class subClass, Integer id) {
+		try {
+			masterDataDAO.delete(subClass, id);
+			return new Response(true, null);
+		} catch (EmptyResultDataAccessException e) {
+			logger.error("MasterData: " + id + " does not exist!");
+			return new Response(false, EpSystemError.NO_RECORD_FOUND);
+		}
+
 	}
 
-	/* (non-Javadoc)
-	 * @see com.medsys.master.bd.MasterConfigBD#getConfigParas()
-	 */
 	@Override
 	public List<MasterData> getAll(String modelName) {
 		return masterDataDAO.getAll(modelName);
 	}
-    
-  
-    
-    
+
+	@Override
+	public MasterData getbyCode(Class subClass, String code) {
+
+		try {
+			return masterDataDAO.getbyCode(subClass, code);
+		} catch (EmptyResultDataAccessException e) {
+			logger.error("MasterData: " + code + " does not exist!");
+			return null;
+		}
+
+	}
+
 }

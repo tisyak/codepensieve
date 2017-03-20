@@ -13,42 +13,19 @@ import com.medsys.master.model.MasterData;
  * The Interface MasterConfigBD.
  */
 public interface MasterDataBD {
-    
-	/**
-	 * Adds the config para.
-	 *
-	 * @param configPara the config para
-	 */
+   
 	public Response add(MasterData masterData);
-	 
-    /**
-     * Gets the config para.
-     *
-     * @param paraname the paraname
-     * @return the config para
-     */
-    public MasterData get(Class subClass,Integer id);
+	
+    public MasterData get(Class<? extends MasterData> subClass,Integer id);
  
-    /**
-     * Update config para.
-     *
-     * @param configPara the config para
-     */
-    public Response update(Class subClass,MasterData masterData);
+    public Response update(Class<? extends MasterData>  subClass,MasterData masterData);
  
-    /**
-     * Delete config para.
-     *
-     * @param paraname the paraname
-     */
-    public Response delete(Class subClass,Integer id);
+    public Response delete(Class<? extends MasterData>  subClass,Integer id);
  
-    /**
-     * Gets the config paras.
-     *
-     * @return the config paras
-     */
+ 
     public List<MasterData> getAll(String modelName);
+  
+    public MasterData getbyCode(Class<? extends MasterData>  subClass,String code);
 	
 	
 }

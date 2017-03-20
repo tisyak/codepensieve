@@ -53,8 +53,7 @@ public class InvoiceController extends SuperController {
 	@Autowired
 	private InvoiceReportDownloadService invoiceReportDownloadService;
 
-	@Autowired
-	private TokenService tokenService;
+	
 
 	@RequestMapping(value = { UIActions.FORWARD_SLASH + UIActions.LIST_ALL_INVOICES }, method = RequestMethod.GET)
 	public String listOfInvoice(Model model) {
@@ -210,20 +209,7 @@ public class InvoiceController extends SuperController {
 		return UIActions.REDIRECT + UIActions.LIST_ALL_INVOICES;
 	}
 
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_PROGRESS)
-	public @ResponseBody ReportsResponse checkDownloadProgress(@RequestParam String token) {
-		String tokenCheck = tokenService.check(token);
-		logger.debug("returning tokenCheck: " + tokenCheck);
-		return new ReportsResponse(true, tokenCheck);
-	}
-
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_TOKEN)
-	public @ResponseBody ReportsResponse getDownloadToken() {
-		String token = tokenService.generate();
-		logger.debug("returning generated token: " + token);
-		return new ReportsResponse(true, token);
-	}
-
+	
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_INVOICE_REPORT)
 	public void download(@RequestParam String type, @RequestParam String token, @RequestParam Integer invoiceId,
 			HttpServletResponse response) {

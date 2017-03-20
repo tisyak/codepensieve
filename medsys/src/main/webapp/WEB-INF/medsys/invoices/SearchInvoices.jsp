@@ -1,6 +1,6 @@
 <%@page import="java.util.List"%>
 <%@page import="com.medsys.orders.model.Invoice"%>
-<%@page import="com.medsys.orders.model.InvoiceStatus"%>
+<%@page import="com.medsys.master.model.InvoiceStatusCode"%>
 <%@page import="com.medsys.ui.util.UIActions"%>
 
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
@@ -84,9 +84,9 @@
 			<tr>
 				<th style="width: 20%">Invoice Number</th>
 				<th style="width: 20%">Invoice To</th>
-				<th style="width: 30%">Product Set</th>
+				<th style="width: 30%">Order Number</th>
 				<th style="width: 10%">Invoice Date</th>
-				<th style="width: 10%">Delivery Date</th>
+				<th style="width: 10%">Total Amount</th>
 				<th style="width: 10%">Actions</th>
 			</tr>
 		</thead>
@@ -96,11 +96,11 @@
 				for (Invoice invoice : (List<Invoice>) request.getAttribute("invoiceList")) {
 			%>
 			<tr>
-				<td><span class="name"><%=invoice.getInvoiceNumber()%></span></td>
+				<td><span class="name"><%=invoice.getInvoiceNo()%></span></td>
 				<td class="hidden-phone"><%=invoice.getCustomer().getName()%></td>
-				<td class="hidden-phone"><%=invoice.getSet().getSetName()%></td>
+				<td class="hidden-phone"><%=invoice.getOrder().getOrderNumber()%></td>
 				<td class="hidden-phone"><%=invoice.getInvoiceDate()%></td>
-				<td class="hidden-phone"><%=invoice.getDeliveryDate()%></td>
+				<td class="hidden-phone"><%=invoice.getTotalAmount()%></td>
 				<td class="hidden-phone">
 					<div class="btn-group">
 						<button data-toggle="dropdown" class="btn btn-xs dropdown-toggle"
@@ -111,14 +111,14 @@
 
 						<ul class="dropdown-menu pull-right">
 							<%
-								if (invoice.getInvoiceStatus().equals(InvoiceStatus.ACTIVE.getCode())) {
+								if (invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())) {
 							%>
 							<li><a href="${editInvoice}?invoiceId=<%=invoice.getInvoiceId()%>">Edit</a></li>
 							<%
 								}
 							%>
 							<%
-								if (invoice.getInvoiceStatus().equals(InvoiceStatus.INITIALIZED.getCode())) {
+								if (invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())) {
 							%>
 							<c:url value="/${UIActions.LOAD_ADD_PRODUCT_INVOICE}"
 								var="addProductsToInvoiceUrl" />
@@ -129,8 +129,8 @@
 								}
 							%>
 							<%
-								if (invoice.getInvoiceStatus().equals(InvoiceStatus.INITIALIZED.getCode())
-									|| invoice.getInvoiceStatus().equals(InvoiceStatus.ACTIVE.getCode())) {
+								if (invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())
+									|| invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())) {
 							%>
 							<li><a href="${deleteInvoice}?invoiceId=<%=invoice.getInvoiceId()%>">Delete</a></li>
 							<%
