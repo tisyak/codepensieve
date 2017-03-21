@@ -1,6 +1,7 @@
 package com.medsys.ui.controller;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,17 +21,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.medsys.adminuser.model.Roles;
-import com.medsys.common.model.ReportsResponse;
 import com.medsys.customer.bd.CustomerBD;
+import com.medsys.master.bd.MasterDataBD;
+import com.medsys.master.model.MasterData;
+import com.medsys.master.model.PaymentTermsMaster;
+import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.bd.InvoiceBD;
+import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.Invoice;
 import com.medsys.product.bd.SetBD;
+import com.medsys.product.model.ProductGroup;
+import com.medsys.product.model.Set;
 import com.medsys.ui.jasper.service.InvoiceReportDownloadService;
-import com.medsys.ui.jasper.util.TokenService;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.UIConstants;
@@ -51,9 +56,13 @@ public class InvoiceController extends SuperController {
 	private SetBD setBD;
 
 	@Autowired
-	private InvoiceReportDownloadService invoiceReportDownloadService;
+	private OrderBD orderBD;
 
-	
+	@Autowired
+	private MasterDataBD masterDataBD;
+
+	@Autowired
+	private InvoiceReportDownloadService invoiceReportDownloadService;
 
 	@RequestMapping(value = { UIActions.FORWARD_SLASH + UIActions.LIST_ALL_INVOICES }, method = RequestMethod.GET)
 	public String listOfInvoice(Model model) {
@@ -111,7 +120,57 @@ public class InvoiceController extends SuperController {
 
 		logger.info("IN: Invoice/loadAdd-GET");
 		model.addAttribute("customerList", customerBD.getAllCustomers());
-		model.addAttribute("setList", setBD.getAllSet());
+		
+		model.addAttribute("paymentTermsList", masterDataBD.getAll(PaymentTermsMaster.class));
+		// TODO: Change this to a order range of last 3 months
+		model.addAttribute("orderList", orderBD.getAllOrders());
+
+		/**
+		 * START Of Converting the MasterData into the format of
+		 * "Code:DisplayValue" as required by the JQGrid Select Options
+		 */
+		
+		/** Set Listing for ADD Product Filter **/
+		List<Set> setMasterList = setBD.getAllSet();
+		String setList = "{";
+		for (Set set : setMasterList) {
+			setList += "'"+set.getSetId() + "':'" + set.getSetName() + "',";
+		}
+		setList = setList.substring(0, setList.length()-1);
+		setList+="}";
+		// Figure out how to cache all these values
+		model.addAttribute("setList", setList);
+		
+		/** ProductGroup Listing for ADD Product Filter **/
+		List<MasterData> productGroupMasterList = masterDataBD.getAll(ProductGroup.class);
+		String pdtGroupList = "{";
+		for (MasterData pgMd : productGroupMasterList) {
+			ProductGroup productGroup = (ProductGroup) pgMd;
+			pdtGroupList += "'"+productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
+		}
+		pdtGroupList = pdtGroupList.substring(0, pdtGroupList.length()-1);
+		pdtGroupList+="}";
+		// Figure out how to cache all these values
+		model.addAttribute("pdtGroupList", pdtGroupList);
+
+		/** VAT Listing for ADD Product Filter **/
+		List<MasterData> taxMasterList = masterDataBD.getAll(TaxMaster.class);
+		String vatTypeList = "{";
+		for (MasterData txMd : taxMasterList) {
+			TaxMaster taxMaster = (TaxMaster) txMd;
+			vatTypeList+= "'"+taxMaster.getTaxId() + "':'" + taxMaster.getTaxDesc() + "',";
+		}
+		vatTypeList = vatTypeList.substring(0, vatTypeList.length()-1);
+		vatTypeList+="}";
+		// TODO: Figure out how to cache all these values
+		model.addAttribute("vatTypeList", vatTypeList);
+		
+		
+		/**
+		 * END Of Converting the MasterData into the format of
+		 * "Code:DisplayValue" as required by the JQGrid Select Options
+		 */
+
 		invoice = new Invoice(true);
 		model.addAttribute("invoice", invoice);
 		return MedsysUITiles.ADD_INVOICE.getTile();
@@ -209,7 +268,6 @@ public class InvoiceController extends SuperController {
 		return UIActions.REDIRECT + UIActions.LIST_ALL_INVOICES;
 	}
 
-	
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_INVOICE_REPORT)
 	public void download(@RequestParam String type, @RequestParam String token, @RequestParam Integer invoiceId,
 			HttpServletResponse response) {

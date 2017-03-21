@@ -80,8 +80,8 @@ public class MasterDataBDImpl implements MasterDataBD {
 	}
 
 	@Override
-	public List<MasterData> getAll(String modelName) {
-		return masterDataDAO.getAll(modelName);
+	public List<MasterData> getAll(Class subClass) {
+		return masterDataDAO.getAll(subClass);
 	}
 
 	@Override

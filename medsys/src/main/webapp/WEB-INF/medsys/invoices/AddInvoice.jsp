@@ -41,6 +41,7 @@
 <script src="<c:url value="/resources/js/moment.min.js"/>"></script>
 <!-- JQGrid Action URLs -->	
 <c:url value="/${UIActions.LIST_ALL_PRODUCT_INVOICES}" var="recordsUrl"/>
+<c:url value="/${UIActions.ADD_PRODUCT_INVOICE}" var="addUrl"/>
 <c:url value="/${UIActions.EDIT_PRODUCT_INVOICE}" var="saveUrl"/>
 <c:url value="/invoiceproduct/update" var="editUrl"/>
 <c:url value="/invoiceproduct/delete" var="deleteUrl"/>
@@ -52,19 +53,17 @@
 <!--End of JQGrid Action URLs -->	
 <%
 	Invoice invoice = (Invoice)request.getAttribute("invoice");
-	pageContext.setAttribute("orderId",invoice.getOrder().getOrderId());
-	pageContext.setAttribute("invoiceId",invoice.getInvoiceId());
-	pageContext.setAttribute("vatTypeList",(ArrayList<String>)request.getAttribute("vatTypeList"));
-	pageContext.setAttribute("setList",(ArrayList<String>)request.getAttribute("setList"));
-	pageContext.setAttribute("pdtGroupList",(ArrayList<String>)request.getAttribute("pdtGroupList"));
+	
+	pageContext.setAttribute("vatTypeList",request.getAttribute("vatTypeList"));
+	pageContext.setAttribute("setList",request.getAttribute("setList"));
+	pageContext.setAttribute("pdtGroupList",request.getAttribute("pdtGroupList"));
 %>
 <script>
 		
 	var data = {};
 	var headers = {};
 	//data[csrfParameter] = csrfToken;
-	data["orderId"] = ${orderId};
-	data["invoiceId"] =${invoiceId};
+	
 	var vatTypeList = ${vatTypeList};
 	var setList = ${setList};
 	var pdtGroupList = ${pdtGroupList};
@@ -152,7 +151,7 @@
 			        .text("Grand Total:");
 			    $newFooterRow.find(">td[aria-describedby=" + this.id + "_amount]")
 			        .text($.fmatter.util.NumberFormat(totalSum, $.jgrid.formatter.number));
-			}
+			},
 		    grouping: true,
 		   	groupingView : {
 		   		groupField : ['product.group.groupName'],
@@ -221,6 +220,46 @@
 	
 	});
 
+	
+	
+		
+			$('#grid').jqGrid( 'editGridRow',  "new",
+	          	{	url:'${addUrl}', 
+				   	reloadAfterSubmit:true,
+	          		serializeDelData: function (postdata) {
+		          	      var rowdata = $('#grid').getRowData(postdata.id);
+		          	      // append postdata with any information 
+		          	      return {id: postdata.id, oper: postdata.oper, username: rowdata.productCode};
+		          	},
+	          		afterSubmit : function(response, postdata) 
+					{ 
+			            var result = eval('(' + response.responseText + ')');
+						var errors = "";
+						
+			            if (result.success == false) {
+							for (var i = 0; i < result.message.length; i++) {
+								errors +=  result.message[i] + "<br/>";
+							}
+			            }  else {
+			            	$('#msgbox').text('Entry has been added successfully');
+							$('#msgbox').dialog( 
+									{	title: 'Success',
+										modal: true,
+										buttons: {"Ok": function()  {
+											$(this).dialog("close");} 
+										}
+									});
+		                }
+				    	// only used for adding new records
+				    	var newId = null;
+			        	
+						return [result.success, errors, newId];
+					}
+	          	});
+		
+	
+	
+	
 	
 	function deleteRow(obj, args) {
 		// Get the currently selected row
@@ -411,13 +450,13 @@
 		<form:errors path="refSource" cssClass="error" />
 		<label  class="col-sm-1"  for="inputPaymentTerms">Payment Terms</label>
 		<div class="col-sm-4">
-		<form:select class="form-control" path="paymentTerms.code">	
+		<form:select class="form-control" path="paymentTerms.paymentTermsCode">	
 		<form:option value="" label="--  Select  --" />
 			<c:forEach items="${paymentTermsList}" var="paymentTerms">
-				<form:option value="${paymentTerms.code}">${paymentTerms.desc}</form:option>
+				<form:option value="${paymentTerms.paymentTermsCode}">${paymentTerms.paymentTermsDesc}</form:option>
 			</c:forEach>
 		</form:select>
-		<form:errors path="paymentTerms.code" cssClass="error" />
+		<form:errors path="paymentTerms.paymentTermsCode" cssClass="error" />
 			</div>
 	</div>
 	

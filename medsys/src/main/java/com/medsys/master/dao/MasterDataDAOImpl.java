@@ -84,8 +84,8 @@ public class MasterDataDAOImpl implements MasterDataDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MasterData> getAll(String modelName) {
-		return getCurrentSession().createQuery("from " + modelName).getResultList();
+	public List<MasterData> getAll(Class subClass) {
+		return getCurrentSession().createQuery("from " + subClass.getName()).getResultList();
 	}
 
 	@Override

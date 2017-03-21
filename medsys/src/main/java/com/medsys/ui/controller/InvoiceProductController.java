@@ -26,9 +26,7 @@ import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.bd.InvoiceBD;
 import com.medsys.orders.model.InvoiceProduct;
 import com.medsys.product.bd.ProductMasterBD;
-import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.ProductMaster;
-import com.medsys.product.model.SetPdtTemplate;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
 import com.medsys.util.EpSystemError;
@@ -129,14 +127,16 @@ public class InvoiceProductController {
 	}
 
 	@RequestMapping(value = UIActions.ADD_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response create(@RequestParam(value = "invoiceId", required = true) Integer invoiceId,
-			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam(value = "qty", required = true) Integer qty,
-			@RequestParam(value = "ratePerUnit", required = true) BigDecimal ratePerUnit,
-			@RequestParam(value = "vatTypeId", required = true) Integer vatTypeId,
-			@RequestParam(value = "vatAmount", required = true) BigDecimal vatAmount,
-			@RequestParam(value = "totalPrice", required = true) BigDecimal totalPrice) {
-
+	public @ResponseBody Response create(@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
+			@RequestParam(value = "product.productCode", required = false) String productCode,
+			@RequestParam(value = "qty", required = false) Integer qty,
+			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
+			@RequestParam(value = "vatTypeId", required = false) Integer vatTypeId,
+			@RequestParam(value = "vatAmount", required = false) BigDecimal vatAmount,
+			@RequestParam(value = "totalPrice", required = false) BigDecimal totalPrice) {
+		
+		logger.debug("Call to add product to invoice.");
+		
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
 		InvoiceProduct newInvoiceProduct = new InvoiceProduct();
 		newInvoiceProduct.setInvoiceId(invoiceId);

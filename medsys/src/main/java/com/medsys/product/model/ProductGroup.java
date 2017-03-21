@@ -13,27 +13,32 @@ import javax.validation.constraints.Size;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.medsys.master.model.MasterData;
+
+
+//TODO:Consider making this master or disassociate it from getAll of masterData
 @Entity
 @Table(name = "product_group")
-public class ProductGroup {
-	
+public class ProductGroup extends MasterData {
+
 	static Logger logger = LoggerFactory.getLogger(ProductGroup.class);
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "group_id", columnDefinition = "serial")
-	private Integer groupId; 
-	
+	private Integer groupId;
+
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 150, message = "{error.field.max}")
 	@Column(name = "group_name", length = 150)
 	private String groupName;
-	
+
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 250, message = "{error.field.max}")
 	@Column(name = "group_desc", length = 250)
 	private String groupDesc;
-			
+
 	/** The update by. */
 	@Column(name = "update_by")
 	private String updateBy;
@@ -88,6 +93,14 @@ public class ProductGroup {
 				+ ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 
-	
+	@Override
+	public Integer getUniqueId() {
+		return this.getGroupId();
+	}
+
+	@Override
+	public String getKeyColumnName() {
+		return "groupName";
+	}
 
 }

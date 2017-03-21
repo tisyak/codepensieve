@@ -22,10 +22,9 @@ public interface MasterDataBD {
  
     public Response delete(Class<? extends MasterData>  subClass,Integer id);
  
- 
-    public List<MasterData> getAll(String modelName);
-  
     public MasterData getbyCode(Class<? extends MasterData>  subClass,String code);
+
+    public List<MasterData> getAll(Class<? extends MasterData>   subClass);
 	
 	
 }
