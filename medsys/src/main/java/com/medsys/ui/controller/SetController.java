@@ -1,8 +1,11 @@
 package com.medsys.ui.controller;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.product.bd.SetBD;
+import com.medsys.product.model.ProductMaster;
 import com.medsys.product.model.SetPdtTemplate;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.UIConstants;
@@ -106,6 +110,37 @@ public class SetController {
 	 * response.setPage(Integer.valueOf(users.getNumber()+1).toString()); return
 	 * response; }
 	 */
+	
+	@RequestMapping(value = UIActions.FORWARD_SLASH
+			+ UIActions.SEARCH_PRODUCTS_BY_SET_GRP_URL, produces = "application/json")
+	public @ResponseBody String searchBySetandGroup(
+			@RequestParam(value = "filters", required = false) String filters) {
+
+		
+		logger.debug("search By Set and Group: " );
+		
+		//TODO: REMOVE SET Hardcoding
+		List<SetPdtTemplate> setPdtTemplates = setBD.getAllProductsInSet(12);
+		List<ProductMaster> pdtMasterList = new ArrayList<>(setPdtTemplates.size());
+		for (SetPdtTemplate pdt : setPdtTemplates) {
+			pdtMasterList.add(pdt.getProduct());
+		}
+		
+		final StringWriter sw =new StringWriter();
+	    final ObjectMapper mapper = new ObjectMapper();
+
+	    try {
+			mapper.writeValue(sw, pdtMasterList);
+		} catch (IOException e) {
+			logger.error("Unable to convert to JSON. Error: " + e.getMessage());
+		}
+
+		String productsList = sw.toString();
+		logger.debug("productsList: " + productsList);
+		
+		return productsList;
+	}
+
 	
 	public static List<OrderProductSet> map(Page<OrderProductSet> pageOfOrderProducts) {
 		List<OrderProductSet> orderProducts = new ArrayList<OrderProductSet>();

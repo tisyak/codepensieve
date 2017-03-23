@@ -60,7 +60,7 @@ public class Invoice {
 	@Column(name = "reference_source", length = 250)
 	private String refSource;
 
-	
+	@NotNull(message = "{error.field.empty}")
 	@Column(name = "invoice_date")
 	@Type(type="date")
 	private Date invoiceDate; 
@@ -81,7 +81,6 @@ public class Invoice {
 	@JoinColumn(name = "vat_type", referencedColumnName = "tax_id")
 	private TaxMaster vatType;
 	
-	@NotNull
 	@Column(name = "total_vat")
 	private BigDecimal totalVat; 
 	

@@ -55,12 +55,15 @@ public class UIActions {
     public static final String LIST_ALL_PRODUCT_SET_TEMPLATE="setPdtTemplate/list";
     public static final String LOAD_SEARCH_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadSearch";
     public static final String SEARCH_PRODUCT_SET_TEMPLATE="setPdtTemplate/search";
+    public static final String SEARCH_PRODUCTS_BY_SET_GRP_URL="productMaster/searchBySetGrp";
     public static final String LOAD_ADD_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadAdd";
     public static final String ADD_PRODUCT_SET_TEMPLATE="setPdtTemplate/add";
     public static final String EDIT_PRODUCT_SET_TEMPLATE="setPdtTemplate/edit";
     public static final String SAVE_PRODUCT_SET_TEMPLATE="setPdtTemplate/save";
     public static final String LOAD_DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadDelete";
     public static final String DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/delete";
+    
+   
     
     public static final String LIST_ALL_ORDERS="orders/list";
     public static final String LOAD_SEARCH_ORDERS="orders/loadSearch";

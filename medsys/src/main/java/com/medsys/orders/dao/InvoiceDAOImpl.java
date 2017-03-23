@@ -149,7 +149,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		getCurrentSession().flush();
 		return getCurrentSession()
 				.createQuery(
-						"from InvoiceProduct " + " where invoiceId = " + invoiceId + " invoice by product.productCode asc ")
+						"from InvoiceProduct " + " where invoiceId = " + invoiceId + " order by product.productCode asc ")
 				.getResultList();
 	}
 

@@ -26,7 +26,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.medsys.adminuser.model.Roles;
 import com.medsys.customer.bd.CustomerBD;
 import com.medsys.master.bd.MasterDataBD;
+import com.medsys.master.model.InvoiceStatusCode;
+import com.medsys.master.model.InvoiceStatusMaster;
 import com.medsys.master.model.MasterData;
+import com.medsys.master.model.OrderStatusCode;
+import com.medsys.master.model.OrderStatusMaster;
 import com.medsys.master.model.PaymentTermsMaster;
 import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.bd.InvoiceBD;
@@ -172,6 +176,7 @@ public class InvoiceController extends SuperController {
 		 */
 
 		invoice = new Invoice(true);
+		invoice.setInvoiceStatus((InvoiceStatusMaster) masterDataBD.getbyCode(InvoiceStatusMaster.class, InvoiceStatusCode.ACTIVE.getCode()));
 		model.addAttribute("invoice", invoice);
 		return MedsysUITiles.ADD_INVOICE.getTile();
 	}
