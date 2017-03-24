@@ -129,6 +129,64 @@ public class InvoiceController extends SuperController {
 		// TODO: Change this to a order range of last 3 months
 		model.addAttribute("orderList", orderBD.getAllOrders());
 
+		invoice = new Invoice(true);
+		invoice.setInvoiceStatus((InvoiceStatusMaster) masterDataBD.getbyCode(InvoiceStatusMaster.class, InvoiceStatusCode.ACTIVE.getCode()));
+		model.addAttribute("invoice", invoice);
+		return MedsysUITiles.ADD_INVOICE.getTile();
+	}
+
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.ADD_INVOICE, method = RequestMethod.POST)
+	public String addInvoice(@Valid @ModelAttribute Invoice invoice, 
+			Model model, BindingResult result,
+			RedirectAttributes redirectAttrs, HttpServletRequest request) {
+
+		logger.info("IN: Invoice/add-POST");
+
+		if (result.hasErrors()) {
+			logger.info("Invoice-add error: " + result.toString());
+			redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.Invoice", result);
+			redirectAttrs.addFlashAttribute("invoice", invoice);
+			return MedsysUITiles.ADD_INVOICE.getTile();
+		} else {
+			logger.info("Invoice-add: " + invoice);
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			invoice.setUpdateBy(auth.getName());
+			invoice.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
+			invoiceBD.addInvoice(invoice);
+			String message = "Invoice " + invoice.getInvoiceId() + " was successfully added";
+
+			logger.info("Invoice-add: " + message + "\n Invoice: " + invoice + " setting the same in request");
+			// Unable to directly update the modelAttribute. Hence, setting
+			// invoiceId separately in request
+			request.setAttribute("invoiceId", invoice.getInvoiceId());
+			redirectAttrs.addFlashAttribute("invoiceId", invoice.getInvoiceId());
+			return UIActions.REDIRECT + UIActions.EDIT_INVOICE;
+		}
+	}
+
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.EDIT_INVOICE, method = RequestMethod.GET)
+	public String loadEditInvoicePage(@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
+			Model model) {
+		logger.info("IN: Invoice/edit-GET:  invoice to query = " + invoiceId);
+		
+		if(invoiceId==null){
+			logger.info("Checking in model for invoiceId = " + model.asMap().get("invoiceId"));
+			invoiceId = (Integer) model.asMap().get("invoiceId");
+		}
+		
+		if (!model.containsAttribute("invoice")) {
+
+			logger.info("Adding Invoice object to model");
+			Invoice invoice = invoiceBD.getInvoice(invoiceId);
+			logger.info("Invoice/edit-GET:  " + invoice);
+			model.addAttribute("invoice", invoice);
+		}
+		model.addAttribute("customerList", customerBD.getAllCustomers());
+		
+		model.addAttribute("paymentTermsList", masterDataBD.getAll(PaymentTermsMaster.class));
+		// TODO: Change this to a order range of last 3 months
+		model.addAttribute("orderList", orderBD.getAllOrders());
+
 		/**
 		 * START Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
@@ -175,52 +233,6 @@ public class InvoiceController extends SuperController {
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
 
-		invoice = new Invoice(true);
-		invoice.setInvoiceStatus((InvoiceStatusMaster) masterDataBD.getbyCode(InvoiceStatusMaster.class, InvoiceStatusCode.ACTIVE.getCode()));
-		model.addAttribute("invoice", invoice);
-		return MedsysUITiles.ADD_INVOICE.getTile();
-	}
-
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.ADD_INVOICE, method = RequestMethod.POST)
-	public String addInvoice(@Valid @ModelAttribute Invoice invoice, Model model, BindingResult result,
-			RedirectAttributes redirectAttrs, HttpServletRequest request) {
-
-		logger.info("IN: Invoice/add-POST");
-
-		if (result.hasErrors()) {
-			logger.info("Invoice-add error: " + result.toString());
-			redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.Invoice", result);
-			redirectAttrs.addFlashAttribute("invoice", invoice);
-			return MedsysUITiles.ADD_INVOICE.getTile();
-		} else {
-			logger.info("Invoice-add: " + invoice);
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			invoice.setUpdateBy(auth.getName());
-			invoice.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
-			invoiceBD.addInvoice(invoice);
-			String message = "Invoice " + invoice.getInvoiceId() + " was successfully added";
-
-			logger.info("Invoice-add: " + message + "\n Invoice: " + invoice + " setting the same in request");
-			// Unable to directly update the modelAttribute. Hence, setting
-			// invoiceId separately in request
-			request.setAttribute("updatedInvoiceId", invoice.getInvoiceId());
-			return UIActions.REDIRECT + UIActions.LIST_ALL_INVOICES;
-		}
-	}
-
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.EDIT_INVOICE, method = RequestMethod.GET)
-	public String loadEditInvoicePage(@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
-			Model model) {
-		logger.info("IN: Invoice/edit-GET:  invoice to query = " + invoiceId);
-		if (!model.containsAttribute("invoice")) {
-
-			logger.info("Adding Invoice object to model");
-			Invoice invoice = invoiceBD.getInvoice(invoiceId);
-			logger.info("Invoice/edit-GET:  " + invoice);
-			model.addAttribute("invoice", invoice);
-		}
-		model.addAttribute("customerList", customerBD.getAllCustomers());
-		model.addAttribute("setList", setBD.getAllSet());
 
 		return MedsysUITiles.EDIT_INVOICE.getTile();
 	}

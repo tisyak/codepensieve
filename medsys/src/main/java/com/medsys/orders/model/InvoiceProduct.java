@@ -25,6 +25,11 @@ import com.medsys.product.model.ProductMaster;
 @Table(name = "invoice_product")
 public class InvoiceProduct  implements Serializable  {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	static Logger logger = LoggerFactory.getLogger(InvoiceProduct.class);
 
 	@Id

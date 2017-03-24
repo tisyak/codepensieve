@@ -73,7 +73,6 @@ public class Invoice {
 	@JoinColumn(name = "invoice_status_id", referencedColumnName = "invoice_status_id")
 	private InvoiceStatusMaster invoiceStatus; 
 	
-	@NotNull
 	@Column(name = "total_amount")
 	private BigDecimal totalAmount; 
 	

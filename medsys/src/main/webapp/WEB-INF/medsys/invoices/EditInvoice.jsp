@@ -1,5 +1,6 @@
-<%@page import="com.medsys.orders.model.Orders"%>
+<%@page import="com.medsys.orders.model.Invoice"%>
 <%@page import="com.medsys.ui.util.UIActions"%>
+<%@page import="java.util.ArrayList"%>
 
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
@@ -9,13 +10,7 @@
 
 <script>
  $( function() {
-    $( "#orderDate" ).datepicker({
-		dateFormat: "dd-M-yy"
-	});
-  } );
-  
-   $( function() {
-    $( "#deliveryDate" ).datepicker( {
+    $( "#invoiceDate" ).datepicker({
 		dateFormat: "dd-M-yy"
 	});
   } );
@@ -38,32 +33,52 @@
 <!-- End of JQGrid Header Files -->
 
 <script src="<c:url value="/resources/js/moment.min.js"/>"></script>
-<!-- JQGrid Action URLs -->	
-<c:url value="/${UIActions.LIST_ALL_PRODUCT_ORDERS}" var="recordsUrl"/>
-<c:url value="/${UIActions.EDIT_PRODUCT_ORDER}" var="saveUrl"/>
-<c:url value="/orderproduct/update" var="editUrl"/>
-<c:url value="/orderproduct/delete" var="deleteUrl"/>
+<!-- JQGrid Action URLs -->
+<c:url value="/${UIActions.LIST_ALL_PRODUCT_INVOICES}" var="recordsUrl" />
+<c:url value="/${UIActions.ADD_PRODUCT_INVOICE}" var="addUrl" />
+<c:url value="/${UIActions.EDIT_PRODUCT_INVOICE}" var="saveUrl" />
+<c:url value="/invoiceproduct/update" var="editUrl" />
+<c:url value="/${UIActions.DELETE_PRODUCT_INVOICE}" var="deleteUrl" />
 
-<c:url value="/${UIActions.GET_ORDER_REPORT}" var="downloadUrl"/>
-<c:url value="/${UIActions.GET_TOKEN}" var="downloadTokenUrl"/>
-<c:url value="/${UIActions.GET_PROGRESS}" var="downloadProgressUrl"/>
+<c:url value="/${UIActions.SEARCH_PRODUCTS_BY_SET_GRP_URL}" var="getFilteredProductsUrl" />
 
-<!--End of JQGrid Action URLs -->	
+
+<c:url value="/${UIActions.GET_INVOICE_REPORT}" var="downloadUrl" />
+<c:url value="/${UIActions.GET_TOKEN}" var="downloadTokenUrl" />
+<c:url value="/${UIActions.GET_PROGRESS}" var="downloadProgressUrl" />
+
+<!--End of JQGrid Action URLs -->
 <%
-	Orders order = (Orders)request.getAttribute("order");
-	pageContext.setAttribute("setId",order.getSet().getSetId());
-	pageContext.setAttribute("orderId",order.getOrderId());
+	Invoice invoice = (Invoice) request.getAttribute("invoice");
+
+	pageContext.setAttribute("vatTypeList", request.getAttribute("vatTypeList"));
+	pageContext.setAttribute("setList", request.getAttribute("setList"));
+	pageContext.setAttribute("pdtGroupList", request.getAttribute("pdtGroupList"));
+
+	pageContext.setAttribute("invoiceId",invoice.getInvoiceId());
 %>
 <script>
 		
 	var data = {};
 	var headers = {};
 	//data[csrfParameter] = csrfToken;
-	data["setId"] = ${setId};
-	data["orderId"] =${orderId};
+	
+	var vatTypeList = ${vatTypeList};
+	var setList = ${setList};
+	var pdtGroupList = ${pdtGroupList};
 	//headers[csrfHeader] = csrfToken; 
 	
+	data["invoiceId"] =${invoiceId};
+	
 	//alert("data for ajax submit: " + data);
+	
+	//force reloading from the server after Add/Edit operation of form editing 
+	$.extend($.jgrid.edit, {
+    beforeSubmit: function () {
+        $("#grid").jqGrid("setGridParam", {datatype: "json"});
+        return [true,"",""];
+		}
+	});
 	
 	$(function() {
 		$("#grid").jqGrid({
@@ -71,18 +86,55 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Adnl.Avl. Qty', 'Actions'],
+		   	colNames:['invoiceProductId','Set', 'Group ID','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','VAT','Total', 'Actions'],
 		   	colModel:[
-		   		{name:'orderProductSetId',index:'id',  hidden:true},
-		   		{name:'setPdtId',index:'setPdtId',hidden:true},
-		   		{name:'product.productCode',index:'product.productCode', width:50, editable:"hidden"},
-				{name:'product.group.groupName',index:'product.group.groupName', width:100},
-		   		{name:'product.productDesc',index:'product.productDesc', width:200, editable:false,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
-		   		{name:'qty',index:'qty', width:50, editable:true, editrules:{required:true}, editoptions:{size:5}, 
-					cellattr: function(rowId, cellValue, rawObject, cm, item) {if(!(typeof(item)  === "undefined")){
-							if((cellValue > item.availableQty)){return ' style="color:red;font-weight:bold;background-color:yellow;"' };
-						}}},
-		   		{name:'availableQty',index:'availableQty', width:50, editable:false},
+		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
+		   		{name:'setId',index:'setId',  hidden: true,edittype:"select",editable: true, editrules: { edithidden: true }, 
+						editoptions: { 
+							value: ${setList},
+						  	dataEvents :[
+								{ type: 'change', fn: function(e) {
+									var thisval = $(e.target).val();
+									$.get('${getFilteredProductsUrl}?setId='+thisval, 
+										function(data)
+										{ 
+											var res = $(data).html();
+											var id = $("#grid").jqGrid('getGridParam', 'selrow');
+											var t = '#' + id + '_product.productId';
+											$(t).html(res);
+										}
+									); // end get
+									}//end func
+								} // end type
+							] // dataevents
+                
+                
+						}
+				},
+		   		{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, editoptions: { value: ${pdtGroupList}}},
+		   		{name:'product.productId',index:'product.productId', width:50, editable: true, editrules: { edithidden: true },
+		   			edittype:"select", editoptions: {
+											dataUrl: '${getFilteredProductsUrl}',
+											buildSelect: function(response){
+                                                                var data = $.parseJSON(response);
+                                                                s = "<select>";
+																 
+																$.each(data, function(i, item) {
+																	 
+																	 s += '<option value="' + data[i].productId + '">' + data[i].productCode +
+                                                                       '</option>';
+																})
+                                                                
+                                                                return s + "</select>";
+                                                            }
+											}	
+		   		},
+				{name:'product.group.groupName',index:'product.group.groupName', width:200},
+		   		{name:'product.productDesc',index:'product.productDesc', width:125, editable: true, editrules: { edithidden: true }, cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
+		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30},
+		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
+		   		{name:'vatTypeId',index:'vatTypeId', width:20,editable: true, editrules: { edithidden: true } ,editoptions: { value: vatTypeList}},
+		   		{name:'totalPrice',index:'totalPrice',editable: true, editrules: { edithidden: true }, width:30},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',
 					formatoptions: {
@@ -100,7 +152,7 @@
 		   	],
 			rowNum:-1,
 		   	rowList:[],
-		   	height: 300,
+		   	//height: auto,
 		   	autowidth: true,
 			rownumbers: true,
 		    pager: '#pager',
@@ -113,8 +165,7 @@
 		    loadonce: true,
 			forceClientSorting: true,
 			navOptions: { reloadGridOptions: { fromServer: true } },
-		    loadComplete: function() {},
-		    grouping: true,
+			grouping: true,
 		   	groupingView : {
 		   		groupField : ['product.group.groupName'],
 		   		groupColumnShow : [false],
@@ -124,6 +175,7 @@
 				groupSummary : [true],
 				groupDataSorted : true
 		   	},
+		  
 		    jsonReader : {
 		        root: "rows",
 		        page: "page",
@@ -131,15 +183,28 @@
 		        records: "records",
 		        repeatitems: false,
 		        cell: "cell",
-		        id: "orderProductSetId"
+		        id: "invoiceProductId"
 		        
 		    }
 			
 			
 		});
 		$("#grid").jqGrid('navGrid','#pager',
-				{edit:false, add:false, del:false, search:true},
-				{}, {}, {}, 
+				{edit:false, add:true, del:false, search:true, cloneToTop: true },
+				{}, 
+				// options for the Add Dialog
+                {
+                    closeAfterAdd: true,
+					url:'${addUrl}', 
+					editData: {
+                           invoiceId: ${invoiceId}
+                       },
+					width:500,
+                    recreateForm: true,
+                    /*errorTextFormat: function (data) {
+                        return 'Error: ' + data.responseText
+                    }*/
+                }, {}, 
 				{ 	// search
 					sopt:['cn', 'eq', 'ne', 'lt', 'gt', 'bw', 'ew'],
 					closeOnEscape: true, 
@@ -167,12 +232,12 @@
 					cursor: "pointer"
 				} 
 			);
-		
-		
-		
-	
 	});
 
+
+	
+	
+	
 	
 	function deleteRow(obj, args) {
 		// Get the currently selected row
@@ -195,7 +260,7 @@
 	          		serializeDelData: function (postdata) {
 		          	      var rowdata = $('#grid').getRowData(postdata.id);
 		          	      // append postdata with any information 
-		          	      return {id: postdata.id, oper: postdata.oper, username: rowdata.productCode};
+		          	      return {id: postdata.id, oper: postdata.oper, username: rowdata.productId};
 		          	},
 	          		afterSubmit : function(response, postdata) 
 					{ 
@@ -252,7 +317,7 @@
                 grid.jqGrid('saveRow',ids[i], 
 				{ 
 					url: '${saveUrl}',
-					extraparam:{orderId:'${orderId}'}
+					extraparam:{invoiceId:'${invoiceId}'}
 				});
             }
 			grid.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
@@ -281,7 +346,8 @@
     					});
     			
     			// Start download
-    			window.location = '${downloadUrl}'+'?token='+token+'&type='+type+'&orderId='+${orderId};
+				var invoiceId=${invoiceId} + "";
+    			window.location = '${downloadUrl}'+'?token='+token+'&invoiceId='+invoiceId+'&type='+type ;
     			// Check periodically if download has started
     			var frequency = 1000;
     			var timer = setInterval(function() {
@@ -301,107 +367,124 @@
 </script>
 
 
-<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.SAVE_ORDER%>"
+<spring:url
+	value="<%=UIActions.FORWARD_SLASH + UIActions.ADD_INVOICE%>"
 	var="action" />
-<form:form class="form-horizontal" method="POST" action="${action}" modelAttribute="order"
-	autocomplete="off">
+<form:form class="form-horizontal" method="POST" action="${action}"
+	modelAttribute="invoice" autocomplete="off">
 
-	<form:hidden path="orderId" title="orderId" />
+	<form:hidden path="invoiceId" title="invoiceId" />
 
 	<div class="form-group">
-		<label class="col-sm-2" for="inputCustomerName">Order From</label>
+		<label class="col-sm-2" for="inputOrderNumber">Invoice For
+			Order</label>
 		<div class="col-sm-5">
-	
-		
-		<form:select class="form-control" path="customer.customerId">	
-		<form:option value="" label="--  Select  --" />
-			<c:forEach items="${customerList}" var="customer">
-				<form:option value="${customer.customerId}">${customer.name}</form:option>
-			</c:forEach>
-		</form:select>
-		<form:errors path="customer.customerId" cssClass="error" />
+
+
+			<form:select class="form-control" path="order.orderId">
+				<form:option value="" label="--  Select Order No --" />
+				<c:forEach items="${orderList}" var="order">
+					<form:option value="${order.orderId}">${order.orderNumber}</form:option>
+				</c:forEach>
+			</form:select>
+			<form:errors path="order.orderId" cssClass="error" />
 		</div>
-		
-		<label class="col-sm-1" for="inputOrderNumber">Order No</label>
+
+		<label class="col-sm-1" for="inputInvoiceNo">Invoice No</label>
 		<div class="col-sm-4">
-		<form:input disabled="true" path="orderNumber" cssClass="form-control"
-			title="orderNumber" />
-			<form:hidden path="orderNumber" title="orderNumber" />
-			</div>
-	</div>	
-	
+			<form:input disabled="true" path="invoiceNo" cssClass="form-control"
+				title="invoiceNo" />
+			<form:hidden path="invoiceNo" title="invoiceNo" />
+			<form:hidden path="invoiceId" title="invoiceId" />
+			<form:hidden path="invoiceId" title="invoiceId" />
+		</div>
+	</div>
+
+
+	<div class="form-group">
+
+		<label class="col-sm-2" for="inputSetName">Invoice To</label>
+		<div class="col-sm-5">
+
+
+			<form:select class="form-control" path="customer.customerId">
+				<form:option value="" label="--  Select  --" />
+				<c:forEach items="${customerList}" var="customer">
+					<form:option value="${customer.customerId}">${customer.name}</form:option>
+				</c:forEach>
+			</form:select>
+			<form:errors path="customer.customerId" cssClass="error" />
+		</div>
+
+		<label class="col-sm-1" for="inputInvoiceDate">Invoice Dt</label>
+		<div class="col-sm-4">
+			<form:input path="invoiceDate" placeholder="Invoice Date"
+				cssClass="form-control" />
+		</div>
+	</div>
+
 
 	<div class="form-group">
 		<label class="col-sm-2" for="inputReferredBy">Referred By</label>
 		<div class="col-sm-5">
-		<form:input path="refSource" cssClass="form-control" title="refSource"
-			autocomplete="off" />
-			</div>
-		<form:errors path="refSource" cssClass="error" />
-		<label class="col-sm-1" for="inputOrderDate">Order Dt</label>
-		<div class="col-sm-4">
-		<form:input path="orderDate" placeholder="Order Date"
-			cssClass="form-control" />
-			</div>
-	</div>
-
-
-	<div class="form-group">
-	<label  class="col-sm-2" for="inputSetName">Order for Set</label>
-	<div class="col-sm-5">
-		<form:select disabled="true" class="form-control"  path="set.setId">	
-		<form:option value="" label="--  Select Set --" />
-			<c:forEach items="${setList}" var="setItem">
-				<form:option value="${setItem.setId}">${setItem.setName}</form:option>
-			</c:forEach>
-		</form:select>
+			<form:input path="refSource" cssClass="form-control"
+				title="refSource" autocomplete="off" />
 		</div>
-		<form:hidden path="set.setId" />
-		<form:errors path="set.setId" cssClass="error" />
-		<label  class="col-sm-1"  for="inputDeliveryDate">Delivery Dt</label>
+		<form:errors path="refSource" cssClass="error" />
+		<label class="col-sm-1" for="inputPaymentTerms">Payment Terms</label>
 		<div class="col-sm-4">
-		<form:input path="deliveryDate" placeholder="Delivery Date"
-			cssClass="form-control" />
-			</div>
+			<form:select class="form-control"
+				path="paymentTerms.paymentTermsId">
+				<form:option value="" label="--  Select  --" />
+				<c:forEach items="${paymentTermsList}" var="paymentTerms">
+					<form:option value="${paymentTerms.paymentTermsId}">${paymentTerms.paymentTermsDesc}</form:option>
+				</c:forEach>
+			</form:select>
+			<form:errors path="paymentTerms.paymentTermsId" cssClass="error" />
+		</div>
 	</div>
-	
+
 	<div class="form-group">
-		<label class="col-sm-2" for="inputOrderNumber">Order Status</label>
+		<label class="col-sm-2" for="inputPatientName">PatientName</label>
 		<div class="col-sm-5">
-		<form:input disabled="true" path="orderStatus" cssClass="form-control"
-			title="orderStatus" />
-			<form:hidden path="orderStatus" title="orderStatus" />
-			</div>
+			<form:input path="patientName" cssClass="form-control"
+				title="patientName" autocomplete="off" />
+		</div>
+		<form:errors path="patientName" cssClass="error" />
+		<label class="col-sm-1" for="inputInvoiceNumber">Invoice
+			Status</label>
+		<div class="col-sm-4">
+			<form:input path="invoiceStatus.invoiceStatusDesc" cssClass="form-control"
+				title="invoiceStatus" disabled="true"/>
+			<form:hidden path="invoiceStatus.invoiceStatusId" title="invoiceStatus" />
+		</div>
 	</div>
-	
-	
+
+
+
+
 	<div>
-	
-	<c:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_ORDERS%>"
-		var="listAllOrdersAction" />
 
-	<button type="submit"  formmethod="post" class="btn btn-primary"
-		formaction="${action}">Save Order</button>
-	<button type="submit"  formmethod="get" class="btn btn-default"
-		formaction="${listAllOrdersAction}">Cancel</button>
-		 <br />  <br />
-    <input type="button" value="Edit Products in Order" onclick="startEdit()" />
-    <input type="button" value="Save Products to Order" onclick="saveRows()" />
+		<c:url
+			value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_INVOICES%>"
+			var="listAllInvoiceAction" />
 
-   <br />  <br />
-	<!-- JQGrid HTML -->
-	<div id='jqgrid'>
-		<div id='pager'></div>
-		<table id='grid'></table>
-		
+		<button type="submit" formmethod="post" class="btn btn-primary"
+			formaction="${action}">Save Invoice</button>
+		<button type="submit" formmethod="get" class="btn btn-default"
+			formaction="${listAllInvoiceAction}">Cancel</button>
+		<br /> <br /> <input type="button" value="Edit Products in Invoice"
+			onclick="startEdit()" /> <input type="button"
+			value="Save Products to Invoice" onclick="saveRows()" /> <br /> <br />
+		<!-- JQGrid HTML -->
+		<div id='jqgrid'>
+			<div id='pager'></div>
+			<table id='grid'></table>
+
+		</div>
+
+		<div id='msgbox' title='' style='display: none'></div>
+
+		<!-- End of JQGrid HTML -->
 	</div>
-
-	<div id='msgbox' title='' style='display: none'></div>
-
-	<!-- End of JQGrid HTML -->
-	</div>
-	
-	
-		
-		
 </form:form>

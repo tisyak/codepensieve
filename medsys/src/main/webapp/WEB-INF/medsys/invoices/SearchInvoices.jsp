@@ -23,11 +23,6 @@
 		});
 	});
 
-	$(function() {
-		$("#deliveryDate").datepicker({
-			dateFormat : "dd-M-yy"
-		});
-	});
 </script>
 
 
@@ -39,9 +34,9 @@
 <form:form method="POST" action="${action}" modelAttribute="invoice"
 	autocomplete="off" class="form-inline">
 	<div class="form-group">
-		<form:input path="invoiceNumber" cssClass="form-control"
+		<form:input path="invoiceNo" cssClass="form-control"
 			title="invoiceNumber" placeholder="Invoice Number" autocomplete="off" />
-		<form:errors path="invoiceNumber" cssClass="error" />
+		<form:errors path="invoiceNo" cssClass="error" />
 	</div>
 
 
@@ -66,13 +61,13 @@
         </div> --%>
 
 	<button type="submit" class="btn btn-primary">Search Invoice</button>
-	<br>
-
+	</br>
+	</br>
 </form:form>
 
 
 <%
-	if (request.getAttribute("invoiceList") != null) {
+	if (request.getAttribute("invoices") != null) {
 %>
 
 
@@ -93,7 +88,7 @@
 		<tbody>
 
 			<%
-				for (Invoice invoice : (List<Invoice>) request.getAttribute("invoiceList")) {
+				for (Invoice invoice : (List<Invoice>) request.getAttribute("invoices")) {
 			%>
 			<tr>
 				<td><span class="name"><%=invoice.getInvoiceNo()%></span></td>
@@ -114,17 +109,6 @@
 								if (invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())) {
 							%>
 							<li><a href="${editInvoice}?invoiceId=<%=invoice.getInvoiceId()%>">Edit</a></li>
-							<%
-								}
-							%>
-							<%
-								if (invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())) {
-							%>
-							<c:url value="/${UIActions.LOAD_ADD_PRODUCT_INVOICE}"
-								var="addProductsToInvoiceUrl" />
-							<li><a
-								href="${addProductsToInvoiceUrl}?updatedInvoiceId=<%=invoice.getInvoiceId()%>">Add
-									Products To Invoice</a></li>
 							<%
 								}
 							%>

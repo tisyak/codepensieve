@@ -1,6 +1,7 @@
 package com.medsys.ui.controller;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,40 +86,6 @@ public class InvoiceProductController {
 
 	}
 
-	/**
-	 * Helper method for returning filtered records
-	 */
-	/*
-	 * public JqgridResponse<InvoiceProduct> getFilteredRecords(String filters,
-	 * Pageable pageRequest) { String qUsername = null; String qFirstName =
-	 * null; String qLastName = null; Integer qRole = null;
-	 * 
-	 * JqgridFilter jqgridFilter = JqgridObjectMapper.map(filters); for
-	 * (JqgridFilter.Rule rule: jqgridFilter.getRules()) { if
-	 * (rule.getField().equals("username")) qUsername = rule.getData(); else if
-	 * (rule.getField().equals("firstName")) qFirstName = rule.getData(); else
-	 * if (rule.getField().equals("lastName")) qLastName = rule.getData(); else
-	 * if (rule.getField().equals("role")) qRole =
-	 * Integer.valueOf(rule.getData()); }
-	 * 
-	 * Page<User> users = null; if (qUsername != null) users =
-	 * repository.findByUsernameLike("%"+qUsername+"%", pageRequest); if
-	 * (qFirstName != null && qLastName != null) users =
-	 * repository.findByFirstNameLikeAndLastNameLike("%"+qFirstName+"%",
-	 * "%"+qLastName+"%", pageRequest); if (qFirstName != null) users =
-	 * repository.findByFirstNameLike("%"+qFirstName+"%", pageRequest); if
-	 * (qLastName != null) users =
-	 * repository.findByLastNameLike("%"+qLastName+"%", pageRequest); if (qRole
-	 * != null) users = repository.findByRole(qRole, pageRequest);
-	 * 
-	 * List<UserDto> userDtos = UserMapper.map(users); JqgridResponse<UserDto>
-	 * response = new JqgridResponse<UserDto>(); response.setRows(userDtos);
-	 * response.setRecords(Long.valueOf(users.getTotalElements()).toString());
-	 * response.setTotal(Integer.valueOf(users.getTotalPages()).toString());
-	 * response.setPage(Integer.valueOf(users.getNumber()+1).toString()); return
-	 * response; }
-	 */
-
 	@RequestMapping(value = UIActions.GET_PRODUCT_INVOICE, produces = "application/json")
 	public @ResponseBody InvoiceProduct get(@RequestBody InvoiceProduct invoiceProductSet) {
 		logger.debug("Getting the product in invoice: " + invoiceProductSet);
@@ -128,24 +95,30 @@ public class InvoiceProductController {
 
 	@RequestMapping(value = UIActions.ADD_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response create(@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
-			@RequestParam(value = "product.productCode", required = false) String productCode,
+			@RequestParam(value = "product.productId", required = false) Integer productId,
 			@RequestParam(value = "qty", required = false) Integer qty,
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
 			@RequestParam(value = "vatTypeId", required = false) Integer vatTypeId,
-			@RequestParam(value = "vatAmount", required = false) BigDecimal vatAmount,
 			@RequestParam(value = "totalPrice", required = false) BigDecimal totalPrice) {
-		
+	
 		logger.debug("Call to add product to invoice.");
 		
-		ProductMaster product = productMasterBD.getProductByCode(productCode);
+		ProductMaster product = productMasterBD.getProduct(productId);
 		InvoiceProduct newInvoiceProduct = new InvoiceProduct();
 		newInvoiceProduct.setInvoiceId(invoiceId);
 		newInvoiceProduct.setProduct(product);
 		newInvoiceProduct.setQty(qty);
 		newInvoiceProduct.setRatePerUnit(ratePerUnit);
-		newInvoiceProduct.setVatType((TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId));
-		newInvoiceProduct.setVatAmount(vatAmount);
-		newInvoiceProduct.setTotalPrice(totalPrice);
+		TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
+		newInvoiceProduct.setVatType(appliedVatType);
+		MathContext mc = new MathContext(4); // 4 precision
+		BigDecimal totalAmountBeforeTax = ratePerUnit.multiply(new BigDecimal(qty), mc);
+		BigDecimal vatPercentageMultiplier = new BigDecimal(appliedVatType.getTax_percentage()/100);
+		logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
+		BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
+		logger.debug("effectiveVat " + effectiveVat);
+		newInvoiceProduct.setVatAmount(effectiveVat);
+		newInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat));
 		
 		logger.debug("Adding the product to invoice: " + newInvoiceProduct);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
