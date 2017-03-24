@@ -4,14 +4,17 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -90,6 +93,10 @@ public class Invoice {
 	/** The update timestamp. */
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
+
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "invoiceId")
+	List<InvoiceProduct> invProducts;
+
 
 	public Invoice() {}
 
@@ -216,6 +223,14 @@ public class Invoice {
 	}
 	
 	
+	public List<InvoiceProduct> getInvProducts() {
+		return invProducts;
+	}
+
+	public void setInvProducts(List<InvoiceProduct> invProducts) {
+		this.invProducts = invProducts;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
