@@ -126,7 +126,7 @@
 			<fieldDescription><![CDATA[qty]]></fieldDescription>
 		</field>
 	</subDataset>
-	<field name="products" class="java.util.List"/>
+	<field name="products" class="java.util.Set"/>
 	<field name="orderId" class="java.lang.Integer"/>
 	<field name="orderNumber" class="java.lang.String"/>
 	<field name="customer.name" class="java.lang.Object"/>

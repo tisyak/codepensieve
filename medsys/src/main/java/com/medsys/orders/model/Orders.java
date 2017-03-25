@@ -80,7 +80,7 @@ public class Orders {
 	private Timestamp updateTimestamp;
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "orderId")
-	List<OrderProductSet> products;
+	java.util.Set<OrderProductSet> products;
 
 	public Orders() {}
 
@@ -185,11 +185,11 @@ public class Orders {
 		this.updateTimestamp = updateTimestamp;
 	}
 
-	public List<OrderProductSet> getProducts() {
+	public java.util.Set<OrderProductSet> getProducts() {
 		return products;
 	}
 
-	public void setProducts(List<OrderProductSet> products) {
+	public void setProducts(java.util.Set<OrderProductSet> products) {
 		this.products = products;
 	}
 

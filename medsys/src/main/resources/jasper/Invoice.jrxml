@@ -122,8 +122,8 @@
 		<field name="product" class="com.medsys.product.model.ProductMaster">
 			<fieldDescription><![CDATA[product]]></fieldDescription>
 		</field>
-		<field name="ratePerUnit" class="java.lang.Integer">
-			<fieldDescription><![CDATA[RatePerUnit]]></fieldDescription>
+		<field name="ratePerUnit" class="java.math.BigDecimal">
+			<fieldDescription><![CDATA[ratePerUnit]]></fieldDescription>
 		</field>
 		<field name="qty" class="java.lang.Integer">
 			<fieldDescription><![CDATA[qty]]></fieldDescription>
@@ -131,12 +131,12 @@
 		<field name="vatType" class="com.medsys.master.model.TaxMaster">
 			<fieldDescription><![CDATA[vatType]]></fieldDescription>
 		</field>
-		<field name="totalPrice" class="java.lang.Integer">
+		<field name="totalPrice" class="java.math.BigDecimal">
 			<fieldDescription><![CDATA[totalPrice]]></fieldDescription>
 		</field>
 	</subDataset>
-	<field name="products" class="java.util.List"/>
-	<field name="orderId" class="java.lang.Integer"/>
+	<field name="products" class="java.util.Set"/>
+	<field name="order.orderNumber" class="java.lang.Integer"/>
 	<field name="invoiceNo" class="java.lang.String"/>
 	<field name="customer.name" class="java.lang.Object"/>
 	<field name="refSource" class="java.lang.String"/>

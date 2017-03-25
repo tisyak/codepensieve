@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -95,7 +94,7 @@ public class Invoice {
 	private Timestamp updateTimestamp;
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "invoiceId")
-	List<InvoiceProduct> invProducts;
+	java.util.Set<InvoiceProduct> products;
 
 
 	public Invoice() {}
@@ -222,13 +221,12 @@ public class Invoice {
 		this.updateTimestamp = updateTimestamp;
 	}
 	
-	
-	public List<InvoiceProduct> getInvProducts() {
-		return invProducts;
+	public java.util.Set<InvoiceProduct> getProducts() {
+		return products;
 	}
 
-	public void setInvProducts(List<InvoiceProduct> invProducts) {
-		this.invProducts = invProducts;
+	public void setProducts(java.util.Set<InvoiceProduct> products) {
+		this.products = products;
 	}
 
 	@Override

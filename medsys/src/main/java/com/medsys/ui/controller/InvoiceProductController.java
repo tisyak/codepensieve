@@ -113,7 +113,7 @@ public class InvoiceProductController {
 		newInvoiceProduct.setVatType(appliedVatType);
 		MathContext mc = new MathContext(4); // 4 precision
 		BigDecimal totalAmountBeforeTax = ratePerUnit.multiply(new BigDecimal(qty), mc);
-		BigDecimal vatPercentageMultiplier = new BigDecimal(appliedVatType.getTax_percentage()/100);
+		BigDecimal vatPercentageMultiplier = new BigDecimal((double)appliedVatType.getTax_percentage()/(double)100,mc);
 		logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
 		BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
 		logger.debug("effectiveVat " + effectiveVat);
