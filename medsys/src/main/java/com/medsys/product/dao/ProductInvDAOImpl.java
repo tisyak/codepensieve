@@ -69,7 +69,7 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 	@SuppressWarnings("unchecked")
 	@Override
 	public ProductInv getProduct(Integer productId) {
-		logger.debug("ProductInvDAOImpl.getProduct() - [" + productId + "]");
+		logger.debug("ProductInvDAOImpl.getProductByProductId() - [" + productId + "]");
 		Query<ProductInv> query = getCurrentSession().createQuery("from ProductInv where product.productId = " + productId + "");
 		// query.productParameter("productId", productId.toString());
 

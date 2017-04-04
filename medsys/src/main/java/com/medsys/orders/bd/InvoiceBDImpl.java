@@ -1,21 +1,28 @@
 package com.medsys.orders.bd;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.exception.SysException;
+import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.dao.InvoiceDAO;
 import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.InvoiceProduct;
 import com.medsys.product.bd.ProductInvBD;
 import com.medsys.product.model.ProductInv;
+import com.medsys.ui.util.UIConstants;
 import com.medsys.util.EpSystemError;
 
 @Service
@@ -87,6 +94,15 @@ public class InvoiceBDImpl implements InvoiceBD {
 		logger.info("ADD product to Invoice: " + newInvoiceProduct);
 		// Managing product inventory before adding product to the invoice
 		try {
+			MathContext mc = new MathContext(Integer.parseInt(UIConstants.MATH_PRECISION_CONTEXT.getValue())); // 4 precision
+			BigDecimal totalAmountBeforeTax = newInvoiceProduct.getRatePerUnit().multiply(new BigDecimal(newInvoiceProduct.getQty()), mc);
+			BigDecimal vatPercentageMultiplier = new BigDecimal((double)newInvoiceProduct.getVatType().getTax_percentage()/(double)100,mc);
+			logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
+			BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
+			logger.debug("effectiveVat " + effectiveVat);
+			newInvoiceProduct.setVatAmount(effectiveVat);
+			newInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat,mc));
+					
 			productInvBD.sellProduct(newInvoiceProduct.getProduct().getProductCode(), newInvoiceProduct.getQty());
 			return invoiceDAO.addProductToInvoice(newInvoiceProduct);
 		} catch (SysException e) {
@@ -108,7 +124,7 @@ public class InvoiceBDImpl implements InvoiceBD {
 		InvoiceProduct orgInvoiceProduct = getProductInInvoice(invoiceProduct.getInvoiceProductId());
 
 		if (!orgInvoiceProduct.getProduct().getProductId().equals(invoiceProduct.getProduct().getProductId())) {
-			return new Response(false, EpSystemError.ORDER_PRODUCT_ID_MISMATCH);
+			return new Response(false, EpSystemError.INVOICE_PRODUCT_ID_MISMATCH);
 		}
 		if (orgInvoiceProduct.getQty() != invoiceProduct.getQty()) {
 
@@ -122,10 +138,25 @@ public class InvoiceBDImpl implements InvoiceBD {
 				return new Response(false, e.getErrorCode());
 			}
 		} else {
-			logger.info("Quantities are same ... Nothing to update in Product Inventory! Proceeding ahead.");
+			logger.info("Quantities, Rate per Unit and VAT Types are same ... Nothing to update in Product Inventory! Proceeding ahead.");
 		}
+		orgInvoiceProduct.setQty(invoiceProduct.getQty());
+		orgInvoiceProduct.setRatePerUnit(invoiceProduct.getRatePerUnit());
+		orgInvoiceProduct.setVatType(invoiceProduct.getVatType());
+		MathContext mc = new MathContext(Integer.parseInt(UIConstants.MATH_PRECISION_CONTEXT.getValue())); // 4 precision
+		BigDecimal totalAmountBeforeTax = invoiceProduct.getRatePerUnit().multiply(new BigDecimal(invoiceProduct.getQty()), mc);
+		BigDecimal vatPercentageMultiplier = new BigDecimal((double)invoiceProduct.getVatType().getTax_percentage()/(double)100,mc);
+		logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
+		BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
+		logger.debug("effectiveVat " + effectiveVat);
+		orgInvoiceProduct.setVatAmount(effectiveVat);
+		orgInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat,mc));
 		
-		return invoiceDAO.updateProductInInvoice(invoiceProduct);
+		logger.debug("Adding the product to invoice: " + orgInvoiceProduct);
+		orgInvoiceProduct.setUpdateBy(invoiceProduct.getUpdateBy());
+		orgInvoiceProduct.setUpdateTimestamp(invoiceProduct.getUpdateTimestamp());
+		
+		return invoiceDAO.updateProductInInvoice(orgInvoiceProduct);
 
 	}
 

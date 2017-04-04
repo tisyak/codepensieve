@@ -98,8 +98,7 @@ public class InvoiceProductController {
 			@RequestParam(value = "product.productId", required = false) Integer productId,
 			@RequestParam(value = "qty", required = false) Integer qty,
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
-			@RequestParam(value = "vatTypeId", required = false) Integer vatTypeId,
-			@RequestParam(value = "totalPrice", required = false) BigDecimal totalPrice) {
+			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId) {
 	
 		logger.debug("Call to add product to invoice.");
 		
@@ -111,14 +110,6 @@ public class InvoiceProductController {
 		newInvoiceProduct.setRatePerUnit(ratePerUnit);
 		TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
 		newInvoiceProduct.setVatType(appliedVatType);
-		MathContext mc = new MathContext(4); // 4 precision
-		BigDecimal totalAmountBeforeTax = ratePerUnit.multiply(new BigDecimal(qty), mc);
-		BigDecimal vatPercentageMultiplier = new BigDecimal((double)appliedVatType.getTax_percentage()/(double)100,mc);
-		logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
-		BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
-		logger.debug("effectiveVat " + effectiveVat);
-		newInvoiceProduct.setVatAmount(effectiveVat);
-		newInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat));
 		
 		logger.debug("Adding the product to invoice: " + newInvoiceProduct);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -130,19 +121,32 @@ public class InvoiceProductController {
 
 	@RequestMapping(value = UIActions.EDIT_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response update(@RequestParam Integer id,
-			@RequestParam(value = "invoiceId", required = true) Integer invoiceId,
-			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam Integer qty) {
+			@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
+			@RequestParam(value = "product.productId", required = false) Integer productId,
+			@RequestParam(value = "qty", required = false) Integer qty,
+			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
+			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId) {
 
-		InvoiceProduct invoiceProductSet = invoiceBD.getProductInInvoice(id);
-		if (invoiceProductSet.getInvoiceId().equals(invoiceId)
-				&& invoiceProductSet.getProduct().getProductCode().equals(productCode)) {
-			invoiceProductSet.setQty(qty);
-			logger.debug("Updating the product in invoice: " + invoiceProductSet);
-			Response response = invoiceBD.updateProductInInvoice(invoiceProductSet);
+		InvoiceProduct invoiceProduct = invoiceBD.getProductInInvoice(id);
+		if (invoiceProduct.getInvoiceId().equals(invoiceId)
+				&& invoiceProduct.getProduct().getProductId().equals(productId)) {
+			InvoiceProduct toBeUpdatedInvoiceProduct = new InvoiceProduct();
+			toBeUpdatedInvoiceProduct.setInvoiceProductId(id);
+			toBeUpdatedInvoiceProduct.setInvoiceId(invoiceId);
+			toBeUpdatedInvoiceProduct.setProduct(invoiceProduct.getProduct());
+			toBeUpdatedInvoiceProduct.setQty(qty);
+			toBeUpdatedInvoiceProduct.setRatePerUnit(ratePerUnit);
+			TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
+			toBeUpdatedInvoiceProduct.setVatType(appliedVatType);
+			
+			logger.debug("Adding the product to invoice: " + toBeUpdatedInvoiceProduct);
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			toBeUpdatedInvoiceProduct.setUpdateBy(auth.getName());
+			toBeUpdatedInvoiceProduct.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
+			Response response = invoiceBD.updateProductInInvoice(toBeUpdatedInvoiceProduct);
 			return response;
 		} else {
-			logger.debug("Error in updating the product in invoice: " + invoiceProductSet + ".\nThe invoiceId and prodcutCodes in request do not match with System data") ;
+			logger.debug("Error in updating the product in invoice: " + invoiceProduct + ".\nThe invoiceId and productCodes in request do not match with System data") ;
 			return new Response(false, EpSystemError.SYSTEM_INTERNAL_ERROR);
 		}
 	}

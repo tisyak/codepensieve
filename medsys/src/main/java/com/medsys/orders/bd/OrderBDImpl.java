@@ -117,7 +117,8 @@ public class OrderBDImpl implements OrderBD {
 				productInvBD.disengageProduct(orgOrderProductSet.getProduct().getProductCode(),
 						orgOrderProductSet.getQty());
 				productInvBD.engageProduct(orderProductSet.getProduct().getProductCode(), orderProductSet.getQty());
-				return orderDAO.updateProductInOrder(orderProductSet);
+				orgOrderProductSet.setQty(orderProductSet.getQty());
+				return orderDAO.updateProductInOrder(orgOrderProductSet);
 			} catch (SysException e) {
 				return new Response(false, e.getErrorCode());
 			}

@@ -23,6 +23,8 @@ public enum UIConstants {
     TOTAL_ZERO("0"),
     PAGE_SINGLE("1"),
     
+    /***************************** Math Calculation Constants ************************************/
+    MATH_PRECISION_CONTEXT("4"),
        
     /***************************** ENCODED URL MANIPULTATION CONSTANTS ***********************************. */
     /**

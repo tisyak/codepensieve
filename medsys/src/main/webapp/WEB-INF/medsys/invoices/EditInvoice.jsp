@@ -86,7 +86,7 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['invoiceProductId','Set', 'Group ID','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','VAT','Total', 'Actions'],
+		   	colNames:['invoiceProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','VAT','Total', 'Actions'],
 		   	colModel:[
 		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
 		   		{name:'setId',index:'setId',  hidden: true,edittype:"select",editable: true, editrules: { edithidden: true }, 
@@ -112,7 +112,7 @@
 						}
 				},
 		   		{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, editoptions: { value: ${pdtGroupList}}},
-		   		{name:'product.productId',index:'product.productId', width:50, editable: true, editrules: { edithidden: true },
+				{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
 		   			edittype:"select", editoptions: {
 											dataUrl: '${getFilteredProductsUrl}',
 											buildSelect: function(response){
@@ -129,11 +129,12 @@
                                                             }
 											}	
 		   		},
-				{name:'product.group.groupName',index:'product.group.groupName', width:200},
+				{name:'product.productCode',index:'product.productCode', width: 40 },
+		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
 		   		{name:'product.productDesc',index:'product.productDesc', width:125, editable: true, editrules: { edithidden: true }, cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
 		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30},
 		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
-		   		{name:'vatTypeId',index:'vatTypeId', width:20,editable: true, editrules: { edithidden: true } ,editoptions: { value: vatTypeList}},
+		   		{name:'vatType.taxId',index:'vatType.taxId', width:20,editable: true, editrules: { edithidden: true } ,editoptions: { value: ${vatTypeList}}},
 		   		{name:'totalPrice',index:'totalPrice',editable: true, editrules: { edithidden: true }, width:30},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',

@@ -165,11 +165,17 @@ public class OrderProductSetController {
 			@RequestParam Integer qty) {
 
 		OrderProductSet orderProductSet = orderBD.getProductInOrder(id);
+		
 		if (orderProductSet.getOrderId().equals(orderId)
 				&& orderProductSet.getProduct().getProductCode().equals(productCode)) {
-			orderProductSet.setQty(qty);
-			logger.debug("Updating the product in order: " + orderProductSet);
-			Response response = orderBD.updateProductInOrder(orderProductSet);
+			OrderProductSet toBeUpdatedOrderProductSet = new OrderProductSet(orderId, orderProductSet.getProduct(), qty);
+			toBeUpdatedOrderProductSet.setQty(qty);
+			
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			toBeUpdatedOrderProductSet.setUpdateBy(auth.getName());
+			toBeUpdatedOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
+			logger.debug("Updating the product in order: " + toBeUpdatedOrderProductSet);
+			Response response = orderBD.updateProductInOrder(toBeUpdatedOrderProductSet);
 			return response;
 		} else {
 			logger.debug("Error in updating the product in order: " + orderProductSet + ".\nThe orderId and prodcutCodes in request do not match with System data") ;
