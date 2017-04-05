@@ -86,7 +86,7 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['invoiceProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','VAT','Total', 'Actions'],
+		   	colNames:['invoiceProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','VAT %','VAT Amount','Total', 'Actions'],
 		   	colModel:[
 		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
 		   		{name:'setId',index:'setId',  hidden: true,edittype:"select",editable: true, editrules: { edithidden: true }, 
@@ -131,11 +131,12 @@
 		   		},
 				{name:'product.productCode',index:'product.productCode', width: 40 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
-		   		{name:'product.productDesc',index:'product.productDesc', width:125, editable: true, editrules: { edithidden: true }, cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
+		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
 		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30},
 		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
-		   		{name:'vatType.taxId',index:'vatType.taxId', width:20,editable: true, editrules: { edithidden: true } ,editoptions: { value: ${vatTypeList}}},
-		   		{name:'totalPrice',index:'totalPrice',editable: true, editrules: { edithidden: true }, width:30},
+		   		{name:'vatType.taxId',index:'vatType.taxId', width:15,formatter: 'select',edittype:"select",editable: true, editoptions: { value: ${vatTypeList}}},
+				{name:'vatAmount',index:'vatAmount',width:20,editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
+		   		{name:'totalPrice',index:'totalPrice',editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',
 					formatoptions: {
@@ -176,7 +177,42 @@
 				groupSummary : [true],
 				groupDataSorted : true
 		   	},
-		  
+			footerrow: true,
+			userDataOnFooter : false,
+			loadComplete: function () {
+				var $this = $(this),
+					sum = $this.jqGrid("getCol", "totalPrice", false, "sum"),
+					taxSum = $this.jqGrid("getCol", "vatAmount", false, "sum"),
+					$footerRow = $(this.grid.sDiv).find("tr.footrow"),
+					localData = $this.jqGrid("getGridParam", "data"),
+					totalRows = localData.length,
+					totalSum = 0,
+					$newFooterRow,
+					i;
+
+				$newFooterRow = $(this.grid.sDiv).find("tr.myfootrow");
+				if ($newFooterRow.length === 0) {
+					// add second row of the footer if it's not exist
+					$newFooterRow = $footerRow.clone();
+					$newFooterRow.removeClass("footrow")
+						.addClass("myfootrow ui-widget-content");
+					$newFooterRow.children("td").each(function () {
+						this.style.width = ""; // remove width from inline CSS
+					});
+					$newFooterRow.insertAfter($footerRow);
+				}
+				$this.jqGrid("footerData", "set", {"ratePerUnit": "Total VAT:", "vatAmount": taxSum});
+
+				// calculate the value for the second footer row
+				/*for (i = 0; i < totalRows; i++) {
+					totalSum += parseInt(localData[i].totalPrice, 10);
+				}*/
+				totalSum = sum + taxSum;
+				$newFooterRow.find(">td[aria-describedby=" + this.id + "_ratePerUnit]")
+					.text("Grand Total:");
+				$newFooterRow.find(">td[aria-describedby=" + this.id + "_totalPrice]")
+					.text(totalSum);
+			},
 		    jsonReader : {
 		        root: "rows",
 		        page: "page",
@@ -487,5 +523,5 @@
 		<div id='msgbox' title='' style='display: none'></div>
 
 		<!-- End of JQGrid HTML -->
-	</div>
+	</div> 
 </form:form>
