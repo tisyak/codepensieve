@@ -94,14 +94,28 @@
 							value: ${setList},
 						  	dataEvents :[
 								{ type: 'change', fn: function(e) {
+									//alert("Calling filter products");
 									var thisval = $(e.target).val();
+									//alert($(e.target).attr("id"));
 									$.get('${getFilteredProductsUrl}?setId='+thisval, 
 										function(data)
 										{ 
-											var res = $(data).html();
-											var id = $("#grid").jqGrid('getGridParam', 'selrow');
-											var t = '#' + id + '_product.productId';
-											$(t).html(res);
+											//alert("data: " + data);
+											//var res = $.parseJSON(data);
+											//alert(res);
+											s = "";
+																 
+											$.each(data, function(i, item) {
+												 
+												 s += '<option value="' + data[i].productId  + '">' + data[i].productCode +
+												   '</option>';
+											})
+											
+											//s += "</select>";
+											//alert(s);
+											form = $(e.target).closest('form.FormGrid');
+                                            $("#product\\.productId", form[0]).html(s);
+											//alert($("select#product\\.productId.FormElement", form[0]).html());
 										}
 									); // end get
 									}//end func
@@ -111,7 +125,41 @@
                 
 						}
 				},
-		   		{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, editoptions: { value: ${pdtGroupList}}},
+		   		{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, 
+					editoptions: { 
+						value: ${pdtGroupList},
+						dataEvents :[
+								{ type: 'change', fn: function(e) {
+									//alert("Calling filter products");
+									var thisval = $(e.target).val();
+									form = $(e.target).closest('form.FormGrid');
+                                    var chosenSetId=$("#setId", form[0]).val();
+									//alert($(e.target).attr("id"));
+									$.get('${getFilteredProductsUrl}?groupId='+thisval+'&setId='+chosenSetId, 
+										function(data)
+										{ 
+											//alert("data: " + data);
+											//var res = $.parseJSON(data);
+											//alert(res);
+											s = "";
+																 
+											$.each(data, function(i, item) {
+												 
+												 s += '<option value="' + data[i].productId  + '">' + data[i].productCode +
+												   '</option>';
+											})
+											
+											//s += "</select>";
+											//alert(s);
+											form = $(e.target).closest('form.FormGrid');
+                                            $("#product\\.productId", form[0]).html(s);
+											//alert($("select#product\\.productId.FormElement", form[0]).html());
+										}
+									); // end get
+									}//end func
+								} // end type
+							] // dataevents
+					}},
 				{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
 		   			edittype:"select", editoptions: {
 											dataUrl: '${getFilteredProductsUrl}',
@@ -523,5 +571,5 @@
 		<div id='msgbox' title='' style='display: none'></div>
 
 		<!-- End of JQGrid HTML -->
-	</div> 
+	</div>
 </form:form>
