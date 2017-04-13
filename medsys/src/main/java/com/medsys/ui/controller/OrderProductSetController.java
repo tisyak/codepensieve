@@ -69,6 +69,7 @@ public class OrderProductSetController {
 		logger.debug("Products in order: " + orderProducts);
 
 		if (orderProducts == null || orderProducts.size() == 0) {
+			
 			List<SetPdtTemplate> setProducts = setBD.getAllProductsInSet(setId);
 
 			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();

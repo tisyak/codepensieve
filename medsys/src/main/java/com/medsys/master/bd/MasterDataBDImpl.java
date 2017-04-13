@@ -33,7 +33,7 @@ public class MasterDataBDImpl implements MasterDataBD {
 	MasterDataDAO masterDataDAO;
 
 	@Override
-	public MasterData get(Class subClass, Integer id) {
+	public MasterData get(Class<? extends MasterData> subClass, Integer id) {
 
 		try {
 			return masterDataDAO.get(subClass, id);
@@ -56,7 +56,7 @@ public class MasterDataBDImpl implements MasterDataBD {
 	}
 
 	@Override
-	public Response update(Class subClass, MasterData masterData) {
+	public Response update(Class<? extends MasterData>  subClass, MasterData masterData) {
 		try {
 			masterDataDAO.update(subClass, masterData);
 			return new Response(true, null);
@@ -68,7 +68,7 @@ public class MasterDataBDImpl implements MasterDataBD {
 	}
 
 	@Override
-	public Response delete(Class subClass, Integer id) {
+	public Response delete(Class<? extends MasterData>  subClass, Integer id) {
 		try {
 			masterDataDAO.delete(subClass, id);
 			return new Response(true, null);
@@ -80,12 +80,12 @@ public class MasterDataBDImpl implements MasterDataBD {
 	}
 
 	@Override
-	public List<MasterData> getAll(Class subClass) {
+	public List<MasterData> getAll(Class<? extends MasterData>  subClass) {
 		return masterDataDAO.getAll(subClass);
 	}
 
 	@Override
-	public MasterData getbyCode(Class subClass, String code) {
+	public MasterData getbyCode(Class<? extends MasterData>  subClass, String code) {
 
 		try {
 			return masterDataDAO.getbyCode(subClass, code);

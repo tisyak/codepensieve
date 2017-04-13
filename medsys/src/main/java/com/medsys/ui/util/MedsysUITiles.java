@@ -43,6 +43,9 @@ public enum MedsysUITiles {
 
 	CONFIRM_DELETE_INVOICE("invoices.DeleteInvoice"),
 	
+	/** PRODUCT INVENTORY MANAGEMENT*/
+	MANAGE_PRODUCT_INV("product.ProductInv"),
+	
 	
 	/** Admin User Management */
 	ADMIN_USERS_LIST("master.AdminUserList"),

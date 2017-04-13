@@ -53,22 +53,16 @@
                         
                        
 						
-						<li class="nav-header hidden-md">Third Party Section</li>
+						<li class="nav-header hidden-md">Product Management Section</li>
 						<li class="accordion">
-                            <a href="#"><i class="glyphicon glyphicon-plus"></i><span> Third Party</span></a>
+                            <a href="#"><i class="glyphicon glyphicon-plus"></i><span> Inventory</span></a>
                            
                             <ul class="nav nav-pills nav-stacked">
                                <li>
-                               <spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_THIRDPARTIES%>" var="listThirdPartyUsers"/> 
+                               <spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_INVENTORY%>" var="manageProductInv"/> 
                                
-                               <a href="${listThirdPartyUsers}"><i class="glyphicon  glyphicon-list"></i><span> List All Third Parties</span></a></li>
+                               <a href="${manageProductInv}"><i class="glyphicon  glyphicon-list"></i><span>Manage Inventory</span></a></li>
                              	<li>
-                               <spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_SEARCH_THIRDPARTY%>" var="searchThirdPartyUsers"/> 
-                               
-                               <a href="${searchThirdPartyUsers}"><i class="glyphicon  glyphicon-search"></i><span> Search Third Parties</span></a></li>                             	<li>
-                                <spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_THIRDPARTY%>" var="addThirdParty"/> 
-                               
-                               <a href="${addThirdParty}"><i class="glyphicon glyphicon-plus-sign"></i><span> Add New Third Party </span></a></li>
                                
                              
                                
