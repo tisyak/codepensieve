@@ -1,5 +1,6 @@
 package com.medsys.product.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
@@ -18,8 +19,13 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "product_inv")
-public class ProductInv {
+public class ProductInv implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5211433230312247579L;
+
 	static Logger logger = LoggerFactory.getLogger(ProductInv.class);
 
 	@Id
@@ -184,11 +190,10 @@ public class ProductInv {
 
 	@Override
 	public String toString() {
-		return "ProductInv [productInvId=" + productInvId + ", product=" + product + ", orgQty="
-				+ orgQty + ", price=" + price + ", mrp=" + mrp + ", soldQty=" + soldQty + ", engagedQty=" + engagedQty
-				+ ", discardedQty=" + discardedQty + ", availableQty=" + availableQty + ", updateBy=" + updateBy
-				+ ", updateTimestamp=" + updateTimestamp + "]";
+		return "ProductInv [productInvId=" + productInvId + ", product=" + product + ", orgQty=" + orgQty + ", price="
+				+ price + ", mrp=" + mrp + ", soldQty=" + soldQty + ", engagedQty=" + engagedQty + ", discardedQty="
+				+ discardedQty + ", availableQty=" + availableQty + ", updateBy=" + updateBy + ", updateTimestamp="
+				+ updateTimestamp + "]";
 	}
 
-	
 }

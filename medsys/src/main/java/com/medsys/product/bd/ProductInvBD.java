@@ -2,12 +2,13 @@ package com.medsys.product.bd;
 
 import java.util.List;
 
+import com.medsys.common.model.Response;
 import com.medsys.exception.SysException;
 import com.medsys.product.model.ProductInv;
 
 public interface ProductInvBD {
 
-	public void addProduct(ProductInv product);
+	public Response addProduct(ProductInv product);
 	
 	public ProductInv getProduct(Integer productId);
 	
@@ -26,6 +27,10 @@ public interface ProductInvBD {
 	public List<ProductInv> searchForProductInv(ProductInv product);
 
 	void cancelProductSale(String productCode, Integer cancelQty) throws SysException;
+	
+	public Response updateProduct(ProductInv product, Integer qtyTobeAdded, Integer qtyTobeDiscarded);
+	
+	public Response deleteProduct(ProductInv product);
 
 	
 

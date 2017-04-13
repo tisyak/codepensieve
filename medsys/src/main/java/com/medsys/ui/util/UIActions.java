@@ -63,7 +63,17 @@ public class UIActions {
     public static final String LOAD_DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadDelete";
     public static final String DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/delete";
     
-   
+    public static final String MANAGE_PRODUCT_INVENTORY="productinv/loadManage";
+    public static final String LIST_ALL_PRODUCT_INVENTORY="productinv/list";
+    public static final String LOAD_SEARCH_PRODUCT_INVENTORY="productinv/loadSearch";
+    public static final String SEARCH_PRODUCT_INVENTORY="productinv/search";
+    public static final String LOAD_ADD_PRODUCT_INVENTORY="productinv/loadAdd";
+    public static final String ADD_PRODUCT_INVENTORY="productinv/add";
+    public static final String GET_PRODUCT_INVENTORY="productinv/get";
+    public static final String EDIT_PRODUCT_INVENTORY="productinv/edit";
+    public static final String LOAD_DELETE_PRODUCT_INVENTORY="productinv/loadDelete";
+    public static final String DELETE_PRODUCT_INVENTORY="productinv/delete";
+    
     
     public static final String LIST_ALL_ORDERS="orders/list";
     public static final String LOAD_SEARCH_ORDERS="orders/loadSearch";

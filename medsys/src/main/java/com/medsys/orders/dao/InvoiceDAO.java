@@ -1,5 +1,6 @@
 package com.medsys.orders.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.medsys.common.model.Response;
@@ -29,6 +30,10 @@ public interface InvoiceDAO {
 	public Response updateProductInInvoice(InvoiceProduct invoiceProduct);
 
 	public Response deleteProductFromInvoice(InvoiceProduct invoiceProduct);
+	
+	public BigDecimal calculateTotalVATForInvoice(Integer invoiceId);
+	
+	public BigDecimal calculateTotalPriceForInvoice(Integer invoiceId);
 	
 	
 	

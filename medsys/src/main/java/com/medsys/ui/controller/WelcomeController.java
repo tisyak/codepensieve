@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,7 +32,6 @@ import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.util.EpMessage;
 import com.medsys.util.EpSystemError;
-import com.octo.captcha.service.image.ImageCaptchaService;
 /*import com.sun.image.codec.jpeg.ImageFormatException;
 import com.sun.image.codec.jpeg.JPEGCodec;
 import com.sun.image.codec.jpeg.JPEGImageEncoder;*/
@@ -43,10 +41,6 @@ import com.sun.image.codec.jpeg.JPEGImageEncoder;*/
  */
 @Controller
 public class WelcomeController extends SuperController {
-
-	
-	@Autowired
-	private ImageCaptchaService capthcaService;
 
 	private byte[] captchaChallengeAsJpeg = null;
 

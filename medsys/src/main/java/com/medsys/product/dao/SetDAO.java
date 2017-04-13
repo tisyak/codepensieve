@@ -19,8 +19,10 @@ public interface SetDAO {
     public List<Set> getAllSet();
 
 	public List<Set> searchForSet(Set set);
-
+	
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId);
+
+	public List<SetPdtTemplate> getAllProductsInSetAndGroup(Integer setId,Integer groupId);
 
 	public Response addProductToSet(SetPdtTemplate product);
 
@@ -29,6 +31,7 @@ public interface SetDAO {
 	public Response updateProuctInSet(SetPdtTemplate product);
 
 	public Response deleteProductFromSet(SetPdtTemplate product);
+
 	
 	
 	

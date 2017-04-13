@@ -44,17 +44,7 @@ public class DashboardController extends SuperController {
 	public String loadMasterAdminDashboard(HttpServletRequest request,
 			Model model) {
 		logger.debug("displaying master admin dashboard.");
-
-		//TODO: Correct Dashboard
-		int masterAdminCount = 0;
-		//int dscCount = clientDSCInfoBD.getCountAllClientDSCs();
-		int spAdminCount = 0;
-		
-		//int monthlyInwardCertificatesCount = clientDSCInfoBD.getCountForCurrentMonthInwardDSCs();
-		//int monthlyOutwardCertificatesCount = clientDSCInfoBD.getCountForCurrentMonthOutwardDSCs();
-		
-		//int thirdPartyCount = thirdPartyBD.getCountOfAllThirdParties();
-
+		//TODO: Change this dashboard to reflect relevant information.
 		request.setAttribute("totalDSCCount", 0);
 		request.setAttribute("thirdPartyCount", 0);
 		request.setAttribute("certExpiringClientCount", 0);

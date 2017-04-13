@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.medsys.common.model.Response;
 import com.medsys.exception.SysException;
 import com.medsys.product.dao.ProductInvDAO;
 import com.medsys.product.model.ProductInv;
@@ -21,9 +22,9 @@ public class ProductInvBDImpl implements ProductInvBD {
     private ProductInvDAO productInvDAO;
  
     @Override
-    public void addProduct(ProductInv user) {
+    public Response addProduct(ProductInv productInv) {
     	logger.debug("ProductInvBD: Adding product.");
-        productInvDAO.addProduct(user);
+        return productInvDAO.addProduct(productInv);
     }
  
     @Override
@@ -76,6 +77,31 @@ public class ProductInvBDImpl implements ProductInvBD {
 	@Override
 	public List<ProductInv> searchForProductInv(ProductInv product) {
 		 return productInvDAO.searchForProduct(product);
+	}
+
+	@Override
+	@Transactional
+	public Response updateProduct(ProductInv product, Integer qtyTobeAdded, Integer qtyTobeDiscarded) {
+		logger.debug("Updating information for product: " + product.getProductInvId() +  " with Code: " + product.getProduct().getProductCode()
+				+ ".Adding quantity: " + qtyTobeAdded + " and Discarding Qty: " + qtyTobeDiscarded 
+				+ ".Other properties:- {MRP: " + product.getMrp() + " , Price: " + product.getPrice() + "}");
+		ProductInv toBeUpdatedProductInv = productInvDAO.getProduct(product.getProductInvId());
+		Integer orgQty = toBeUpdatedProductInv.getOrgQty();
+		Integer avlQty = toBeUpdatedProductInv.getAvailableQty();
+		Integer dscrdQty = toBeUpdatedProductInv.getDiscardedQty();
+		toBeUpdatedProductInv.setOrgQty(orgQty + qtyTobeAdded);
+		toBeUpdatedProductInv.setAvailableQty(avlQty + qtyTobeAdded - qtyTobeDiscarded);
+		toBeUpdatedProductInv.setDiscardedQty(dscrdQty + qtyTobeDiscarded);
+		toBeUpdatedProductInv.setMrp(product.getMrp());
+		toBeUpdatedProductInv.setPrice(product.getPrice());
+		toBeUpdatedProductInv.setUpdateBy(product.getUpdateBy());
+		toBeUpdatedProductInv.setUpdateTimestamp(product.getUpdateTimestamp());
+		return productInvDAO.updateProduct(toBeUpdatedProductInv);
+	}
+
+	@Override
+	public Response deleteProduct(ProductInv product) {
+		return productInvDAO.deleteProduct(product);
 	}
 
 	

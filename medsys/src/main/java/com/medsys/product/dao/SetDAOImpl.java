@@ -106,9 +106,34 @@ public class SetDAOImpl implements SetDAO {
 	@Override
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId) {
 		logger.debug("Fetching all products in Set: " + setId);
-		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(
-				" from SetPdtTemplate as spt "
-				+ " where set_id = " + setId).getResultList();
+
+		List<SetPdtTemplate> pdtList = getCurrentSession()
+				.createQuery(" from SetPdtTemplate as spt WHERE  spt.set.setId = " + setId).getResultList();
+		logger.debug("pdtList: " + pdtList);
+		return pdtList;
+	}
+
+	@Override
+	public List<SetPdtTemplate> getAllProductsInSetAndGroup(Integer setId, Integer groupId) {
+		logger.debug("Fetching all products in Set: " + setId + " and Group: " + groupId);
+		String queryForFilteredPdts = " from SetPdtTemplate as spt ";
+
+		if ((setId != null && !setId.equals(0)) || (groupId != null && !groupId.equals(0))) {
+			queryForFilteredPdts += " WHERE ";
+		}
+
+		if (setId != null && !setId.equals(0)) {
+			queryForFilteredPdts += " set.setId = " + setId;
+		}
+
+		if (groupId != null && !groupId.equals(0)) {
+
+			if (setId != null && !setId.equals(0)) {
+				queryForFilteredPdts += " AND ";
+			}
+			queryForFilteredPdts += " product.group.groupId = " + groupId;
+		}
+		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(queryForFilteredPdts).getResultList();
 		logger.debug("pdtList: " + pdtList);
 		return pdtList;
 	}

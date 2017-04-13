@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.medsys.orders.model.OrderProductSet;
+import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.ProductMaster;
 import com.medsys.product.model.SetPdtTemplate;
@@ -30,6 +31,9 @@ public class SetController {
 
 	@Autowired
 	private SetBD setBD;
+	
+	@Autowired
+	private ProductMasterBD productMasterBD;
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE, produces = "application/json")
@@ -114,18 +118,24 @@ public class SetController {
 	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.SEARCH_PRODUCTS_BY_SET_GRP_URL, produces = "application/json")
 	public @ResponseBody String searchBySetandGroup(
-			@RequestParam(value = "filters", required = false) String filters) {
+			@RequestParam(value = "setId", required = false) Integer setId,
+			@RequestParam(value = "groupId", required = false) Integer groupId) {
 
 		
 		logger.debug("search By Set and Group: " );
-		
-		//TODO: REMOVE SET Hardcoding
-		List<SetPdtTemplate> setPdtTemplates = setBD.getAllProductsInSet(12);
-		List<ProductMaster> pdtMasterList = new ArrayList<>(setPdtTemplates.size());
-		for (SetPdtTemplate pdt : setPdtTemplates) {
-			pdtMasterList.add(pdt.getProduct());
+		List<SetPdtTemplate> setPdtTemplates;
+		List<ProductMaster> pdtMasterList;
+		if((setId!=null && !setId.equals(0)) || (groupId!=null && !groupId.equals(0))){
+			setPdtTemplates = setBD.getAllProductsInSetAndGroup(setId,groupId);
+			pdtMasterList = new ArrayList<>(setPdtTemplates.size());
+			for (SetPdtTemplate pdt : setPdtTemplates) {
+				pdtMasterList.add(pdt.getProduct());
+			}
+		}else{
+			logger.debug("No search criteria given. Hence, retrieving complete Product Master List: " );
+			pdtMasterList = productMasterBD.getAllProductMaster();
 		}
-		
+	
 		final StringWriter sw =new StringWriter();
 	    final ObjectMapper mapper = new ObjectMapper();
 

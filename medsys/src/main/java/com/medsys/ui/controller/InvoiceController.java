@@ -1,7 +1,6 @@
 package com.medsys.ui.controller;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,8 +28,6 @@ import com.medsys.master.bd.MasterDataBD;
 import com.medsys.master.model.InvoiceStatusCode;
 import com.medsys.master.model.InvoiceStatusMaster;
 import com.medsys.master.model.MasterData;
-import com.medsys.master.model.OrderStatusCode;
-import com.medsys.master.model.OrderStatusMaster;
 import com.medsys.master.model.PaymentTermsMaster;
 import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.bd.InvoiceBD;

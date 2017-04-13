@@ -57,11 +57,30 @@ public class SetBDImpl implements SetBD {
 	public List<Set> searchForSet(Set set) {
 		 return setDAO.searchForSet(set);
 	}
-
+	
 	@Override
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId) {
 		logger.debug("Get All products in Set: " + setId);
 		List<SetPdtTemplate> setPdtTemplates =  setDAO.getAllProductsInSet(setId);
+		
+		for(SetPdtTemplate pdtTemplate: setPdtTemplates){
+			try{
+				ProductInv productInv = productInvBD.getProduct(pdtTemplate.getProduct().getProductId());
+				pdtTemplate.setAvailableQty(productInv.getAvailableQty());
+			}catch(EmptyResultDataAccessException e){ 
+				logger.debug("Product "+ pdtTemplate.getProduct().getProductCode() +" not found in Inventory");
+				pdtTemplate.setAvailableQty(0);
+			}
+			
+		}
+		
+		return setPdtTemplates;
+	}
+
+	@Override
+	public List<SetPdtTemplate> getAllProductsInSetAndGroup(Integer setId,Integer groupId) {
+		logger.debug("Get All products in Set: " + setId + " and Group: " + groupId);
+		List<SetPdtTemplate> setPdtTemplates =  setDAO.getAllProductsInSetAndGroup(setId,groupId);
 		
 		for(SetPdtTemplate pdtTemplate: setPdtTemplates){
 			try{

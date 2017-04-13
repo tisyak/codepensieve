@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import com.medsys.customer.model.Customer;
 import com.medsys.master.model.InvoiceStatusMaster;
 import com.medsys.master.model.PaymentTermsMaster;
-import com.medsys.master.model.TaxMaster;
 
 @Entity
 @Table(name = "invoice")
@@ -77,11 +76,7 @@ public class Invoice {
 	
 	@Column(name = "total_amount")
 	private BigDecimal totalAmount; 
-	
-	@ManyToOne
-	@JoinColumn(name = "vat_type", referencedColumnName = "tax_id")
-	private TaxMaster vatType;
-	
+
 	@Column(name = "total_vat")
 	private BigDecimal totalVat; 
 	
@@ -189,14 +184,6 @@ public class Invoice {
 		this.totalAmount = totalAmount;
 	}
 	
-	public TaxMaster getVatType() {
-		return vatType;
-	}
-
-	public void setVatType(TaxMaster vatType) {
-		this.vatType = vatType;
-	}
-
 	public BigDecimal getTotalVat() {
 		return totalVat;
 	}
@@ -265,7 +252,7 @@ public class Invoice {
 		return "Invoice [invoiceId=" + invoiceId + ", invoiceNo=" + invoiceNo + ", order=" + order + ", customer="
 				+ customer + ", patientName=" + patientName + ", refSource=" + refSource + ", invoiceDate="
 				+ invoiceDate + ", paymentTerms=" + paymentTerms + ", invoiceStatus=" + invoiceStatus + ", totalAmount="
-				+ totalAmount + ", vatType=" + vatType + ", totalVat=" + totalVat + ", updateBy=" + updateBy
+				+ totalAmount + ", totalVat=" + totalVat + ", updateBy=" + updateBy
 				+ ", updateTimestamp=" + updateTimestamp + "]";
 	}
 

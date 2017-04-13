@@ -183,7 +183,11 @@
 		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30},
 		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
 		   		{name:'vatType.taxId',index:'vatType.taxId', width:15,formatter: 'select',edittype:"select",editable: true, editoptions: { value: ${vatTypeList}}},
-				{name:'vatAmount',index:'vatAmount',width:20,editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
+				{name:'vatAmount',index:'vatAmount',width:20,editrules: { edithidden: true }, width:30, formatter:'currency',  
+				/*formatter: function (cellValue, option, rowObject) {
+								alert('value8: ' + rowObject.ratePerUnit + ' value9: ' + rowObject.qty + ' value10: ' + rowObject['vatType.taxId']);
+								return parseFloat(rowObject.ratePerUnit, 10) * parseFloat(rowObject.qty, 10) * parseFloat(rowObject['vatType.taxId'], 10);
+				},*/ formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
 		   		{name:'totalPrice',index:'totalPrice',editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',

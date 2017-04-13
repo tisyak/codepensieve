@@ -9,14 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.exception.SysException;
-import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.dao.InvoiceDAO;
 import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.InvoiceProduct;
@@ -73,19 +70,19 @@ public class InvoiceBDImpl implements InvoiceBD {
 	public List<InvoiceProduct> getAllProductsInInvoice(Integer invoiceId) {
 		logger.info("Get All products in Invoice: " + invoiceId);
 		List<InvoiceProduct> invoiceProducts = invoiceDAO.getAllProductsInInvoice(invoiceId);
-		for(InvoiceProduct product: invoiceProducts){
-			try{
+		for (InvoiceProduct product : invoiceProducts) {
+			try {
 				ProductInv productInv = productInvBD.getProduct(product.getProduct().getProductId());
 				product.setAvailableQty(productInv.getAvailableQty());
-			}catch(EmptyResultDataAccessException e){ 
-				logger.debug("Product "+ product.getProduct().getProductCode() +" not found in Inventory");
+			} catch (EmptyResultDataAccessException e) {
+				logger.debug("Product " + product.getProduct().getProductCode() + " not found in Inventory");
 				product.setAvailableQty(0);
 			}
-			
+
 		}
-		
+
 		return invoiceProducts;
-		
+
 	}
 
 	@Override
@@ -94,17 +91,28 @@ public class InvoiceBDImpl implements InvoiceBD {
 		logger.info("ADD product to Invoice: " + newInvoiceProduct);
 		// Managing product inventory before adding product to the invoice
 		try {
-			MathContext mc = new MathContext(Integer.parseInt(UIConstants.MATH_PRECISION_CONTEXT.getValue())); // 4 precision
-			BigDecimal totalAmountBeforeTax = newInvoiceProduct.getRatePerUnit().multiply(new BigDecimal(newInvoiceProduct.getQty()), mc);
-			BigDecimal vatPercentageMultiplier = new BigDecimal((double)newInvoiceProduct.getVatType().getTax_percentage()/(double)100,mc);
+			MathContext mc = new MathContext(Integer.parseInt(UIConstants.MATH_PRECISION_CONTEXT.getValue())); // 4
+																												// precision
+			BigDecimal totalAmountBeforeTax = newInvoiceProduct.getRatePerUnit()
+					.multiply(new BigDecimal(newInvoiceProduct.getQty()), mc);
+			BigDecimal vatPercentageMultiplier = new BigDecimal(
+					(double) newInvoiceProduct.getVatType().getTax_percentage() / (double) 100, mc);
 			logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
 			BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
 			logger.debug("effectiveVat " + effectiveVat);
 			newInvoiceProduct.setVatAmount(effectiveVat);
-			newInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat,mc));
-					
+			newInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat, mc));
+
 			productInvBD.sellProduct(newInvoiceProduct.getProduct().getProductCode(), newInvoiceProduct.getQty());
-			return invoiceDAO.addProductToInvoice(newInvoiceProduct);
+
+			Response response = invoiceDAO.addProductToInvoice(newInvoiceProduct);
+
+			if (response.isStatus()) {
+				updateEffectiveTotalsInInvoice(newInvoiceProduct.getInvoiceId(), newInvoiceProduct.getUpdateBy(),
+						newInvoiceProduct.getUpdateTimestamp());
+			}
+
+			return response;
 		} catch (SysException e) {
 			return new Response(false, e.getErrorCode());
 		}
@@ -133,30 +141,55 @@ public class InvoiceBDImpl implements InvoiceBD {
 				productInvBD.cancelProductSale(orgInvoiceProduct.getProduct().getProductCode(),
 						orgInvoiceProduct.getQty());
 				productInvBD.sellProduct(invoiceProduct.getProduct().getProductCode(), invoiceProduct.getQty());
-				
+
 			} catch (SysException e) {
 				return new Response(false, e.getErrorCode());
 			}
 		} else {
-			logger.info("Quantities, Rate per Unit and VAT Types are same ... Nothing to update in Product Inventory! Proceeding ahead.");
+			logger.info(
+					"Quantities, Rate per Unit and VAT Types are same ... Nothing to update in Product Inventory! Proceeding ahead.");
 		}
 		orgInvoiceProduct.setQty(invoiceProduct.getQty());
 		orgInvoiceProduct.setRatePerUnit(invoiceProduct.getRatePerUnit());
 		orgInvoiceProduct.setVatType(invoiceProduct.getVatType());
-		MathContext mc = new MathContext(Integer.parseInt(UIConstants.MATH_PRECISION_CONTEXT.getValue())); // 4 precision
-		BigDecimal totalAmountBeforeTax = invoiceProduct.getRatePerUnit().multiply(new BigDecimal(invoiceProduct.getQty()), mc);
-		BigDecimal vatPercentageMultiplier = new BigDecimal((double)invoiceProduct.getVatType().getTax_percentage()/(double)100,mc);
+		MathContext mc = new MathContext(Integer.parseInt(UIConstants.MATH_PRECISION_CONTEXT.getValue())); // 4
+																											// precision
+		BigDecimal totalAmountBeforeTax = invoiceProduct.getRatePerUnit()
+				.multiply(new BigDecimal(invoiceProduct.getQty()), mc);
+		BigDecimal vatPercentageMultiplier = new BigDecimal(
+				(double) invoiceProduct.getVatType().getTax_percentage() / (double) 100, mc);
 		logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
 		BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
 		logger.debug("effectiveVat " + effectiveVat);
 		orgInvoiceProduct.setVatAmount(effectiveVat);
-		orgInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat,mc));
-		
+		orgInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat, mc));
+
 		logger.debug("Adding the product to invoice: " + orgInvoiceProduct);
 		orgInvoiceProduct.setUpdateBy(invoiceProduct.getUpdateBy());
 		orgInvoiceProduct.setUpdateTimestamp(invoiceProduct.getUpdateTimestamp());
-		
-		return invoiceDAO.updateProductInInvoice(orgInvoiceProduct);
+
+		Response response = invoiceDAO.updateProductInInvoice(orgInvoiceProduct);
+		if (response.isStatus()) {
+			updateEffectiveTotalsInInvoice(invoiceProduct.getInvoiceId(), invoiceProduct.getUpdateBy(),
+					invoiceProduct.getUpdateTimestamp());
+		}
+		return response;
+
+	}
+
+	private void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp) {
+
+		BigDecimal totalVATAmount = invoiceDAO.calculateTotalVATForInvoice(invoiceId);
+		BigDecimal totalPrice = invoiceDAO.calculateTotalPriceForInvoice(invoiceId);
+
+		Invoice invoice = invoiceDAO.getInvoice(invoiceId);
+		invoice.setTotalVat(totalVATAmount);
+		invoice.setTotalAmount(totalPrice);
+		invoice.setUpdateBy(updateBy);
+		invoice.setUpdateTimestamp(updateTimestamp);
+
+		logger.debug("Updating invoice with changed TotalVAT and TotalPrice: " + invoice);
+		invoiceDAO.updateInvoice(invoice);
 
 	}
 

@@ -19,17 +19,20 @@ public interface SetBD {
 	public List<Set> getAllSet();
 	
 	public List<Set> searchForSet(Set set);
-	
-	public List<SetPdtTemplate> getAllProductsInSet(Integer setId);
 
 	public Response addProductToSet(SetPdtTemplate product);
-
 
 	public Response updateProuctInSet(SetPdtTemplate product);
 
 	public Response deleteProductFromSet(SetPdtTemplate product);
 
 	public SetPdtTemplate getProductInSet(Integer productId);
+	
+	public List<SetPdtTemplate> getAllProductsInSet(Integer setId);
+
+	public List<SetPdtTemplate> getAllProductsInSetAndGroup(Integer setId, Integer groupId);
+
+	
 
 	
 

@@ -1,7 +1,10 @@
 package com.medsys.orders.dao;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.TemporalType;
 
 import org.hibernate.HibernateException;
@@ -108,17 +111,17 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		logger.debug("InvoiceDAOImpl.searchForInvoice() - [" + invoice.toString() + "]");
 		Query<Invoice> query = getCurrentSession().createQuery(
 				"from Invoice where lower(invoiceNo) like :invoiceNo OR lower(customer.name) like :custName "
-				+ " OR invoiceDate = :invoiceDate "
-						+ " order by invoiceNo asc");
+						+ " OR invoiceDate = :invoiceDate " + " order by invoiceNo asc",
+				Invoice.class);
 
 		if (invoice.getInvoiceNo() != null) {
 			query.setParameter("invoiceNo", "%" + invoice.getInvoiceNo().toLowerCase() + "%");
 		} else {
 			query.setParameter("invoiceNo", invoice.getInvoiceNo());
 		}
-		
+
 		if (invoice.getInvoiceDate() != null) {
-			query.setParameter("invoiceDate",  invoice.getInvoiceDate(),TemporalType.DATE);
+			query.setParameter("invoiceDate", invoice.getInvoiceDate(), TemporalType.DATE);
 		} else {
 			query.setParameter("invoiceDate", null);
 		}
@@ -147,9 +150,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	public List<InvoiceProduct> getAllProductsInInvoice(Integer invoiceId) {
 		logger.debug("Fetching all products in Invoice: " + invoiceId);
 		getCurrentSession().flush();
-		return getCurrentSession()
-				.createQuery(
-						"from InvoiceProduct " + " where invoiceId = " + invoiceId + " order by product.productCode asc ")
+		return getCurrentSession().createQuery(
+				"from InvoiceProduct " + " where invoiceId = " + invoiceId + " order by product.productCode asc ")
 				.getResultList();
 	}
 
@@ -165,21 +167,20 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	public InvoiceProduct getProductInInvoice(Integer invoiceProductId) {
 		logger.debug("Getting product having invoiceProductId: " + invoiceProductId);
 
-		Query<InvoiceProduct> query = getCurrentSession()
-				.createQuery("from InvoiceProduct where invoiceProductId = " + invoiceProductId.toString() + "");
+		Query<InvoiceProduct> query = getCurrentSession().createQuery(
+				"from InvoiceProduct where invoiceProductId = " + invoiceProductId.toString() + "",
+				InvoiceProduct.class);
 		// query.setParameter("invoiceId", invoiceId.toString());
 
 		logger.debug(query.toString());
-		if (query.getResultList().size() == 0) {
-			logger.debug("Product not found in invoice.");
-			throw new EmptyResultDataAccessException("InvoiceProduct [" + invoiceProductId + "] not found", 1);
-		} else {
-
-			logger.debug("InvoiceProduct List Size: " + query.getResultList().size());
-			List<InvoiceProduct> list = (List<InvoiceProduct>) query.getResultList();
-			InvoiceProduct invoiceProduct = (InvoiceProduct) list.get(0);
+		try {
+			InvoiceProduct invoiceProduct = query.getSingleResult();
 			return invoiceProduct;
+		} catch (NoResultException | NonUniqueResultException ne) {
+			logger.debug("Product not found in invoice." + ne.getMessage());
+			throw new EmptyResultDataAccessException("InvoiceProduct [" + invoiceProductId + "] not found", 1);
 		}
+
 	}
 
 	@Override
@@ -208,6 +209,24 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
 		return new Response(false, EpSystemError.NO_RECORD_FOUND);
 
+	}
+
+	@Override
+	public BigDecimal calculateTotalVATForInvoice(Integer invoiceId) {
+		logger.debug("Calculating total tax for all products in Invoice: " + invoiceId);
+		getCurrentSession().flush();
+		return (BigDecimal) getCurrentSession()
+				.createQuery("SELECT SUM(vatAmount) from InvoiceProduct where invoiceId = " + invoiceId)
+				.getSingleResult();
+	}
+
+	@Override
+	public BigDecimal calculateTotalPriceForInvoice(Integer invoiceId) {
+		logger.debug("Calculating total price for all products in Invoice: " + invoiceId);
+		getCurrentSession().flush();
+		return (BigDecimal) getCurrentSession()
+				.createQuery("SELECT SUM(totalPrice) from InvoiceProduct where invoiceId = " + invoiceId)
+				.getSingleResult();
 	}
 
 }
