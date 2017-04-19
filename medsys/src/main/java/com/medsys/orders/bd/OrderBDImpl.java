@@ -28,7 +28,7 @@ public class OrderBDImpl implements OrderBD {
 
 	@Autowired
 	private ProductInvBD productInvBD;
-
+	
 	@Override
 	public Response addOrder(Orders user) {
 		logger.debug("OrderBD: Adding order.");
@@ -88,7 +88,8 @@ public class OrderBDImpl implements OrderBD {
 		// Managing product inventory before adding product to the order
 		try {
 			productInvBD.engageProduct(newOrderProductSet.getProduct().getProductCode(), newOrderProductSet.getQty());
-			return orderDAO.addProductToOrder(newOrderProductSet);
+			Response response = orderDAO.addProductToOrder(newOrderProductSet);
+			return response;
 		} catch (SysException e) {
 			return new Response(false, e.getErrorCode());
 		}

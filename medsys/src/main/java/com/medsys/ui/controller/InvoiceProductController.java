@@ -126,7 +126,11 @@ public class InvoiceProductController {
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
 			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId) {
 
+		logger.debug("invoiceId in request: "+invoiceId);
+		logger.debug("productId in request: "+productId);
 		InvoiceProduct invoiceProduct = invoiceBD.getProductInInvoice(id);
+		logger.debug("InvoiceProduct from DB: "+invoiceProduct);
+		
 		if (invoiceProduct.getInvoiceId().equals(invoiceId)
 				&& invoiceProduct.getProduct().getProductId().equals(productId)) {
 			InvoiceProduct toBeUpdatedInvoiceProduct = new InvoiceProduct();

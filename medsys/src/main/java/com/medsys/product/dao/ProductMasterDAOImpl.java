@@ -86,7 +86,7 @@ public class ProductMasterDAOImpl implements ProductMasterDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<ProductMaster> getAllProduct() {
-		return getCurrentSession().createQuery("from ProductMaster order by productName asc").getResultList();
+		return getCurrentSession().createQuery("from ProductMaster order by productCode asc").getResultList();
 	}
 
 	@Override

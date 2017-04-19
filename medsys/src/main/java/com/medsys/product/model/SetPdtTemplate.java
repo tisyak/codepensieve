@@ -35,7 +35,7 @@ public class SetPdtTemplate implements Serializable {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "set_id", referencedColumnName = "set_id")
-	private Set set;
+	private Set parentSet;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "product_id", referencedColumnName = "product_id")
@@ -64,12 +64,12 @@ public class SetPdtTemplate implements Serializable {
 		this.setPdtId = setPdtId;
 	}
 
-	public Set getSet() {
-		return set;
+	public Set getParentSet() {
+		return parentSet;
 	}
 
-	public void setSet(Set set) {
-		this.set = set;
+	public void setParentSet(Set parentSet) {
+		this.parentSet = parentSet;
 	}
 
 	public ProductMaster getProduct() {
@@ -114,7 +114,7 @@ public class SetPdtTemplate implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SetPdtTemplate [setPdtId=" + setPdtId + ", set=" + set + ", product=" + product + ", qty=" + qty
+		return "SetPdtTemplate [setPdtId=" + setPdtId + ", parentSet=" + parentSet + ", product=" + product + ", qty=" + qty
 				+ ", availableQty=" + availableQty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp
 				+ "]";
 	}

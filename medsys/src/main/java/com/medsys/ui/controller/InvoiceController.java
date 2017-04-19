@@ -155,7 +155,6 @@ public class InvoiceController extends SuperController {
 			logger.info("Invoice-add: " + message + "\n Invoice: " + invoice + " setting the same in request");
 			// Unable to directly update the modelAttribute. Hence, setting
 			// invoiceId separately in request
-			request.setAttribute("invoiceId", invoice.getInvoiceId());
 			redirectAttrs.addFlashAttribute("invoiceId", invoice.getInvoiceId());
 			return UIActions.REDIRECT + UIActions.EDIT_INVOICE;
 		}

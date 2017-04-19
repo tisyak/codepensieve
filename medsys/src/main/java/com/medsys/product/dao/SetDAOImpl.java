@@ -83,7 +83,7 @@ public class SetDAOImpl implements SetDAO {
 	public List<Set> searchForSet(Set set) {
 		logger.debug("SetDAOImpl.searchForSet() - [" + set.toString() + "]");
 		Query<Set> query = getCurrentSession()
-				.createQuery("from Set where lower(setName) like :setName  order by setName asc");
+				.createQuery("from Set where lower(setName) like :setName  order by setName asc",Set.class);
 
 		if (set.getSetName() != null) {
 			query.setParameter("setName", "%" + set.getSetName().toLowerCase() + "%");
@@ -108,7 +108,7 @@ public class SetDAOImpl implements SetDAO {
 		logger.debug("Fetching all products in Set: " + setId);
 
 		List<SetPdtTemplate> pdtList = getCurrentSession()
-				.createQuery(" from SetPdtTemplate as spt WHERE  spt.set.setId = " + setId).getResultList();
+				.createQuery(" from SetPdtTemplate WHERE  parentSet.setId = " + setId, SetPdtTemplate.class).getResultList();
 		logger.debug("pdtList: " + pdtList);
 		return pdtList;
 	}
@@ -116,14 +116,14 @@ public class SetDAOImpl implements SetDAO {
 	@Override
 	public List<SetPdtTemplate> getAllProductsInSetAndGroup(Integer setId, Integer groupId) {
 		logger.debug("Fetching all products in Set: " + setId + " and Group: " + groupId);
-		String queryForFilteredPdts = " from SetPdtTemplate as spt ";
+		String queryForFilteredPdts = " from SetPdtTemplate ";
 
 		if ((setId != null && !setId.equals(0)) || (groupId != null && !groupId.equals(0))) {
 			queryForFilteredPdts += " WHERE ";
 		}
 
 		if (setId != null && !setId.equals(0)) {
-			queryForFilteredPdts += " set.setId = " + setId;
+			queryForFilteredPdts += " parentSet.setId = " + setId;
 		}
 
 		if (groupId != null && !groupId.equals(0)) {
@@ -133,7 +133,7 @@ public class SetDAOImpl implements SetDAO {
 			}
 			queryForFilteredPdts += " product.group.groupId = " + groupId;
 		}
-		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(queryForFilteredPdts).getResultList();
+		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(queryForFilteredPdts,SetPdtTemplate.class).getResultList();
 		logger.debug("pdtList: " + pdtList);
 		return pdtList;
 	}
@@ -151,7 +151,7 @@ public class SetDAOImpl implements SetDAO {
 		logger.debug("Getting product having productId: " + productId);
 
 		Query<SetPdtTemplate> query = getCurrentSession()
-				.createQuery("from SetPdtTemplate where productId = " + productId.toString() + "");
+				.createQuery("from SetPdtTemplate where productId = " + productId.toString() + "",SetPdtTemplate.class);
 		// query.setParameter("setId", setId.toString());
 
 		logger.debug(query.toString());

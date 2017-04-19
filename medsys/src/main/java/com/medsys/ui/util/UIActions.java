@@ -110,7 +110,6 @@ public class UIActions {
     public static final String LIST_ALL_PRODUCT_INVOICES="invoiceproduct/list";
     public static final String LOAD_SEARCH_PRODUCT_INVOICES="invoiceproduct/loadSearch";
     public static final String SEARCH_PRODUCT_INVOICES="invoiceproduct/search";
-    public static final String LOAD_ADD_PRODUCT_INVOICE="invoiceproduct/loadAdd";
     public static final String ADD_PRODUCT_INVOICE="invoiceproduct/add";
     public static final String GET_PRODUCT_INVOICE="invoiceproduct/get";
     public static final String EDIT_PRODUCT_INVOICE="invoiceproduct/edit";

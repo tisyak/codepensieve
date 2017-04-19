@@ -198,7 +198,12 @@
 							// When the editformbutton parameter is set to true the form editing dialogue appear instead of in-line edit.
                             editformbutton:false,
 							//if true will show edit icon, else will hide
-							editbutton : false, 
+							editbutton : true, 
+							//inline edit save url
+							url: '${saveUrl}',
+							extraparam:{invoiceId:'${invoiceId}'},
+							//triggering reloadGrid after save
+							afterSave: function () { $("#grid").setGridParam({datatype:'json',postData: data}).trigger('reloadGrid');},
 							//if true will show delete icon, else will hide
 							delbutton : true 
                     }
@@ -388,7 +393,7 @@
 		}
 	}
 	
-	function startEdit() {
+/*	function startEdit() {
             var grid = $("#grid");
             var ids = grid.jqGrid('getDataIDs');
 			//Done in reverse manner so that focus remains on the first record for edit
@@ -409,9 +414,9 @@
 					extraparam:{invoiceId:'${invoiceId}'}
 				});
             }
-			grid.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
+			grid.setGridParam({datatype:'json',postData: data}).trigger('reloadGrid');
         }
-
+*/
         
         function downloadXls() {download('xls');}
     	
@@ -562,9 +567,13 @@
 			formaction="${action}">Save Invoice</button>
 		<button type="submit" formmethod="get" class="btn btn-default"
 			formaction="${listAllInvoiceAction}">Cancel</button>
-		<br /> <br /> <input type="button" value="Edit Products in Invoice"
+		<br /> <br /> 
+		
+		<!-- <input type="button" value="Edit Products in Invoice"
 			onclick="startEdit()" /> <input type="button"
 			value="Save Products to Invoice" onclick="saveRows()" /> <br /> <br />
+			-->
+			
 		<!-- JQGrid HTML -->
 		<div id='jqgrid'>
 			<div id='pager'></div>

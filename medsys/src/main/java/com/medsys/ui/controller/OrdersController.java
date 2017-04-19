@@ -117,7 +117,7 @@ public class OrdersController extends SuperController {
 		model.addAttribute("setList", setBD.getAllSet());
 		order = new Orders(true);
 		model.addAttribute("order", order);
-		order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class, OrderStatusCode.EMPTY.getCode()));
+		order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class, OrderStatusCode.ACTIVE.getCode()));
 		return MedsysUITiles.ADD_ORDER.getTile();
 	}
 
@@ -144,13 +144,22 @@ public class OrdersController extends SuperController {
 			// Unable to directly update the modelAttribute. Hence, setting
 			// orderId separately in request
 			request.setAttribute("updatedOrderId", order.getOrderId());
-			return UIActions.FORWARD + UIActions.LOAD_ADD_PRODUCT_ORDER;
+			redirectAttrs.addFlashAttribute("updatedOrderId",order.getOrderId());
+			return UIActions.REDIRECT + UIActions.LOAD_ADD_PRODUCT_ORDER;
 		}
 	}
 
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_PRODUCT_ORDER, method = RequestMethod.POST)
-	public String loadAddProductsToOrder(@RequestAttribute("updatedOrderId") Integer orderId, Model model) {
-
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_PRODUCT_ORDER, method = {RequestMethod.POST, RequestMethod.GET})
+	public String loadAddProductsToOrder(
+			@RequestParam(value = "updatedOrderId", required = false) Integer orderId,
+			Model model) {
+		
+		if(orderId == null){
+			logger.info("Checking in model for updatedOrderId = " + model.asMap().get("updatedOrderId"));
+			orderId = (Integer) model.asMap().get("updatedOrderId");
+		}
+		
+		
 		logger.info(" IN: Order/loadAddProductsToOrder-POST orderId : " + orderId);
 		model.addAttribute("order", ordersBD.getOrder(orderId));
 		return MedsysUITiles.ADD_PRODUCTS_IN_ORDER.getTile();

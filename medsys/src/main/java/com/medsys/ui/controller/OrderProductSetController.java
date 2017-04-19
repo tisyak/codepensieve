@@ -171,7 +171,7 @@ public class OrderProductSetController {
 				&& orderProductSet.getProduct().getProductCode().equals(productCode)) {
 			OrderProductSet toBeUpdatedOrderProductSet = new OrderProductSet(orderId, orderProductSet.getProduct(), qty);
 			toBeUpdatedOrderProductSet.setQty(qty);
-			
+			toBeUpdatedOrderProductSet.setOrderProductSetId(id);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			toBeUpdatedOrderProductSet.setUpdateBy(auth.getName());
 			toBeUpdatedOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
