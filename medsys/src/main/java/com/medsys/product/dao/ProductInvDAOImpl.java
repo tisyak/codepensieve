@@ -97,7 +97,7 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<ProductInv> getAllProduct() {
-		return getCurrentSession().createQuery("from ProductInv order by productName asc").getResultList();
+		return getCurrentSession().createQuery("from ProductInv order by product.productCode asc").getResultList();
 	}
 
 	private Response updateProductInv(ProductInv product) {

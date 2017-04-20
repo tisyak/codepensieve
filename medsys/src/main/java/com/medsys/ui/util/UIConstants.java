@@ -25,6 +25,7 @@ public enum UIConstants {
     
     /***************************** Math Calculation Constants ************************************/
     MATH_PRECISION_CONTEXT("4"),
+    EMPTY_QTY("0"),
        
     /***************************** ENCODED URL MANIPULTATION CONSTANTS ***********************************. */
     /**

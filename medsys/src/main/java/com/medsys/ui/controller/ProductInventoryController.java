@@ -24,9 +24,6 @@ import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
 import com.medsys.master.bd.MasterDataBD;
 import com.medsys.master.model.MasterData;
-import com.medsys.master.model.PaymentTermsMaster;
-import com.medsys.master.model.TaxMaster;
-import com.medsys.orders.model.Invoice;
 import com.medsys.product.bd.ProductInvBD;
 import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.bd.SetBD;
@@ -36,6 +33,7 @@ import com.medsys.product.model.ProductMaster;
 import com.medsys.product.model.Set;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
+import com.medsys.ui.util.UIConstants;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
 import com.medsys.util.EpSystemError;
 
@@ -149,7 +147,7 @@ public class ProductInventoryController {
 
 	@RequestMapping(value = UIActions.ADD_PRODUCT_INVENTORY, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response create(@RequestParam(value = "product.productId", required = false) Integer productId,
-			@RequestParam(value = "qty", required = false) Integer qty,
+			@RequestParam(value = "orgQty", required = false) Integer qty,
 			@RequestParam(value = "mrp", required = false) BigDecimal mrp,
 			@RequestParam(value = "price", required = false) BigDecimal price) {
 	
@@ -159,6 +157,14 @@ public class ProductInventoryController {
 		ProductInv newProductInv = new ProductInv();
 		newProductInv.setProduct(product);
 		newProductInv.setOrgQty(qty);
+		newProductInv.setAvailableQty(qty);
+		
+		//Initializing all other Quantity specifiers to Zero!
+		Integer initializeToZero = Integer.parseInt(UIConstants.EMPTY_QTY.getValue());
+		newProductInv.setDiscardedQty(initializeToZero);
+		newProductInv.setEngagedQty(initializeToZero);
+		newProductInv.setSoldQty(initializeToZero);
+		
 		newProductInv.setMrp(mrp);
 		newProductInv.setPrice(price);
 		

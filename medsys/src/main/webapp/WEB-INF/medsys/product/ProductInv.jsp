@@ -34,11 +34,11 @@
 
 <script src="<c:url value="/resources/js/moment.min.js"/>"></script>
 <!-- JQGrid Action URLs -->
-<c:url value="/${UIActions.LIST_ALL_PRODUCT_PRODUCT_INVENTORYS}" var="recordsUrl" />
-<c:url value="/${UIActions.ADD_PRODUCT_PRODUCT_INVENTORY}" var="addUrl" />
-<c:url value="/${UIActions.EDIT_PRODUCT_PRODUCT_INVENTORY}" var="saveUrl" />
+<c:url value="/${UIActions.LIST_ALL_PRODUCT_INVENTORY}" var="recordsUrl" />
+<c:url value="/${UIActions.ADD_PRODUCT_INVENTORY}" var="addUrl" />
+<c:url value="/${UIActions.EDIT_PRODUCT_INVENTORY}" var="saveUrl" />
 <c:url value="/productinv/update" var="editUrl" />
-<c:url value="/${UIActions.DELETE_PRODUCT_PRODUCT_INVENTORY}" var="deleteUrl" />
+<c:url value="/${UIActions.DELETE_PRODUCT_INVENTORY}" var="deleteUrl" />
 
 <c:url value="/${UIActions.SEARCH_PRODUCTS_BY_SET_GRP_URL}" var="getFilteredProductsUrl" />
 
@@ -65,8 +65,6 @@
 	var pdtGroupList = ${pdtGroupList};
 	//headers[csrfHeader] = csrfToken; 
 	
-	data["productInvId"] =${productInvId};
-	
 	//alert("data for ajax submit: " + data);
 	
 	//force reloading from the server after Add/Edit operation of form editing 
@@ -83,7 +81,7 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['productInvProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Org Qty','Engd Qty','Sold Qty','Dscrd Qty','Avlbl Qty','Price','MRP', 'Actions'],
+		   	colNames:['productInvProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Org Qty','Engd Qty','Sold Qty','Dscrd Qty','Avlbl Qty','Quantity to be added','Quantity to be discarded','Price','MRP', 'Actions'],
 		   	colModel:[
 		   		{name:'productInvId',index:'id',  hidden:true},
 		   		{name:'setId',index:'setId',  hidden: true,edittype:"select",editable: true, editrules: { edithidden: true }, 
@@ -174,16 +172,18 @@
                                                             }
 											}	
 		   		},
-				{name:'product.productCode',index:'product.productCode', width: 40 },
+				{name:'product.productCode',index:'product.productCode', width: 30 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
 		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
-		   		{name:'orgQty',index:'orgQty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
-		   		{name:'engagedQty',index:'engagedQty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
-		   		{name:'soldQty',index:'soldQty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
-		   		{name:'discardedQty',index:'discardedQty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
-		   		{name:'availableQty',index:'availableQty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
+		   		{name:'orgQty',index:'orgQty', width:20, editable:true, editrules:{required:true}, editoptions:{size:5} },
+		   		{name:'engagedQty',index:'engagedQty', width:20, editable:false, editrules:{required:true}, editoptions:{size:5} },
+		   		{name:'soldQty',index:'soldQty', width:20, editable:false, editrules:{required:true}, editoptions:{size:5} },
+		   		{name:'discardedQty',index:'discardedQty', width:20, editable:false, editrules:{required:true}, editoptions:{size:5} },
+		   		{name:'availableQty',index:'availableQty', width:20, editable:false, editrules:{required:true}, editoptions:{size:5} },
+				{name:'qtyTobeAdded',index:'qtyTobeAdded',  hidden:true,width:20, editable:true, editrules:{edithidden: true}, editoptions:{size:5} },
+				{name:'qtyTobeDiscarded',index:'qtyTobeDiscarded', hidden:true, width:20, editable:true, editrules:{edithidden: true}, editoptions:{size:5} },
 		   		{name:'price',index:'price', editable: true, editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
-				{name:'mrp',index:'mrp',editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
+				{name:'mrp',index:'mrp',editable: true,editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',
 					formatoptions: {
@@ -191,20 +191,33 @@
 							//Currently,setting this to false
                             keys: false,
 							// When the editformbutton parameter is set to true the form editing dialogue appear instead of in-line edit.
-                            editformbutton:false,
+                            editformbutton:true,
 							//if true will show edit icon, else will hide
-							editbutton :true, 
+							editbutton : true, 
+							editOptions:{ beforeShowForm: function(form) { 
+												//During edit hide the Set and Group Columns 
+												//and disable the Product Code
+												$("#tr_groupId", form).hide(); 
+												$("#tr_setId", form).hide(); 
+												$("#tr_orgQty", form).hide(); 
+												$("#product\\.productId", form).prop("disabled", true); 
+											},
+											url: '${saveUrl}',
+											closeAfterEdit: true
+							},
+							
 							//if true will show delete icon, else will hide
 							delbutton : true 
                     }
 				}
 		   	],
-			rowNum:-1,
+			rowNum:15,
 		   	rowList:[],
 		   	//height: auto,
 		   	autowidth: true,
 			rownumbers: true,
 		    pager: '#pager',
+			toppager: true,
 		   	sortname: 'product.productCode',
 		    viewrecords: true,
 		    sortorder: "asc",
@@ -242,11 +255,15 @@
 				{}, 
 				// options for the Add Dialog
                 {
+					beforeShowForm: function(form) { 
+												//During edit hide the Set and Group Columns 
+												//and disable the Product Code
+												$("#tr_qtyTobeAdded", form).hide(); 
+												$("#tr_qtyTobeDiscarded", form).hide(); 
+												$("#product\\.productId", form).prop("disabled", false); 
+											},
                     closeAfterAdd: true,
 					url:'${addUrl}', 
-					editData: {
-                           productInvId: ${productInvId}
-                       },
 					width:500,
                     recreateForm: true,
                     /*errorTextFormat: function (data) {
@@ -370,9 +387,8 @@
     						}
     					});
     			
-    			// Start download
-				var productInvId=${productInvId} + "";
-    			window.location = '${downloadUrl}'+'?token='+token+'&productInvId='+productInvId+'&type='+type ;
+    			
+    			window.location = '${downloadUrl}'+'?token='+token+'&type='+type ;
     			// Check periodically if download has started
     			var frequency = 1000;
     			var timer = setInterval(function() {
@@ -397,8 +413,6 @@
 	var="action" />
 <form:form class="form-horizontal" method="POST" action="${action}"
 	modelAttribute="productInv" autocomplete="off">
-
-	<form:hidden path="productInvId" title="productInvId" />
 
 	<div>
 

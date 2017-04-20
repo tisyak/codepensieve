@@ -73,6 +73,7 @@ public class UIActions {
     public static final String EDIT_PRODUCT_INVENTORY="productinv/edit";
     public static final String LOAD_DELETE_PRODUCT_INVENTORY="productinv/loadDelete";
     public static final String DELETE_PRODUCT_INVENTORY="productinv/delete";
+    public static final String GET_PRODUCT_INVENTORY_REPORT="productinv/download";
     
     
     public static final String LIST_ALL_ORDERS="orders/list";
