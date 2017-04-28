@@ -252,10 +252,12 @@
                 grid.jqGrid('saveRow',ids[i], 
 				{ 
 					url: '${saveUrl}',
-					extraparam:{orderId:'${orderId}'}
+					extraparam:{orderId:'${orderId}'},
+					//triggering reloadGrid after save
+					afterSave: function () { $("#grid").setGridParam({datatype:'json',postData: data}).trigger('reloadGrid');}
 				});
             }
-			grid.setGridParam({datatype:'json', page:1}).trigger('reloadGrid');
+			grid.trigger('reloadGrid');
         }
 
         
