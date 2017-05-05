@@ -49,17 +49,10 @@ public enum MedsysUITiles {
 	
 	/** Admin User Management */
 	ADMIN_USERS_LIST("master.AdminUserList"),
-
-	SEARCH_CUSTOMER("customer.SearchCustomer"),
-
-	CUSTOMER_LIST("customer.CustomerList"),
-
-	ADD_CUSTOMER("customer.AddCustomer"),
-
-	EDIT_CUSTOMER("customer.EditCustomer"),
-
-	CONFIRM_DELETE_CUSTOMER("customer.DeleteCustomer"),
-
+	
+	/** CUSTOMER MANAGEMENT*/
+	MANAGE_CUSTOMER("customer.CustomerList"),
+	
 	SEARCH_CUSTOMER_DSC("customer.SearchCustomerDSC"),
 
 	CUSTOMER_DSC_LIST("customer.CustomerDSCList"),

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.medsys.common.model.Response;
 import com.medsys.customer.dao.CustomerDAO;
 import com.medsys.customer.model.Customer;
  
@@ -21,9 +22,9 @@ public class CustomerBDImpl implements CustomerBD {
     private CustomerDAO customerDAO;
  
     @Override
-    public void addCustomer(Customer user) {
+    public Response addCustomer(Customer user) {
     	logger.debug("CustomerBD: Adding customer.");
-        customerDAO.addCustomer(user);
+        return customerDAO.addCustomer(user);
     }
  
     @Override
@@ -32,14 +33,14 @@ public class CustomerBDImpl implements CustomerBD {
     }
  
     @Override
-    public void updateCustomer(Customer user)  {
+    public Response updateCustomer(Customer user)  {
     	logger.debug("CustomerBD: Updating customer.");
-        customerDAO.updateCustomer(user);
+    	return customerDAO.updateCustomer(user);
     }
  
     @Override
-    public void deleteCustomer(UUID customerId)  {
-        customerDAO.deleteCustomer(customerId);
+    public Response deleteCustomer(UUID customerId)  {
+    	return customerDAO.deleteCustomer(customerId);
     }
  
     @Override

@@ -32,11 +32,13 @@ public class UIActions {
     
     public static final String LIST_ADMIN_USERS="adminuser/list";
     
+    public static final String MANAGE_CUSTOMERS="customer/loadManage";
     public static final String LIST_ALL_CUSTOMERS="customer/list";
     public static final String LOAD_SEARCH_CUSTOMER="customer/loadSearch";
     public static final String SEARCH_CUSTOMER="customer/search";
     public static final String LOAD_ADD_CUSTOMER="customer/loadAdd";
     public static final String ADD_CUSTOMER="customer/add";
+    public static final String GET_CUSTOMER="customer/get";
     public static final String EDIT_CUSTOMER="customer/edit";
     public static final String SAVE_CUSTOMER="customer/save";
     public static final String LOAD_DELETE_CUSTOMER="customer/loadDelete";

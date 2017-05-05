@@ -1,5 +1,7 @@
 package com.medsys.customer.model;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +23,12 @@ import com.google.common.base.Objects;
 
 @Entity
 @Table(name = "customer")
-public class Customer {
+public class Customer implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8163961530923682334L;
 
 	static Logger logger = LoggerFactory.getLogger(Customer.class);
 
@@ -130,6 +137,30 @@ public class Customer {
 	public void setContacts(List<CustomerContact> contacts) {
 		this.contacts = contacts;
 	}
+	
+	public String getUpdateBy() {
+		return updateBy;
+	}
+
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
+	}
+
+	public Timestamp getUpdateTimestamp() {
+		return updateTimestamp;
+	}
+
+	public void setUpdateTimestamp(Timestamp updateTimestamp) {
+		this.updateTimestamp = updateTimestamp;
+	}
+
+	/** The update by. */
+	@Column(name = "update_by")
+	private String updateBy;
+
+	/** The update timestamp. */
+	@Column(name = "update_timestamp")
+	private Timestamp updateTimestamp;
 
 	@Override
 	public boolean equals(Object o) {
