@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +98,8 @@ public class CustomerController {
 			@RequestParam(value = "mobileNo", required = false) String mobileNo,
 			@RequestParam(value = "address", required = false) String address,
 			@RequestParam(value = "city", required = false) String city,
-			@RequestParam(value = "pincode", required = false) String pincode) {
+			@RequestParam(value = "pincode", required = false) String pincode,
+			HttpServletResponse httpServletResponse) {
 	
 		logger.debug("Call to add customer.");
 		
@@ -113,6 +116,9 @@ public class CustomerController {
 		newCustomer.setUpdateBy(auth.getName());
 		newCustomer.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		Response response = customerBD.addCustomer(newCustomer);
+		if(!response.isStatus()){
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 	}
 	
@@ -125,7 +131,8 @@ public class CustomerController {
 			@RequestParam(value = "mobileNo", required = false) String mobileNo,
 			@RequestParam(value = "address", required = false) String address,
 			@RequestParam(value = "city", required = false) String city,
-			@RequestParam(value = "pincode", required = false) String pincode) {
+			@RequestParam(value = "pincode", required = false) String pincode,
+			HttpServletResponse httpServletResponse) {
 
 		
 			Customer toBeUpdatedCustomer = new Customer();
@@ -141,15 +148,22 @@ public class CustomerController {
 			toBeUpdatedCustomer.setUpdateBy(auth.getName());
 			toBeUpdatedCustomer.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 			Response response = customerBD.updateCustomer(toBeUpdatedCustomer);
+			if(!response.isStatus()){
+				httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			}
 			return response;
 	
 	}
 
 	@RequestMapping(value = UIActions.DELETE_CUSTOMER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam(value = "id", required = false) String customerId) {
+	public @ResponseBody Response delete(@RequestParam(value = "id", required = false) String customerId,
+			HttpServletResponse httpServletResponse) {
 
 		logger.debug("Deleting the customer with customerId: " + customerId);
 		Response response = customerBD.deleteCustomer(UUID.fromString(customerId));
+		if(!response.isStatus()){
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 	}
 

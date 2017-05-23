@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -167,11 +166,14 @@ public class InvoiceProductController {
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer invoiceProductSetId) {
+	public @ResponseBody Response delete(@RequestParam Integer invoiceProductSetId,HttpServletResponse httpServletResponse) {
 
 		InvoiceProduct invoiceProductSet = invoiceBD.getProductInInvoice(invoiceProductSetId);
 		logger.debug("Deleting the product in invoice: " + invoiceProductSet);
 		Response response = invoiceBD.deleteProductFromInvoice(invoiceProductSet);
+		if(!response.isStatus()){
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 	}
 

@@ -43,7 +43,7 @@ public class SetDAOImpl implements SetDAO {
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
-			logger.debug("No user found.");
+			logger.debug("No set found.");
 			throw new EmptyResultDataAccessException("Set [" + setId + "] not found", 1);
 		} else {
 

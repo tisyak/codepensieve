@@ -1,6 +1,7 @@
 package com.medsys.orders.dao;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.NoResultException;
@@ -56,7 +57,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
-			logger.debug("No user found.");
+			logger.debug("No invoice found.");
 			throw new EmptyResultDataAccessException("Invoice [" + invoiceId + "] not found", 1);
 		} else {
 
@@ -145,6 +146,40 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		}
 	}
 
+	@Override
+	public List<Invoice> searchForInvoice(Date fromDate, Date toDate) {
+		logger.debug("InvoiceDAOImpl.searchForInvoice() - [" + fromDate + "]" + " to [" + toDate + "]");
+		Query<Invoice> query = getCurrentSession().createQuery(
+				"from Invoice where invoiceDate >= :fromDate AND invoiceDate<= :toDate " + " order by invoiceNo asc",
+				Invoice.class);
+
+		if (fromDate != null) {
+			query.setParameter("fromDate", fromDate, TemporalType.DATE);
+		} else {
+			query.setParameter("fromDate", null);
+		}
+		
+		if (toDate != null) {
+			query.setParameter("toDate", toDate, TemporalType.DATE);
+		} else {
+			query.setParameter("toDate", null);
+		}
+
+		logger.debug(query.toString());
+
+		if (query.getResultList().size() == 0) {
+			logger.debug("No invoices found matching current date search criteria.");
+			return null;
+
+		} else {
+
+			logger.debug("Search Invoice List Size: " + query.getResultList().size());
+			List<Invoice> list = (List<Invoice>) query.getResultList();
+			return list;
+		}
+	}
+
+	
 	@Override
 	public List<InvoiceProduct> getAllProductsInInvoice(Integer invoiceId) {
 		logger.debug("Fetching all products in Invoice: " + invoiceId);

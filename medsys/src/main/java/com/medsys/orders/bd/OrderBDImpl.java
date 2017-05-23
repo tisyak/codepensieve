@@ -31,9 +31,9 @@ public class OrderBDImpl implements OrderBD {
 
 	@Override
 	@Transactional
-	public Response addOrder(Orders user) {
+	public Response addOrder(Orders order) {
 		logger.debug("OrderBD: Adding order.");
-		Response response = orderDAO.addOrder(user);
+		Response response = orderDAO.addOrder(order);
 		if (response.isStatus()) {
 
 		}
@@ -47,9 +47,9 @@ public class OrderBDImpl implements OrderBD {
 	}
 
 	@Override
-	public Orders updateOrder(Orders user) {
+	public Orders updateOrder(Orders order) {
 		logger.debug("OrderBD: Updating order.");
-		return orderDAO.updateOrder(user);
+		return orderDAO.updateOrder(order);
 	}
 
 	@Override

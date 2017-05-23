@@ -20,9 +20,9 @@ public class ProductMasterBDImpl implements ProductMasterBD {
     private ProductMasterDAO productMasterDAO;
  
     @Override
-    public void addProduct(ProductMaster user) {
+    public void addProduct(ProductMaster product) {
     	logger.debug("ProductMasterBD: Adding product.");
-        productMasterDAO.addProduct(user);
+        productMasterDAO.addProduct(product);
     }
  
     @Override

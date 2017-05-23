@@ -1,6 +1,7 @@
 package com.medsys.orders.dao;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import com.medsys.common.model.Response;
@@ -36,5 +37,7 @@ public interface InvoiceDAO {
 	public BigDecimal calculateTotalVATForInvoice(Integer invoiceId);
 	
 	public BigDecimal calculateTotalPriceForInvoice(Integer invoiceId);
+
+	List<Invoice> searchForInvoice(Date fromDate, Date toDate);
 	
 }

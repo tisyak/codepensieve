@@ -67,7 +67,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.logout()
 				.logoutUrl(UIActions.FORWARD_SLASH + UIActions.LOG_OUT)
 				.deleteCookies("JSESSIONID")
-				.permitAll()
 				.and()
 				.exceptionHandling()
 				.accessDeniedPage(

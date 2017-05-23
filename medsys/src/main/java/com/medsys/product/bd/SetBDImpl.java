@@ -27,9 +27,9 @@ public class SetBDImpl implements SetBD {
     private ProductInvBD productInvBD;
  
     @Override
-    public void addSet(Set user) {
+    public void addSet(Set set) {
     	logger.debug("SetBD: Adding set.");
-        setDAO.addSet(user);
+        setDAO.addSet(set);
     }
  
     @Override
@@ -38,9 +38,9 @@ public class SetBDImpl implements SetBD {
     }
  
     @Override
-    public void updateSet(Set user)  {
+    public void updateSet(Set set)  {
     	logger.debug("SetBD: Updating set.");
-        setDAO.updateSet(user);
+        setDAO.updateSet(set);
     }
  
     @Override

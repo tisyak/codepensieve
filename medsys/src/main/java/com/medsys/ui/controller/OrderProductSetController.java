@@ -4,6 +4,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +147,8 @@ public class OrderProductSetController {
 	@RequestMapping(value = UIActions.ADD_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response create(@RequestParam(value = "orderId", required = true) Integer orderId,
 			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam(value = "qty", required = true) Integer qty) {
+			@RequestParam(value = "qty", required = true) Integer qty,
+			HttpServletResponse httpServletResponse) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
 		OrderProductSet newOrderProductSet = new OrderProductSet(orderId, null, product, qty);
@@ -155,6 +158,9 @@ public class OrderProductSetController {
 		newOrderProductSet.setUpdateBy(auth.getName());
 		newOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		Response response = orderBD.addProductToOrder(newOrderProductSet);
+		if(!response.isStatus()){
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 	}
 
@@ -162,7 +168,8 @@ public class OrderProductSetController {
 	public @ResponseBody Response update(@RequestParam String id,
 			@RequestParam(value = "orderId", required = true) Integer orderId,
 			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam Integer qty) {
+			@RequestParam Integer qty,
+			HttpServletResponse httpServletResponse) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
 		Integer convertIdtoInt = null;
@@ -178,16 +185,23 @@ public class OrderProductSetController {
 		toBeUpdatedOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		logger.debug("Updating the product in order: " + toBeUpdatedOrderProductSet);
 		Response response = orderBD.updateProductInOrder(toBeUpdatedOrderProductSet);
+		if(!response.isStatus()){
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer id) {
+	public @ResponseBody Response delete(@RequestParam Integer id,
+			HttpServletResponse httpServletResponse) {
 
 		OrderProductSet orderProductSet = orderBD.getProductInOrder(id);
 		logger.debug("Deleting the product in order: " + orderProductSet);
 		Response response = orderBD.deleteProductFromOrder(orderProductSet);
+		if(!response.isStatus()){
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 	}
 

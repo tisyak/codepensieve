@@ -27,9 +27,9 @@ public class CompanyBDImpl implements CompanyBD {
     }
  
     @Override
-    public Response updateCompany(Company user)  {
+    public Response updateCompany(Company company)  {
     	logger.debug("CompanyBD: Updating company.");
-        return companyDAO.updateCompany(user);
+        return companyDAO.updateCompany(company);
     }
  
     @Override

@@ -9,21 +9,6 @@ package com.medsys.master.model;
  */
 public class ConfigParaKey{
 
-	/** The user webservice. */
-	public static String USER_WEBSERVICE = "user_webservice";
-
-	/** The user pan ekyc webservice. */
-	public static String USER_PAN_EKYC_WEBSERVICE = "user_pan_ekyc_webservice";
-
-	/** The user aadhaar ekyc request otp service url. */
-	public static String USER_AADHAAR_EKYC_REQUEST_OTP_SERVICE_URL = "user_aadhaar_ekyc_request_otp_service_url";
-
-	/** The user aadhaar ekyc verify otp service url. */
-	public static String USER_AADHAAR_EKYC_VERIFY_OTP_SERVICE_URL = "user_aadhaar_ekyc_verify_otp_service_url";
-
-	/** The smtp user portal url. */
-	public static String USER_PORTAL_URL = "user_portal_url";
-
 	/** The smtp verification url. */
 	public static String SMTP_VERIFICATION_URL = "smtp_verficationURL";
 

@@ -53,7 +53,7 @@ public class OrderDAOImpl implements OrderDAO {
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
-			logger.debug("No user found.");
+			logger.debug("No order found.");
 			throw new EmptyResultDataAccessException("Order [" + orderId + "] not found", 1);
 		} else {
 

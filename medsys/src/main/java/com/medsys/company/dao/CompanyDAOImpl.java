@@ -38,7 +38,7 @@ public class CompanyDAOImpl implements CompanyDAO {
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
-			logger.debug("No user found.");
+			logger.debug("No company found.");
 			throw new UsernameNotFoundException("Company [" + companyId + "] not found");
 		} else {
 

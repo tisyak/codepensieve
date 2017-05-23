@@ -78,6 +78,11 @@
 										Products in a Set</span></a></li>
 
 						</ul></li>
+					<li><spring:url
+							value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_GROUP%>"
+							var="manageProductGroup" /> <a href="${manageProductGroup}"><i
+							class="glyphicon  glyphicon-list"></i><span> Manage
+								Product Group</span></a></li>
 					<li class="nav-header hidden-md">Master Records</li>
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_CUSTOMERS%>"
@@ -104,13 +109,12 @@
 
 					<li class="nav-header hidden-md">Reports</li>
 					<li><spring:url
-							value="<%=UIActions.FORWARD_SLASH + UIActions.DSC_TRANSFER_INFO%>"
-							var="DSCTransferInfo" /> <a href="${DSCTransferInfo}"><i
-							class="glyphicon glyphicon-list"></i><span> Monthly Sales
-								Tax</span></a></li>
+							value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_SALES_TAX_REPORT%>"
+							var="viewSalesTax" /> <a href="${viewSalesTax}"><i
+							class="glyphicon glyphicon-list"></i><span> Sales Tax</span></a></li>
 					<li><spring:url
-							value="<%=UIActions.FORWARD_SLASH + UIActions.DSC_EXPIRING_LIST%>"
-							var="DSCExpiringList" /> <a href="${DSCExpiringList}"><i
+							value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_SALES_TAX_REPORT%>"
+							var="productsInDeficit" /> <a href="${productsInDeficit}"><i
 							class="glyphicon glyphicon-list"></i><span> Product
 								Deficit Report</span></a></li>
 

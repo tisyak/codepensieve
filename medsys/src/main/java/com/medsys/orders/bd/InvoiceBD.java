@@ -1,5 +1,6 @@
 package com.medsys.orders.bd;
 
+import java.util.Date;
 import java.util.List;
 
 import com.medsys.common.model.Response;
@@ -29,6 +30,8 @@ public interface InvoiceBD {
 	public Response updateProductInInvoice(InvoiceProduct invoiceProduct);
 
 	public Response deleteProductFromInvoice(InvoiceProduct invoiceProduct);
+
+	public List<Invoice> searchForInvoice(Date fromDate, Date toDate);
 
 	
 

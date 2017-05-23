@@ -1,5 +1,6 @@
 package com.medsys.product.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -14,13 +15,15 @@ import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.medsys.master.model.MasterData;
 
-
-//TODO:Consider making this master or disassociate it from getAll of masterData
 @Entity
 @Table(name = "product_group")
-public class ProductGroup extends MasterData {
+public class ProductGroup implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7040323197837217019L;
 
 	static Logger logger = LoggerFactory.getLogger(ProductGroup.class);
 
@@ -91,16 +94,6 @@ public class ProductGroup extends MasterData {
 	public String toString() {
 		return "ProductGroup [groupId=" + groupId + ", groupName=" + groupName + ", groupDesc=" + groupDesc
 				+ ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
-	}
-
-	@Override
-	public Integer getUniqueId() {
-		return this.getGroupId();
-	}
-
-	@Override
-	public String getKeyColumnName() {
-		return "groupName";
 	}
 
 }

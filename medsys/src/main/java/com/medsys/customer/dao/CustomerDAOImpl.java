@@ -52,7 +52,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
-			logger.debug("No user found.");
+			logger.debug("No customer found.");
 			throw new UsernameNotFoundException("Customer [" + customerId + "] not found");
 		} else {
 

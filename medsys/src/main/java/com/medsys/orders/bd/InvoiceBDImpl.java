@@ -3,6 +3,7 @@ package com.medsys.orders.bd;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -34,9 +35,9 @@ public class InvoiceBDImpl implements InvoiceBD {
 	private ProductInvBD productInvBD;
 
 	@Override
-	public Response addInvoice(Invoice user) {
+	public Response addInvoice(Invoice invoice) {
 		logger.debug("InvoiceBD: Adding invoice.");
-		return invoiceDAO.addInvoice(user);
+		return invoiceDAO.addInvoice(invoice);
 
 	}
 
@@ -46,9 +47,9 @@ public class InvoiceBDImpl implements InvoiceBD {
 	}
 
 	@Override
-	public Invoice updateInvoice(Invoice user) {
+	public Invoice updateInvoice(Invoice invoice) {
 		logger.debug("InvoiceBD: Updating invoice.");
-		return invoiceDAO.updateInvoice(user);
+		return invoiceDAO.updateInvoice(invoice);
 	}
 
 	@Override
@@ -64,6 +65,12 @@ public class InvoiceBDImpl implements InvoiceBD {
 	@Override
 	public List<Invoice> searchForInvoice(Invoice invoice) {
 		return invoiceDAO.searchForInvoice(invoice);
+	}
+
+	
+	@Override
+	public List<Invoice> searchForInvoice(Date fromDate,Date toDate) {
+		return invoiceDAO.searchForInvoice(fromDate,toDate);
 	}
 
 	@Override
@@ -208,5 +215,6 @@ public class InvoiceBDImpl implements InvoiceBD {
 			return new Response(false, e.getErrorCode());
 		}
 	}
+
 
 }

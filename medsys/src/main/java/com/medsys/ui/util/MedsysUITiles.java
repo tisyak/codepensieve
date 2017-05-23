@@ -43,9 +43,13 @@ public enum MedsysUITiles {
 
 	CONFIRM_DELETE_INVOICE("invoices.DeleteInvoice"),
 	
+	SALES_TAX_REPORT("invoices.SalesTax"),
+	
 	/** PRODUCT INVENTORY MANAGEMENT*/
 	MANAGE_PRODUCT_INV("product.ProductInv"),
 	
+	/** PRODUCT GROUP MANAGEMENT*/
+	MANAGE_PRODUCT_GROUP("product.ProductGroup"),
 	
 	/** Admin User Management */
 	ADMIN_USERS_LIST("master.AdminUserList"),
@@ -55,6 +59,7 @@ public enum MedsysUITiles {
 	
 	/** COMPANY MANAGEMENT*/
 	MANAGE_COMPANY("company.Company"),
+	
 
 	/** PROFILE MANAGEMENT */
 	VIEW_PROFILE("profile.View"), EDIT_PROFILE("profile.Edit"), FORGOT_PASSWORD_OPTIONS("profile.forgotpassword.Options"),

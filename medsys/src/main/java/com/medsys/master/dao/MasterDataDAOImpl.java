@@ -100,7 +100,7 @@ public class MasterDataDAOImpl implements MasterDataDAO {
 
 			logger.debug(query.toString());
 			if (query.getResultList().size() == 0) {
-				logger.debug("No user found.");
+				logger.debug("No masterdata found.");
 				throw new EmptyResultDataAccessException(
 						"MasterData [" + subClass.getName() + "] with code [" + code + "]+ not found", 1);
 			} else {

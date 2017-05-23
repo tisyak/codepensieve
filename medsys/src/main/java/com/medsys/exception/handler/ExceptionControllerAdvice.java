@@ -4,13 +4,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.http.HttpStatus;
 
-import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIConstants;
 
 /**
@@ -35,6 +34,7 @@ public class ExceptionControllerAdvice {
     @ResponseStatus(HttpStatus.CONFLICT)  
     // HttpStatus.CONFLICT 409 code is used in situations where the user 
     // might be able to resolve the conflict and resubmit the request.
+    //TODO: Figure out alternative for runtime exception loading
     @ResponseBody
     @ExceptionHandler(Exception.class)
    public String exception(Exception e,HttpServletRequest request) {

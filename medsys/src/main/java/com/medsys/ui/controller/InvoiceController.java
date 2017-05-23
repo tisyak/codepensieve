@@ -33,6 +33,7 @@ import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.bd.InvoiceBD;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.Invoice;
+import com.medsys.product.bd.ProductGroupBD;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.ProductGroup;
 import com.medsys.product.model.Set;
@@ -61,6 +62,9 @@ public class InvoiceController extends SuperController {
 
 	@Autowired
 	private MasterDataBD masterDataBD;
+	
+	@Autowired
+	private ProductGroupBD productGroupBD;
 
 	@Autowired
 	private InvoiceReportDownloadService invoiceReportDownloadService;
@@ -200,10 +204,9 @@ public class InvoiceController extends SuperController {
 		model.addAttribute("setList", setList);
 		
 		/** ProductGroup Listing for ADD Product Filter **/
-		List<MasterData> productGroupMasterList = masterDataBD.getAll(ProductGroup.class);
+		List<ProductGroup> productGroupMasterList = productGroupBD.getAllProductGroup();
 		String pdtGroupList = "{";
-		for (MasterData pgMd : productGroupMasterList) {
-			ProductGroup productGroup = (ProductGroup) pgMd;
+		for (ProductGroup productGroup : productGroupMasterList) {
 			pdtGroupList += "'"+productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
 		}
 		pdtGroupList = pdtGroupList.substring(0, pdtGroupList.length()-1);

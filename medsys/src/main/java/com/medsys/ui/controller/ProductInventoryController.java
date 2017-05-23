@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
-import com.medsys.master.bd.MasterDataBD;
-import com.medsys.master.model.MasterData;
+import com.medsys.product.bd.ProductGroupBD;
 import com.medsys.product.bd.ProductInvBD;
 import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.bd.SetBD;
@@ -45,20 +46,18 @@ public class ProductInventoryController {
 
 	@Autowired
 	private ProductInvBD productInvBD;
-	
 
 	@Autowired
 	private SetBD setBD;
 
-
 	@Autowired
-	private MasterDataBD masterDataBD;
-
+	private ProductGroupBD productGroupBD;
 
 	@Autowired
 	private ProductMasterBD productMasterBD;
 
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LIST_ALL_PRODUCT_INVENTORY, produces = "application/json")
+	@RequestMapping(value = UIActions.FORWARD_SLASH
+			+ UIActions.LIST_ALL_PRODUCT_INVENTORY, produces = "application/json")
 	public @ResponseBody JqgridResponse<?> records(@RequestParam("_search") Boolean search,
 			@RequestParam(value = "filters", required = false) String filters,
 			@RequestParam(value = "productInvId", required = false) Integer productInvId,
@@ -81,19 +80,18 @@ public class ProductInventoryController {
 
 		logger.debug("Products in inventory: " + productInvs);
 
-			JqgridResponse<ProductInv> response = new JqgridResponse<ProductInv>();
-			response.setRows(productInvs);
+		JqgridResponse<ProductInv> response = new JqgridResponse<ProductInv>();
+		response.setRows(productInvs);
 
-			response.setRecords(Integer.valueOf(productInvs.size()).toString());
-			// Single page to display all products part of the set chosen for
-			// inventory.
-			response.setTotal(Integer.valueOf(1).toString());
-			response.setPage(Integer.valueOf(1).toString());
+		response.setRecords(Integer.valueOf(productInvs.size()).toString());
+		// Single page to display all products part of the set chosen for
+		// inventory.
+		response.setTotal(Integer.valueOf(1).toString());
+		response.setPage(Integer.valueOf(1).toString());
 
-			logger.debug("Products already exist in inventory. Loading response from Inventory Product List: " + response);
+		logger.debug("Products already exist in inventory. Loading response from Inventory Product List: " + response);
 
-			return response;
-		
+		return response;
 
 	}
 
@@ -103,36 +101,35 @@ public class ProductInventoryController {
 
 		return productInvBD.getProduct(productInv.getProductInvId());
 	}
-	
+
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_INVENTORY, method = RequestMethod.GET)
 	public String loadManageProductInventoryPage(Model model) {
 		logger.info("IN: ProductInv/manage-GET: ");
-		
+
 		/**
 		 * START Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
-		
+
 		/** Set Listing for ADD Product Filter **/
 		List<Set> setMasterList = setBD.getAllSet();
 		String setList = "{";
 		for (Set set : setMasterList) {
-			setList += "'"+set.getSetId() + "':'" + set.getSetName() + "',";
+			setList += "'" + set.getSetId() + "':'" + set.getSetName() + "',";
 		}
-		setList = setList.substring(0, setList.length()-1);
-		setList+="}";
+		setList = setList.substring(0, setList.length() - 1);
+		setList += "}";
 		// Figure out how to cache all these values
 		model.addAttribute("setList", setList);
-		
+
 		/** ProductGroup Listing for ADD Product Filter **/
-		List<MasterData> productGroupMasterList = masterDataBD.getAll(ProductGroup.class);
+		List<ProductGroup> productGroupMasterList = productGroupBD.getAllProductGroup();
 		String pdtGroupList = "{";
-		for (MasterData pgMd : productGroupMasterList) {
-			ProductGroup productGroup = (ProductGroup) pgMd;
-			pdtGroupList += "'"+productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
+		for (ProductGroup productGroup : productGroupMasterList) {
+			pdtGroupList += "'" + productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
 		}
-		pdtGroupList = pdtGroupList.substring(0, pdtGroupList.length()-1);
-		pdtGroupList+="}";
+		pdtGroupList = pdtGroupList.substring(0, pdtGroupList.length() - 1);
+		pdtGroupList += "}";
 		// Figure out how to cache all these values
 		model.addAttribute("pdtGroupList", pdtGroupList);
 
@@ -141,7 +138,6 @@ public class ProductInventoryController {
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
 
-
 		return MedsysUITiles.MANAGE_PRODUCT_INV.getTile();
 	}
 
@@ -149,34 +145,36 @@ public class ProductInventoryController {
 	public @ResponseBody Response create(@RequestParam(value = "product.productId", required = false) Integer productId,
 			@RequestParam(value = "orgQty", required = false) Integer qty,
 			@RequestParam(value = "mrp", required = false) BigDecimal mrp,
-			@RequestParam(value = "price", required = false) BigDecimal price) {
-	
+			@RequestParam(value = "price", required = false) BigDecimal price,
+			HttpServletResponse httpServletResponse) {
+
 		logger.debug("Call to add product to inventory.");
-		
+
 		ProductMaster product = productMasterBD.getProduct(productId);
 		ProductInv newProductInv = new ProductInv();
 		newProductInv.setProduct(product);
 		newProductInv.setOrgQty(qty);
 		newProductInv.setAvailableQty(qty);
-		
-		//Initializing all other Quantity specifiers to Zero!
+
+		// Initializing all other Quantity specifiers to Zero!
 		Integer initializeToZero = Integer.parseInt(UIConstants.EMPTY_QTY.getValue());
 		newProductInv.setDiscardedQty(initializeToZero);
 		newProductInv.setEngagedQty(initializeToZero);
 		newProductInv.setSoldQty(initializeToZero);
-		
+
 		newProductInv.setMrp(mrp);
 		newProductInv.setPrice(price);
-		
+
 		logger.debug("Adding the product to inventory: " + newProductInv);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		newProductInv.setUpdateBy(auth.getName());
 		newProductInv.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		Response response = productInvBD.addProduct(newProductInv);
+		if (!response.isStatus()) {
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 	}
-	
-	
 
 	@RequestMapping(value = UIActions.EDIT_PRODUCT_INVENTORY, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response update(@RequestParam Integer id,
@@ -184,7 +182,8 @@ public class ProductInventoryController {
 			@RequestParam(value = "qtyTobeAdded", required = false) Integer qtyTobeAdded,
 			@RequestParam(value = "qtyTobeDiscarded", required = false) Integer qtyTobeDiscarded,
 			@RequestParam(value = "price", required = false) BigDecimal price,
-			@RequestParam(value = "mrp", required = false) BigDecimal mrp) {
+			@RequestParam(value = "mrp", required = false) BigDecimal mrp,
+			HttpServletResponse httpServletResponse) {
 
 		ProductInv productInv = productInvBD.getProduct(id);
 		if (productInv.getProduct().getProductId().equals(productId)) {
@@ -197,20 +196,29 @@ public class ProductInventoryController {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			toBeUpdatedProductInv.setUpdateBy(auth.getName());
 			toBeUpdatedProductInv.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
-			Response response = productInvBD.updateProduct(toBeUpdatedProductInv,qtyTobeAdded,qtyTobeDiscarded);
+			Response response = productInvBD.updateProduct(toBeUpdatedProductInv, qtyTobeAdded, qtyTobeDiscarded);
+			if (!response.isStatus()) {
+				httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			}
 			return response;
 		} else {
-			logger.debug("Error in updating the product in inventory: " + productInv + ".\nThe productCodes in request do not match with System data") ;
+			logger.debug("Error in updating the product in inventory: " + productInv
+					+ ".\nThe productCodes in request do not match with System data");
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new Response(false, EpSystemError.SYSTEM_INTERNAL_ERROR);
 		}
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_INVENTORY, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer productInvId) {
+	public @ResponseBody Response delete(@RequestParam Integer productInvId,
+			HttpServletResponse httpServletResponse) {
 
 		ProductInv productInv = productInvBD.getProduct(productInvId);
 		logger.debug("Deleting the product in inventory: " + productInv);
 		Response response = productInvBD.deleteProduct(productInv);
+		if(!response.isStatus()){
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 	}
 

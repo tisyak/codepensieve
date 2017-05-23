@@ -77,6 +77,13 @@ public class UIActions {
     public static final String LOAD_DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadDelete";
     public static final String DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/delete";
     
+    public static final String MANAGE_PRODUCT_GROUP="productGroup/loadManage";
+    public static final String LIST_ALL_PRODUCT_GROUP="productGroup/list";
+    public static final String ADD_PRODUCT_GROUP="productGroup/add";
+    public static final String GET_PRODUCT_GROUP="productGroup/get";
+    public static final String EDIT_PRODUCT_GROUP="productGroup/edit";
+    public static final String DELETE_PRODUCT_GROUP="productGroup/delete";
+    
     public static final String MANAGE_PRODUCT_INVENTORY="productinv/loadManage";
     public static final String LIST_ALL_PRODUCT_INVENTORY="productinv/list";
     public static final String LOAD_SEARCH_PRODUCT_INVENTORY="productinv/loadSearch";
@@ -131,39 +138,8 @@ public class UIActions {
     public static final String LOAD_DELETE_PRODUCT_INVOICE="invoiceproduct/loadDelete";
     public static final String DELETE_PRODUCT_INVOICE="invoiceproduct/delete";
    
-    public static final String LOAD_ADD_CUSTOMER_DSC="customer/dsc/loadAdd";
-    public static final String ADD_CUSTOMER_DSC="customer/dsc/add";
-    public static final String EDIT_CUSTOMER_DSC="customer/dsc/edit";
-    public static final String SAVE_CUSTOMER_DSC="customer/dsc/save";
-    public static final String LOAD_DELETE_CUSTOMER_DSC="customer/dsc/loadDelete";
-    public static final String DELETE_CUSTOMER_DSC="customer/dsc/delete";
-    
-    public static final String LIST_ALL_THIRDPARTIES="thirdparty/list";
-    public static final String LOAD_SEARCH_THIRDPARTY="thirdparty/loadSearch";
-    public static final String SEARCH_THIRDPARTY="thirdparty/search";
-    public static final String LOAD_ADD_THIRDPARTY="thirdparty/loadAdd";
-    public static final String ADD_THIRDPARTY="thirdparty/add";
-    public static final String EDIT_THIRDPARTY="thirdparty/edit";
-    public static final String SAVE_THIRDPARTY="thirdparty/save";
-    public static final String LOAD_DELETE_THIRDPARTY="thirdparty/loadDelete";
-    public static final String DELETE_THIRDPARTY="thirdparty/delete";
-    
-    public static final String LIST_ALL_THIRD_PARTY_HELD_DSCS="thirdparty/dsc/list";
-    
-    public static final String LIST_ALL_DSC_TRANSFER_INFOS="dsc/transfer/list";
-    public static final String LOAD_SEARCH_DSC_TRANSFER_INFO="dsc/transfer/loadSearch";
-    public static final String SEARCH_DSC_TRANSFER_INFO="dsc/transfer/search";
-    public static final String LOAD_ADD_DSC_TRANSFER_INFO="dsc/transfer/loadAdd";
-    public static final String ADD_DSC_TRANSFER_INFO="dsc/transfer/add";
-    public static final String EDIT_DSC_TRANSFER_INFO="dsc/transfer/edit";
-    public static final String SAVE_DSC_TRANSFER_INFO="dsc/transfer/save";
-    public static final String LOAD_RETURN_DSC_TRANSFER="dsc/transfer/loadReturn";
-    public static final String RETURN_DSC_TRANSFER="dsc/transfer/return";
-    public static final String LOAD_DELETE_DSC_TRANSFER="dsc/transfer/loadDelete";
-    public static final String DELETE_DSC_TRANSFER="dsc/transfer/delete";
-    
-    public static final String DSC_EXPIRING_LIST="dsc/report/expiring/list";
-    public static final String DSC_TRANSFER_INFO="dsc/report/transfer/list";
+    public static final String LOAD_REQUEST_FOR_SALES_TAX_REPORT = "reports/loadSalesTax";
+    public static final String VIEW_SALES_TAX = "reports/salesTax";
     
     public static final String FORGOT_PASSWORD="forgotPassword";
     public static final String LOAD_FORGOT_PASSWORD_OPTIONS="options";

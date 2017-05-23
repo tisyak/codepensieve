@@ -40,7 +40,7 @@ public class ProductMasterDAOImpl implements ProductMasterDAO {
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
-			logger.debug("No user found.");
+			logger.debug("No ProductMaster found.");
 			throw new EmptyResultDataAccessException("ProductMaster [" + productId + "] not found", 1);
 		} else {
 
@@ -61,7 +61,7 @@ public class ProductMasterDAOImpl implements ProductMasterDAO {
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
-			logger.debug("No user found.");
+			logger.debug("No ProductMaster found.");
 			throw new EmptyResultDataAccessException("ProductMaster [" + productCode + "] not found", 1);
 		} else {
 

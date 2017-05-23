@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +99,8 @@ public class CompanyController {
 			@RequestParam(value = "vatTinNo", required = false) String vatTinNo,
 			@RequestParam(value = "cstNo", required = false) String cstNo,
 			@RequestParam(value = "fda20bLcNo", required = false) String fda20bLcNo,
-			@RequestParam(value = "fda21bLcNo", required = false) String fda21bLcNo) {
+			@RequestParam(value = "fda21bLcNo", required = false) String fda21bLcNo,
+			HttpServletResponse httpServletResponse) {
 
 		
 			Company toBeUpdatedCompany = new Company();
@@ -119,6 +122,9 @@ public class CompanyController {
 			//toBeUpdatedCompany.setUpdateBy(auth.getName());
 			//toBeUpdatedCompany.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 			Response response = companyBD.updateCompany(toBeUpdatedCompany);
+			if(!response.isStatus()){
+				httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			}
 			return response;
 	
 	}

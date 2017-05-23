@@ -22,9 +22,9 @@ public class CustomerBDImpl implements CustomerBD {
     private CustomerDAO customerDAO;
  
     @Override
-    public Response addCustomer(Customer user) {
+    public Response addCustomer(Customer customer) {
     	logger.debug("CustomerBD: Adding customer.");
-        return customerDAO.addCustomer(user);
+        return customerDAO.addCustomer(customer);
     }
  
     @Override
@@ -33,9 +33,9 @@ public class CustomerBDImpl implements CustomerBD {
     }
  
     @Override
-    public Response updateCustomer(Customer user)  {
+    public Response updateCustomer(Customer customer)  {
     	logger.debug("CustomerBD: Updating customer.");
-    	return customerDAO.updateCustomer(user);
+    	return customerDAO.updateCustomer(customer);
     }
  
     @Override
