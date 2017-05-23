@@ -74,13 +74,16 @@ public class Invoice {
 	@JoinColumn(name = "invoice_status_id", referencedColumnName = "invoice_status_id")
 	private InvoiceStatusMaster invoiceStatus; 
 	
+	@Column(name = "total_amount_before_tax")
+	private BigDecimal totalAmountBeforeTax;
+	
 	@Column(name = "total_amount")
 	private BigDecimal totalAmount; 
 
 	@Column(name = "total_vat")
 	private BigDecimal totalVat; 
 	
-	/** The update by. */
+		/** The update by. */
 	@Column(name = "update_by")
 	private String updateBy;
 
@@ -190,6 +193,14 @@ public class Invoice {
 
 	public void setTotalVat(BigDecimal totalVat) {
 		this.totalVat = totalVat;
+	}
+
+	public BigDecimal getTotalAmountBeforeTax() {
+		return totalAmountBeforeTax;
+	}
+
+	public void setTotalAmountBeforeTax(BigDecimal totalAmountBeforeTax) {
+		this.totalAmountBeforeTax = totalAmountBeforeTax;
 	}
 
 	public String getUpdateBy() {

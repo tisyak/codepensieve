@@ -100,6 +100,7 @@ public class InvoiceBDImpl implements InvoiceBD {
 			logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
 			BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
 			logger.debug("effectiveVat " + effectiveVat);
+			newInvoiceProduct.setTotalBeforeTax(totalAmountBeforeTax);
 			newInvoiceProduct.setVatAmount(effectiveVat);
 			newInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat, mc));
 
@@ -162,9 +163,10 @@ public class InvoiceBDImpl implements InvoiceBD {
 		BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier, mc);
 		logger.debug("effectiveVat " + effectiveVat);
 		orgInvoiceProduct.setVatAmount(effectiveVat);
+		orgInvoiceProduct.setTotalBeforeTax(totalAmountBeforeTax);
 		orgInvoiceProduct.setTotalPrice(totalAmountBeforeTax.add(effectiveVat, mc));
 
-		logger.debug("Adding the product to invoice: " + orgInvoiceProduct);
+		logger.debug("Updating the product to invoice: " + orgInvoiceProduct);
 		orgInvoiceProduct.setUpdateBy(invoiceProduct.getUpdateBy());
 		orgInvoiceProduct.setUpdateTimestamp(invoiceProduct.getUpdateTimestamp());
 
@@ -179,10 +181,12 @@ public class InvoiceBDImpl implements InvoiceBD {
 
 	private void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp) {
 
+		BigDecimal totalBeforeTax = invoiceDAO.calculateTotalBeforeTaxForInvoice(invoiceId);
 		BigDecimal totalVATAmount = invoiceDAO.calculateTotalVATForInvoice(invoiceId);
 		BigDecimal totalPrice = invoiceDAO.calculateTotalPriceForInvoice(invoiceId);
 
 		Invoice invoice = invoiceDAO.getInvoice(invoiceId);
+		invoice.setTotalAmountBeforeTax(totalBeforeTax);
 		invoice.setTotalVat(totalVATAmount);
 		invoice.setTotalAmount(totalPrice);
 		invoice.setUpdateBy(updateBy);
@@ -196,15 +200,13 @@ public class InvoiceBDImpl implements InvoiceBD {
 	@Override
 	public Response deleteProductFromInvoice(InvoiceProduct invoiceProduct) {
 		logger.info("DELETE invoiceProduct: " + invoiceProduct);
-
-		// Managing product inventory before updating product to the invoice
+		// Managing product inventory before deleting product to the invoice
 		try {
 			productInvBD.cancelProductSale(invoiceProduct.getProduct().getProductCode(), invoiceProduct.getQty());
 			return invoiceDAO.deleteProductFromInvoice(invoiceProduct);
 		} catch (SysException e) {
 			return new Response(false, e.getErrorCode());
 		}
-
 	}
 
 }

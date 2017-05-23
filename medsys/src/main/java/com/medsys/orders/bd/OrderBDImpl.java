@@ -28,11 +28,16 @@ public class OrderBDImpl implements OrderBD {
 
 	@Autowired
 	private ProductInvBD productInvBD;
-	
+
 	@Override
+	@Transactional
 	public Response addOrder(Orders user) {
 		logger.debug("OrderBD: Adding order.");
-		return orderDAO.addOrder(user);
+		Response response = orderDAO.addOrder(user);
+		if (response.isStatus()) {
+
+		}
+		return response;
 
 	}
 
@@ -66,19 +71,19 @@ public class OrderBDImpl implements OrderBD {
 	public List<OrderProductSet> getAllProductsInOrder(Integer orderId) {
 		logger.debug("Get All products in Order: " + orderId);
 		List<OrderProductSet> orderProducts = orderDAO.getAllProductsInOrder(orderId);
-		for(OrderProductSet product: orderProducts){
-			try{
+		for (OrderProductSet product : orderProducts) {
+			try {
 				ProductInv productInv = productInvBD.getProduct(product.getProduct().getProductId());
 				product.setAvailableQty(productInv.getAvailableQty());
-			}catch(EmptyResultDataAccessException e){ 
-				logger.debug("Product "+ product.getProduct().getProductCode() +" not found in Inventory");
+			} catch (EmptyResultDataAccessException e) {
+				logger.debug("Product " + product.getProduct().getProductCode() + " not found in Inventory");
 				product.setAvailableQty(0);
 			}
-			
+
 		}
-		
+
 		return orderProducts;
-		
+
 	}
 
 	@Override
@@ -106,26 +111,46 @@ public class OrderBDImpl implements OrderBD {
 	public Response updateProductInOrder(OrderProductSet orderProductSet) {
 
 		logger.debug("UPDATE orderProductSet: " + orderProductSet);
-		OrderProductSet orgOrderProductSet = getProductInOrder(orderProductSet.getOrderProductSetId());
+		OrderProductSet orgOrderProductSet = null;
+		try {
+			orgOrderProductSet = getProductInOrder(orderProductSet.getOrderProductSetId());
 
-		if (!orgOrderProductSet.getProduct().getProductId().equals(orderProductSet.getProduct().getProductId())) {
-			return new Response(false, EpSystemError.ORDER_PRODUCT_ID_MISMATCH);
-		}
-		if (orgOrderProductSet.getQty() != orderProductSet.getQty()) {
-
-			// Managing product inventory before updating product to the order
-			try {
-				productInvBD.disengageProduct(orgOrderProductSet.getProduct().getProductCode(),
-						orgOrderProductSet.getQty());
-				productInvBD.engageProduct(orderProductSet.getProduct().getProductCode(), orderProductSet.getQty());
-				orgOrderProductSet.setQty(orderProductSet.getQty());
-				return orderDAO.updateProductInOrder(orgOrderProductSet);
-			} catch (SysException e) {
-				return new Response(false, e.getErrorCode());
+			if (!orgOrderProductSet.getOrderId().equals(orderProductSet.getOrderId())) {
+				logger.error("Order id for orderProductSet: " + orderProductSet.getOrderProductSetId() + " in DB is "
+						+ orgOrderProductSet.getOrderId() + " and in the received request is: "
+						+ orderProductSet.getOrderId() + ". Unable to update product in order due to this mismatch!");
+				return new Response(false, EpSystemError.ORDER_PRODUCT_ID_MISMATCH);
 			}
-		} else {
-			logger.debug("Quantities are same ... Nothing to update! Returning success.");
-			return new Response(true, null);
+
+			if (!orgOrderProductSet.getProduct().getProductId().equals(orderProductSet.getProduct().getProductId())) {
+				logger.error("Product id for orderProductSet: " + orderProductSet.getOrderProductSetId() + " in DB is "
+						+ orgOrderProductSet.getProduct().getProductId() + " and in the received request is: "
+						+ orderProductSet.getProduct().getProductId()
+						+ ". Unable to update product in order due to this mismatch!");
+				return new Response(false, EpSystemError.ORDER_PRODUCT_ID_MISMATCH);
+			}
+			if (orgOrderProductSet.getQty() != orderProductSet.getQty()) {
+
+				// Managing product inventory before updating product to the
+				// order
+				try {
+					productInvBD.disengageProduct(orgOrderProductSet.getProduct().getProductCode(),
+							orgOrderProductSet.getQty());
+					productInvBD.engageProduct(orderProductSet.getProduct().getProductCode(), orderProductSet.getQty());
+					orgOrderProductSet.setQty(orderProductSet.getQty());
+					return orderDAO.updateProductInOrder(orgOrderProductSet);
+				} catch (SysException e) {
+					logger.error("System Exception: " +e.getMessage() );
+					return new Response(false, e.getErrorCode());
+				}
+			} else {
+				logger.debug("Quantities are same ... Nothing to update! Returning success.");
+				return new Response(true, null);
+			}
+		} catch (EmptyResultDataAccessException emptyEx) {
+			logger.info("This product does not exist in the order.Hence adding it to the order");
+			Response response = this.addProductToOrder(orderProductSet);
+			return response;
 		}
 
 	}

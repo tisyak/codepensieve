@@ -45,11 +45,30 @@ public class DashboardController extends SuperController {
 			Model model) {
 		logger.debug("displaying master admin dashboard.");
 		//TODO: Change this dashboard to reflect relevant information.
-		request.setAttribute("totalDSCCount", 0);
-		request.setAttribute("thirdPartyCount", 0);
-		request.setAttribute("certExpiringClientCount", 0);
-		request.setAttribute("monthlyInwardCertificatesCount", 0);
-		request.setAttribute("monthlyOutwardCertificatesCount", 0);
+		/*totalOrdersInMonth
+		totalOrdersInWeek
+		totalInvoiceAmountInMonth
+		totalInvoicesInMonth
+		countOfProductsInDeficit
+		countOfPOsInMonth
+		countOfCustomersBilledInMonth
+		orderCountForYear
+		salesInYear
+		invoiceCountForYear
+		VATForYear
+		countOfCustomersBilledThisYear*/
+		request.setAttribute("totalOrdersInMonth", 0);
+		request.setAttribute("totalOrdersInWeek", 0);
+		request.setAttribute("totalInvoiceAmountInMonth", 0);
+		request.setAttribute("totalInvoicesInMonth", 0);
+		request.setAttribute("countOfProductsInDeficit", 0);
+		request.setAttribute("countOfPOsInMonth", 0);
+		request.setAttribute("countOfCustomersBilledInMonth", 0);
+		request.setAttribute("orderCountForYear", 0);
+		request.setAttribute("salesInYear", 0);
+		request.setAttribute("invoiceCountForYear", 0);
+		request.setAttribute("VATForYear", 0);
+		request.setAttribute("countOfCustomersBilledThisYear", 0);
 
 		return MedsysUITiles.MASTER_ADMIN_DASHBOARD.getTile();
 	}

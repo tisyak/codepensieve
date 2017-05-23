@@ -63,9 +63,10 @@ public class OrderProductSet implements Serializable {
 	public OrderProductSet() {
 	}
 
-	public OrderProductSet(Integer orderId, ProductMaster product, Integer qty) {
+	public OrderProductSet(Integer orderId,Integer productSetId,ProductMaster product, Integer qty) {
 		this.orderId = orderId;
-		this.product =  product;
+		this.orderProductSetId =  productSetId;
+		this.product = product;
 		this.qty = qty;
 
 	}

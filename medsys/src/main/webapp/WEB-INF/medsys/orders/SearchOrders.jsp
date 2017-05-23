@@ -111,24 +111,9 @@
 
 
 						<ul class="dropdown-menu pull-right">
-							<%
-								if (!order.getProducts().isEmpty()) {
-							%>
+							
 							<li><a href="${editOrder}?orderId=<%=order.getOrderId()%>">Edit</a></li>
-							<%
-								}
-							%>
-							<%
-								if (order.getProducts().isEmpty()) {
-							%>
-							<c:url value="/${UIActions.LOAD_ADD_PRODUCT_ORDER}"
-								var="addProductsToOrderUrl" />
-							<li><a
-								href="${addProductsToOrderUrl}?updatedOrderId=<%=order.getOrderId()%>">Add
-									Products To Order</a></li>
-							<%
-								}
-							%>
+							
 							<%
 								if (order.getOrderStatus().getOrderStatusCode().equals(OrderStatusCode.ACTIVE.getCode())) {
 							%>

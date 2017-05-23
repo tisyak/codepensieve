@@ -65,15 +65,26 @@
 	
 	//alert("data for ajax submit: " + data);
 	
+	//force reloading from the server after Add/Edit operation of form editing 
+	$.extend($.jgrid.edit, {
+    beforeSubmit: function () {
+        $("#grid").jqGrid("setGridParam", {datatype: "json"});
+        return [true,"",""];
+		}
+	});
+	
 	$(function() {
 		$("#grid").jqGrid({
 		   	url:'${recordsUrl}',
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['orderProductSetId', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Adnl.Avl. Qty', 'Actions'],
+		   	colNames:['Id', 'setPdtId', 'Product Code', 'Group Name','Product Name', 'Qty','Adnl.Avl. Qty', 'Actions'],
 		   	colModel:[
-		   		{name:'orderProductSetId',index:'id',  hidden:true},
+		   		{name:'orderProductSetId',index:'id', width:25,
+					cellattr: function(rowId, cellValue, rawObject, cm, item) {if(!(typeof(item)  === "undefined")){
+							if(isNaN(cellValue)){return ' style="color:DarkBlue;font-weight:bold;background-color:LightBlue;"' };
+					}}},
 		   		{name:'setPdtId',index:'setPdtId',hidden:true},
 		   		{name:'product.productCode',index:'product.productCode', width:50, editable:"hidden"},
 				{name:'product.group.groupName',index:'product.group.groupName', width:100},
@@ -94,7 +105,11 @@
 							//if true will show edit icon, else will hide
 							editbutton : false, 
 							//if true will show delete icon, else will hide
-							delbutton : true 
+							delbutton : true,
+							delOptions:{
+								url: '${deleteUrl}'
+								
+							}
                     }
 				}
 		   	],
@@ -104,6 +119,7 @@
 		   	autowidth: true,
 			rownumbers: true,
 		    pager: '#pager',
+			toppager: true,
 		   	sortname: 'product.productCode',
 		    viewrecords: true,
 		    sortorder: "asc",
@@ -167,73 +183,10 @@
 					cursor: "pointer"
 				} 
 			);
-		
-		
-		
-	
+
 	});
 
-	
-	function deleteRow(obj, args) {
-		// Get the currently selected row
-	    var row = $('#grid').jqGrid('getGridParam','selrow');
-	    // A pop-up dialog will appear to confirm the selected action
-		if( row != null ) 
-			$('#grid').jqGrid( 'delGridRow', row,
-	          	{	url:'${deleteUrl}', 
-					recreateForm: true,
-				    beforeShowForm: function(form) {
-				    	//Change title
-				        $(".delmsg").replaceWith('<span style="white-space: pre;">' +
-				        		'Delete selected record?' + '</span>');
-		            	//hide arrows
-				        $('#pData').hide();  
-				        $('#nData').hide();
-				    },
-	          		reloadAfterSubmit:true,
-	          		closeAfterDelete: true,
-	          		serializeDelData: function (postdata) {
-		          	      var rowdata = $('#grid').getRowData(postdata.id);
-		          	      // append postdata with any information 
-		          	      return {id: postdata.id, oper: postdata.oper, username: rowdata.productCode};
-		          	},
-	          		afterSubmit : function(response, postdata) 
-					{ 
-			            var result = eval('(' + response.responseText + ')');
-						var errors = "";
-						
-			            if (result.success == false) {
-							for (var i = 0; i < result.message.length; i++) {
-								errors +=  result.message[i] + "<br/>";
-							}
-			            }  else {
-			            	$('#msgbox').text('Entry has been deleted successfully');
-							$('#msgbox').dialog( 
-									{	title: 'Success',
-										modal: true,
-										buttons: {"Ok": function()  {
-											$(this).dialog("close");} 
-										}
-									});
-		                }
-				    	// only used for adding new records
-				    	var newId = null;
-			        	
-						return [result.success, errors, newId];
-					}
-	          	});
-		else {
-			$('#msgbox').text('You must select a record first!');
-			$('#msgbox').dialog( 
-					{	title: 'Error',
-						modal: true,
-						buttons: {"Ok": function()  {
-							$(this).dialog("close");} 
-						}
-					});
-		}
-	}
-	
+		
 	function startEdit() {
             var grid = $("#grid");
             var ids = grid.jqGrid('getDataIDs');
@@ -257,7 +210,6 @@
 					afterSave: function () { $("#grid").setGridParam({datatype:'json',postData: data}).trigger('reloadGrid');}
 				});
             }
-			grid.trigger('reloadGrid');
         }
 
         
@@ -391,6 +343,7 @@
     <input type="button" value="Save Products to Order" onclick="saveRows()" />
 
    <br />  <br />
+   <p style="color:blue;font-size:80%;font-weight:bold;background-color:LightYellow;"><i>The IDs in blue are not yet part of the order. They are as per the SET selected.</i></p>
 	<!-- JQGrid HTML -->
 	<div id='jqgrid'>
 		<div id='pager'></div>

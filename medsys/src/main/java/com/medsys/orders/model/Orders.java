@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -56,10 +57,12 @@ public class Orders {
 
 	@Column(name = "order_date")
 	@Type(type = "date")
+	@NotNull
 	private Date orderDate;
 
 	@Column(name = "delivery_date")
 	@Type(type = "date")
+	@NotNull
 	private Date deliveryDate;
 
 	@ManyToOne

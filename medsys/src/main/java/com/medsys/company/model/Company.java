@@ -1,5 +1,6 @@
 package com.medsys.company.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -16,7 +17,12 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "company_info")
-public class Company {
+public class Company implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4592326906219471138L;
 
 	static Logger logger = LoggerFactory.getLogger(Company.class);
 

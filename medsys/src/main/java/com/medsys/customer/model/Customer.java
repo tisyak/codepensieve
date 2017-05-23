@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -69,7 +70,7 @@ public class Customer implements Serializable{
 	@Column(name = "pincode", length = 512)
 	private String pincode;
 	
-	 @OneToMany( mappedBy = "customerId", cascade = CascadeType.REFRESH)
+	 @OneToMany( mappedBy = "customerId", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
 	 List<CustomerContact> contacts;
 
 	

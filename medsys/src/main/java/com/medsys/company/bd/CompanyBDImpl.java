@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.medsys.common.model.Response;
 import com.medsys.company.dao.CompanyDAO;
 import com.medsys.company.model.Company;
  
@@ -26,41 +27,19 @@ public class CompanyBDImpl implements CompanyBD {
     }
  
     @Override
-    public void updateCompany(Company user)  {
+    public Response updateCompany(Company user)  {
     	logger.debug("CompanyBD: Updating company.");
-        companyDAO.updateCompany(user);
+        return companyDAO.updateCompany(user);
     }
  
     @Override
-    public void deleteCompany(UUID companyId)  {
-        companyDAO.deleteCompany(companyId);
-    }
- 
-    @Override
-    public List<Company> getAllCompanys() {
-        return companyDAO.getAllCompanys();
+    public List<Company> getAllCompanies() {
+        return companyDAO.getAllCompanies();
     }
 
 	@Override
-	public List<Company> searchForCompanys(Company company) {
-		 return companyDAO.searchForCompanys(company);
+	public List<Company> searchForCompanies(Company company) {
+		 return companyDAO.searchForCompanies(company);
 	}
-
-	/*@Override
-	public List<Company> listCompanyswithAvailableDSCs() {
-		return companyDAO.listCompanyswithAvailableDSCs();
-	}
-	
-	@Override
-	public List<Company>  monthlyCompanyListHavingInwardDSCs(){
-		return companyDAO.monthlyCompanyListHavingInwardDSCs();
-	}
-	
-	@Override
-	public List<Company>  monthlyCompanyListHavingOutwardDSCs(){
-		return companyDAO.monthlyCompanyListHavingOutwardDSCs();
-	}
-   
-*/
    
 }

@@ -51,39 +51,10 @@ public enum MedsysUITiles {
 	ADMIN_USERS_LIST("master.AdminUserList"),
 	
 	/** CUSTOMER MANAGEMENT*/
-	MANAGE_CUSTOMER("customer.CustomerList"),
+	MANAGE_CUSTOMER("customer.Customer"),
 	
-	SEARCH_CUSTOMER_DSC("customer.SearchCustomerDSC"),
-
-	CUSTOMER_DSC_LIST("customer.CustomerDSCList"),
-
-	ADD_CUSTOMER_DSC("customer.AddCustomerDSC"),
-
-	EDIT_CUSTOMER_DSC("customer.EditCustomerDSC"),
-
-	CONFIRM_DELETE_CUSTOMER_DSC("customer.DeleteCustomerDSC"),
-
-	SEARCH_THIRDPARTY("thirdparty.SearchThirdParty"),
-
-	THIRDPARTY_LIST("thirdparty.ThirdPartyList"),
-
-	ADD_THIRDPARTY("thirdparty.AddThirdParty"),
-
-	EDIT_THIRDPARTY("thirdparty.EditThirdParty"),
-
-	CONFIRM_DELETE_THIRDPARTY("thirdparty.DeleteThirdParty"),
-
-	SEARCH_DSC_TRANSFER("dsctransfer.SearchDscTranfer"),
-
-	DSC_TRANSFER_LIST("dsctransfer.DscTranferList"),
-
-	ADD_DSC_TRANSFER_INFO("dsctransfer.AddDscTranferInfo"),
-
-	EDIT_DSC_TRANSFER_INFO("dsctransfer.EditDscTranferInfo"),
-
-	CONFIRM_DSC_RETURN("dsctransfer.ReturnDsc"),
-
-	CONFIRM_DSC_DELETE("dsctransfer.DeleteDsc"),
+	/** COMPANY MANAGEMENT*/
+	MANAGE_COMPANY("company.Company"),
 
 	/** PROFILE MANAGEMENT */
 	VIEW_PROFILE("profile.View"), EDIT_PROFILE("profile.Edit"), FORGOT_PASSWORD_OPTIONS("profile.forgotpassword.Options"),

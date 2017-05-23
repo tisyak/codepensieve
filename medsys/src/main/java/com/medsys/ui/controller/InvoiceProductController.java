@@ -5,6 +5,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,7 +100,8 @@ public class InvoiceProductController {
 			@RequestParam(value = "product.productId", required = false) Integer productId,
 			@RequestParam(value = "qty", required = false) Integer qty,
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
-			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId) {
+			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId,
+			HttpServletResponse httpServletResponse) {
 	
 		logger.debug("Call to add product to invoice.");
 		
@@ -115,6 +119,9 @@ public class InvoiceProductController {
 		newInvoiceProduct.setUpdateBy(auth.getName());
 		newInvoiceProduct.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		Response response = invoiceBD.addProductToInvoice(newInvoiceProduct);
+		if(!response.isStatus()){
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		}
 		return response;
 	}
 
@@ -124,7 +131,8 @@ public class InvoiceProductController {
 			@RequestParam(value = "product.productId", required = false) Integer productId,
 			@RequestParam(value = "qty", required = false) Integer qty,
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
-			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId) {
+			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId,
+			HttpServletResponse httpServletResponse) {
 
 		logger.debug("invoiceId in request: "+invoiceId);
 		logger.debug("productId in request: "+productId);
@@ -147,9 +155,13 @@ public class InvoiceProductController {
 			toBeUpdatedInvoiceProduct.setUpdateBy(auth.getName());
 			toBeUpdatedInvoiceProduct.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 			Response response = invoiceBD.updateProductInInvoice(toBeUpdatedInvoiceProduct);
+			if(!response.isStatus()){
+				httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			}
 			return response;
 		} else {
 			logger.debug("Error in updating the product in invoice: " + invoiceProduct + ".\nThe invoiceId and productCodes in request do not match with System data") ;
+			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new Response(false, EpSystemError.SYSTEM_INTERNAL_ERROR);
 		}
 	}

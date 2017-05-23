@@ -109,7 +109,7 @@ public class OrderDAOImpl implements OrderDAO {
 		Query<Orders> query = getCurrentSession().createQuery(
 				"from Orders where lower(orderNumber) like :orderNo OR lower(customer.name) like :custName "
 				+ " OR orderDate = :orderDate "
-						+ " order by orderNumber asc");
+						+ " order by orderNumber asc",Orders.class);
 
 		if (order.getOrderNumber() != null) {
 			query.setParameter("orderNo", "%" + order.getOrderNumber().toLowerCase() + "%");
@@ -149,7 +149,7 @@ public class OrderDAOImpl implements OrderDAO {
 		getCurrentSession().flush();
 		return getCurrentSession()
 				.createQuery(
-						"from OrderProductSet " + " where orderId = " + orderId + " order by product.productCode asc ")
+						"from OrderProductSet " + " where orderId = " + orderId + " order by product.productCode asc ",OrderProductSet.class)
 				.getResultList();
 	}
 
@@ -166,7 +166,7 @@ public class OrderDAOImpl implements OrderDAO {
 		logger.debug("Getting product having orderProductSetId: " + orderProductSetId);
 
 		Query<OrderProductSet> query = getCurrentSession()
-				.createQuery("from OrderProductSet where orderProductSetId = " + orderProductSetId.toString() + "");
+				.createQuery("from OrderProductSet where orderProductSetId = " + orderProductSetId + "",OrderProductSet.class);
 		// query.setParameter("orderId", orderId.toString());
 
 		logger.debug(query.toString());

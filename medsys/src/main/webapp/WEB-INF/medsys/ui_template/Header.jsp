@@ -21,15 +21,18 @@
 		</button>
 		<a class="navbar-brand" href="index.html"> <img
 			alt="MEDSYS Logo" src="<c:url value="/resources/img/logo20.png"/>"
-			class="hidden-xs" /> <span>DSC Inventory System</span></a>
+			class="hidden-xs" /> <span>An Inventory System</span></a>
 
 		<!-- user dropdown starts -->
 		<div class="btn-group pull-right">
 			<button class="btn btn-default dropdown-toggle"
 				data-toggle="dropdown">
 				<i class="glyphicon glyphicon-user"></i><span
-					class="hidden-sm hidden-xs"> <sec:authentication
-						property="principal.username" /></span> <span class="caret"></span>
+					class="hidden-sm hidden-xs"> 
+					<sec:authorize access="isAuthenticated()">  
+					<sec:authentication
+						property="principal.username" />
+						</sec:authorize>  </span> <span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu">
 				<li><a href="#">Profile</a></li>

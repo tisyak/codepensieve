@@ -156,7 +156,7 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 		ProductInv productToUpdate = getProductByCode(productCode);
 		Integer availableQty = productToUpdate.getAvailableQty();
 		Integer engageQty = productToUpdate.getEngagedQty();
-		if (engageQty <= releaseQty) {
+		if (releaseQty <= engageQty) {
 			productToUpdate.setEngagedQty(engageQty - releaseQty);
 			productToUpdate.setAvailableQty(availableQty + releaseQty);
 			updateProductInv(productToUpdate);

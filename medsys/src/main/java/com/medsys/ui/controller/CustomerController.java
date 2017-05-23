@@ -1,9 +1,9 @@
 package com.medsys.ui.controller;
 
-import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +24,9 @@ import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
 import com.medsys.customer.bd.CustomerBD;
 import com.medsys.customer.model.Customer;
-import com.medsys.master.bd.MasterDataBD;
-import com.medsys.master.model.MasterData;
-import com.medsys.product.model.Set;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
-import com.medsys.ui.util.UIConstants;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
-import com.medsys.util.EpSystemError;
 
 @Controller
 @Secured(Roles.MASTER_ADMIN)
@@ -42,11 +37,6 @@ public class CustomerController {
 	@Autowired
 	private CustomerBD customerBD;
 	
-	@Autowired
-	private MasterDataBD masterDataBD;
-
-
-
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LIST_ALL_CUSTOMERS, produces = "application/json")
 	public @ResponseBody JqgridResponse<?> records(@RequestParam("_search") Boolean search,
 			@RequestParam(value = "filters", required = false) String filters,
@@ -129,7 +119,7 @@ public class CustomerController {
 	
 
 	@RequestMapping(value = UIActions.EDIT_CUSTOMER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response update(@RequestParam(value = "name", required = false) String name,
+	public @ResponseBody Response update(@RequestParam(value = "id", required = false) String customerId,
 			@RequestParam(value = "name", required = false) String name,
 			@RequestParam(value = "email", required = false) String email,
 			@RequestParam(value = "mobileNo", required = false) String mobileNo,
@@ -137,31 +127,29 @@ public class CustomerController {
 			@RequestParam(value = "city", required = false) String city,
 			@RequestParam(value = "pincode", required = false) String pincode) {
 
-		Customer customer = customerBD.getCustomer(id);
-		if (customer.getCustomerId().equals(productId)) {
+		
 			Customer toBeUpdatedCustomer = new Customer();
-			toBeUpdatedCustomer.setCustomerId(id);
-			toBeUpdatedCustomer.setCustomer(customer.getCustomer());
-			toBeUpdatedCustomer.setPrice(price);
-			toBeUpdatedCustomer.setMrp(mrp);
-			logger.debug("Adding the product to inventory: " + toBeUpdatedCustomer);
+			toBeUpdatedCustomer.setCustomerId(UUID.fromString(customerId));
+			toBeUpdatedCustomer.setName(name);
+			toBeUpdatedCustomer.setEmail(email);
+			toBeUpdatedCustomer.setMobileNo(mobileNo);
+			toBeUpdatedCustomer.setAddress(address);
+			toBeUpdatedCustomer.setCity(city);
+			toBeUpdatedCustomer.setPincode(pincode);
+			logger.debug("Updating customer information: " + toBeUpdatedCustomer);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			toBeUpdatedCustomer.setUpdateBy(auth.getName());
 			toBeUpdatedCustomer.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
-			Response response = customerBD.updateCustomer(toBeUpdatedCustomer,qtyTobeAdded,qtyTobeDiscarded);
+			Response response = customerBD.updateCustomer(toBeUpdatedCustomer);
 			return response;
-		} else {
-			logger.debug("Error in updating the product in inventory: " + customer + ".\nThe productCodes in request do not match with System data") ;
-			return new Response(false, EpSystemError.SYSTEM_INTERNAL_ERROR);
-		}
+	
 	}
 
 	@RequestMapping(value = UIActions.DELETE_CUSTOMER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer customerId) {
+	public @ResponseBody Response delete(@RequestParam(value = "id", required = false) String customerId) {
 
-		Customer customer = customerBD.getCustomer(customerId);
-		logger.debug("Deleting the product in inventory: " + customer);
-		Response response = customerBD.deleteCustomer(customer);
+		logger.debug("Deleting the customer with customerId: " + customerId);
+		Response response = customerBD.deleteCustomer(UUID.fromString(customerId));
 		return response;
 	}
 

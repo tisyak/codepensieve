@@ -64,20 +64,19 @@ public class RoleDAOImpl implements RoleDAO {
 	@Override
 	public Role getRole(String usersRole) throws EmptyResultDataAccessException {
 		logger.debug("getRole() - [" + usersRole + "]");
-		Query query = getCurrentSession().createQuery(
-				"from Role where rolename = :usersRole ");
-		query.setString("usersRole", usersRole);
+		Query<Role> query = getCurrentSession().createQuery(
+				"from Role where rolename = :usersRole ",Role.class);
+		query.setParameter("usersRole", usersRole);
 
 		logger.debug(query.toString());
-		if (query.list().size() == 0) {
+		if (query.getResultList().size() == 0) {
 			logger.debug("No role found.");
 			throw new UsernameNotFoundException("Role [" + usersRole
 					+ "] not found");
 		} else {
 
-			logger.debug("AdminUser List Size: " + query.list().size());
-			@SuppressWarnings("unchecked")
-			List<Role> list = (List<Role>) query.list();
+			logger.debug("AdminUser List Size: " + query.getResultList().size());
+			List<Role> list = (List<Role>) query.getResultList();
 			Role roleObject = (Role) list.get(0);
 
 			return roleObject;
@@ -104,9 +103,8 @@ public class RoleDAOImpl implements RoleDAO {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Role> getRoles() {
-		return getCurrentSession().createQuery("from Role").list();
+		return getCurrentSession().createQuery("from Role",Role.class).getResultList();
 	}
 }

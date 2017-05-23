@@ -144,7 +144,7 @@ public class OrdersController extends SuperController {
 			// orderId separately in request
 			request.setAttribute("updatedOrderId", order.getOrderId());
 			redirectAttrs.addFlashAttribute("updatedOrderId",order.getOrderId());
-			return UIActions.REDIRECT + UIActions.LOAD_ADD_PRODUCT_ORDER;
+			return UIActions.REDIRECT + UIActions.EDIT_ORDER;
 		}
 	}
 
@@ -167,6 +167,12 @@ public class OrdersController extends SuperController {
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.EDIT_ORDER, method = RequestMethod.GET)
 	public String loadEditOrdersPage(@RequestParam(value = "orderId", required = false) Integer orderId, Model model) {
 		logger.info("IN: Order/edit-GET:  order to query = " + orderId);
+		
+		if(orderId == null){
+			logger.info("Checking in model for updatedOrderId = " + model.asMap().get("updatedOrderId"));
+			orderId = (Integer) model.asMap().get("updatedOrderId");
+		}
+		
 		if (!model.containsAttribute("order")) {
 
 			logger.info("Adding Order object to model");

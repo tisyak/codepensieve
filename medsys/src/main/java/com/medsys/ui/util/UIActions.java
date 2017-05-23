@@ -44,6 +44,18 @@ public class UIActions {
     public static final String LOAD_DELETE_CUSTOMER="customer/loadDelete";
     public static final String DELETE_CUSTOMER="customer/delete";
     
+    public static final String MANAGE_COMPANIES="company/loadManage";
+    public static final String LIST_ALL_COMPANIES="company/list";
+    public static final String LOAD_SEARCH_COMPANY="company/loadSearch";
+    public static final String SEARCH_COMPANY="company/search";
+    public static final String LOAD_ADD_COMPANY="company/loadAdd";
+    public static final String ADD_COMPANY="company/add";
+    public static final String GET_COMPANY="company/get";
+    public static final String EDIT_COMPANY="company/edit";
+    public static final String SAVE_COMPANY="company/save";
+    public static final String LOAD_DELETE_COMPANY="company/loadDelete";
+    public static final String DELETE_COMPANY="company/delete";
+    
     public static final String LIST_ALL_SETS="set/list";
     public static final String LOAD_SEARCH_SETS="set/loadSearch";
     public static final String SEARCH_SETS="set/search";

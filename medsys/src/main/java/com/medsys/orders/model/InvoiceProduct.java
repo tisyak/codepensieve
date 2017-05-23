@@ -49,6 +49,14 @@ public class InvoiceProduct  implements Serializable  {
 	private BigDecimal ratePerUnit;
 
 	@NotNull
+	@Column(name = "qty")
+	private Integer qty;
+
+	@NotNull
+	@Column(name = "total_before_tax")
+	private BigDecimal totalBeforeTax;
+	
+	@NotNull
 	@Column(name = "total")
 	private BigDecimal totalPrice;
 
@@ -59,10 +67,6 @@ public class InvoiceProduct  implements Serializable  {
 	@ManyToOne
 	@JoinColumn(name = "vat_type", referencedColumnName = "tax_id")
 	private TaxMaster vatType;
-
-	@NotNull
-	@Column(name = "qty")
-	private Integer qty;
 
 	@Transient
 	private Integer availableQty; 
@@ -106,6 +110,14 @@ public class InvoiceProduct  implements Serializable  {
 
 	public void setRatePerUnit(BigDecimal ratePerUnit) {
 		this.ratePerUnit = ratePerUnit;
+	}
+
+	public BigDecimal getTotalBeforeTax() {
+		return totalBeforeTax;
+	}
+
+	public void setTotalBeforeTax(BigDecimal totalBeforeTax) {
+		this.totalBeforeTax = totalBeforeTax;
 	}
 
 	public BigDecimal getTotalPrice() {
@@ -200,12 +212,9 @@ public class InvoiceProduct  implements Serializable  {
 	@Override
 	public String toString() {
 		return "InvoiceProduct [invoiceProductId=" + invoiceProductId + ", invoiceId=" + invoiceId + ", product="
-				+ product + ", ratePerUnit=" + ratePerUnit + ", totalPrice=" + totalPrice + ", vatAmount=" + vatAmount
-				+ ", vatType=" + vatType + ", qty=" + qty + ", updateBy=" + updateBy + ", updateTimestamp="
-				+ updateTimestamp + "]";
+				+ product + ", ratePerUnit=" + ratePerUnit + ", qty=" + qty + ", totalBeforeTax=" + totalBeforeTax
+				+ ", totalPrice=" + totalPrice + ", vatAmount=" + vatAmount + ", vatType=" + vatType + ", availableQty="
+				+ availableQty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
-	
-	
-	
 
 }

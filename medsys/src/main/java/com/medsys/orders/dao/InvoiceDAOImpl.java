@@ -63,7 +63,6 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 			logger.debug("Invoice List Size: " + query.getResultList().size());
 			List<Invoice> list = (List<Invoice>) query.getResultList();
 			Invoice invoice = (Invoice) list.get(0);
-
 			return invoice;
 		}
 	}
@@ -151,7 +150,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		logger.debug("Fetching all products in Invoice: " + invoiceId);
 		getCurrentSession().flush();
 		return getCurrentSession().createQuery(
-				"from InvoiceProduct " + " where invoiceId = " + invoiceId + " order by product.productCode asc ")
+				"from InvoiceProduct " + " where invoiceId = " + invoiceId + " order by product.productCode asc ",InvoiceProduct.class)
 				.getResultList();
 	}
 
@@ -189,28 +188,35 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		invoiceProductToUpdate.setQty(invoiceProduct.getQty());
 		invoiceProductToUpdate.setRatePerUnit(invoiceProduct.getRatePerUnit());
 		invoiceProductToUpdate.setVatType(invoiceProduct.getVatType());
+		invoiceProductToUpdate.setTotalBeforeTax(invoiceProduct.getTotalBeforeTax());
 		invoiceProductToUpdate.setTotalPrice(invoiceProduct.getTotalPrice());
 		invoiceProductToUpdate.setVatAmount(invoiceProduct.getVatAmount());
 		invoiceProductToUpdate.setUpdateBy(invoiceProduct.getUpdateBy());
 		invoiceProductToUpdate.setUpdateTimestamp(invoiceProduct.getUpdateTimestamp());
 		getCurrentSession().update(invoiceProductToUpdate);
-		// TODO: change return appropriately
 		return new Response(true, null);
 	}
 
 	@Override
 	public Response deleteProductFromInvoice(InvoiceProduct invoiceProduct) {
-		InvoiceProduct existingInvoiceProduct = getProductInInvoice(invoiceProduct.getInvoiceProductId());
 
+		InvoiceProduct existingInvoiceProduct = getProductInInvoice(invoiceProduct.getInvoiceProductId());
 		if (existingInvoiceProduct != null) {
 			getCurrentSession().delete(existingInvoiceProduct);
 			return new Response(true, null);
 		}
-
 		return new Response(false, EpSystemError.NO_RECORD_FOUND);
-
 	}
 
+	@Override
+	public BigDecimal calculateTotalBeforeTaxForInvoice(Integer invoiceId) {
+		logger.debug("Calculating total amount before tax for all products in Invoice: " + invoiceId);
+		getCurrentSession().flush();
+		return (BigDecimal) getCurrentSession()
+				.createQuery("SELECT SUM(totalBeforeTax) from InvoiceProduct where invoiceId = " + invoiceId)
+				.getSingleResult();
+	}
+	
 	@Override
 	public BigDecimal calculateTotalVATForInvoice(Integer invoiceId) {
 		logger.debug("Calculating total tax for all products in Invoice: " + invoiceId);

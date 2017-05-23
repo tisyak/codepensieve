@@ -28,7 +28,6 @@ import com.medsys.product.model.ProductMaster;
 import com.medsys.product.model.SetPdtTemplate;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.jqgrid.JqgridResponse;
-import com.medsys.util.EpSystemError;
 
 @Controller
 @Secured(Roles.MASTER_ADMIN)
@@ -69,7 +68,7 @@ public class OrderProductSetController {
 		logger.debug("Products in order: " + orderProducts);
 
 		if (orderProducts == null || orderProducts.size() == 0) {
-			
+
 			List<SetPdtTemplate> setProducts = setBD.getAllProductsInSet(setId);
 
 			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();
@@ -149,7 +148,7 @@ public class OrderProductSetController {
 			@RequestParam(value = "qty", required = true) Integer qty) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
-		OrderProductSet newOrderProductSet = new OrderProductSet(orderId, product, qty);
+		OrderProductSet newOrderProductSet = new OrderProductSet(orderId, null, product, qty);
 
 		logger.debug("Adding the product to order: " + newOrderProductSet);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -160,34 +159,33 @@ public class OrderProductSetController {
 	}
 
 	@RequestMapping(value = UIActions.EDIT_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response update(@RequestParam Integer id,
+	public @ResponseBody Response update(@RequestParam String id,
 			@RequestParam(value = "orderId", required = true) Integer orderId,
 			@RequestParam(value = "product.productCode", required = true) String productCode,
 			@RequestParam Integer qty) {
 
-		OrderProductSet orderProductSet = orderBD.getProductInOrder(id);
-		
-		if (orderProductSet.getOrderId().equals(orderId)
-				&& orderProductSet.getProduct().getProductCode().equals(productCode)) {
-			OrderProductSet toBeUpdatedOrderProductSet = new OrderProductSet(orderId, orderProductSet.getProduct(), qty);
-			toBeUpdatedOrderProductSet.setQty(qty);
-			toBeUpdatedOrderProductSet.setOrderProductSetId(id);
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			toBeUpdatedOrderProductSet.setUpdateBy(auth.getName());
-			toBeUpdatedOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
-			logger.debug("Updating the product in order: " + toBeUpdatedOrderProductSet);
-			Response response = orderBD.updateProductInOrder(toBeUpdatedOrderProductSet);
-			return response;
-		} else {
-			logger.debug("Error in updating the product in order: " + orderProductSet + ".\nThe orderId and prodcutCodes in request do not match with System data") ;
-			return new Response(false, EpSystemError.SYSTEM_INTERNAL_ERROR);
+		ProductMaster product = productMasterBD.getProductByCode(productCode);
+		Integer convertIdtoInt = null;
+		try {
+			convertIdtoInt = Integer.parseInt(id);
+		} catch (NumberFormatException numEx) {
+			logger.debug("Received Id is not an Integer. Hence passing on Null");
 		}
+
+		OrderProductSet toBeUpdatedOrderProductSet = new OrderProductSet(orderId, convertIdtoInt, product, qty);
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		toBeUpdatedOrderProductSet.setUpdateBy(auth.getName());
+		toBeUpdatedOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
+		logger.debug("Updating the product in order: " + toBeUpdatedOrderProductSet);
+		Response response = orderBD.updateProductInOrder(toBeUpdatedOrderProductSet);
+		return response;
+
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer orderProductSetId) {
+	public @ResponseBody Response delete(@RequestParam Integer id) {
 
-		OrderProductSet orderProductSet = orderBD.getProductInOrder(orderProductSetId);
+		OrderProductSet orderProductSet = orderBD.getProductInOrder(id);
 		logger.debug("Deleting the product in order: " + orderProductSet);
 		Response response = orderBD.deleteProductFromOrder(orderProductSet);
 		return response;

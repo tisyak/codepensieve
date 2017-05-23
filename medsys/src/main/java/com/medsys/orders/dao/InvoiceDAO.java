@@ -31,11 +31,10 @@ public interface InvoiceDAO {
 
 	public Response deleteProductFromInvoice(InvoiceProduct invoiceProduct);
 	
+	public BigDecimal calculateTotalBeforeTaxForInvoice(Integer invoiceId);
+	
 	public BigDecimal calculateTotalVATForInvoice(Integer invoiceId);
 	
 	public BigDecimal calculateTotalPriceForInvoice(Integer invoiceId);
-	
-	
-	
 	
 }

@@ -34,7 +34,7 @@ public class MasterDataDAOImpl implements MasterDataDAO {
 	}
 
 	@Override
-	public MasterData get(Class subClass, Integer id) throws EmptyResultDataAccessException {
+	public MasterData get(Class<? extends MasterData> subClass, Integer id) throws EmptyResultDataAccessException {
 		logger.debug("MasterConfigDAOImpl.getMasterData() - for " + subClass.getName() + "[" + id + "]");
 		MasterData masterData = null;
 
@@ -50,7 +50,7 @@ public class MasterDataDAOImpl implements MasterDataDAO {
 	}
 
 	@Override
-	public void update(Class subClass, MasterData masterData) throws EmptyResultDataAccessException {
+	public void update(Class<? extends MasterData> subClass, MasterData masterData) throws EmptyResultDataAccessException {
 		logger.debug("MasterConfigDAOImpl.update() - for " + subClass.getName() + " masterData :" + masterData);
 		MasterData masterDataToUpdate = get(subClass, masterData.getUniqueId());
 		if (masterDataToUpdate != null) {
@@ -72,7 +72,7 @@ public class MasterDataDAOImpl implements MasterDataDAO {
 	}
 
 	@Override
-	public void delete(Class subClass, Integer id) throws EmptyResultDataAccessException {
+	public void delete(Class<? extends MasterData> subClass, Integer id) throws EmptyResultDataAccessException {
 		MasterData masterData = get(subClass, id);
 		if (masterData != null) {
 			getCurrentSession().delete(masterData);
@@ -84,19 +84,19 @@ public class MasterDataDAOImpl implements MasterDataDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<MasterData> getAll(Class subClass) {
+	public List<MasterData> getAll(Class<? extends MasterData> subClass) {
 		return getCurrentSession().createQuery("from " + subClass.getName()).getResultList();
 	}
 
 	@Override
-	public MasterData getbyCode(Class subClass, String code) {
+	public MasterData getbyCode(Class<? extends MasterData> subClass, String code) {
 		logger.debug("MasterDataDAOImpl.getbyCode() - [" + code + "]");
 		MasterData masterdata;
 		try {
 			masterdata = (MasterData) subClass.newInstance();
 
 			Query<MasterData> query = getCurrentSession().createQuery(
-					"from " + subClass.getName() + " where " + masterdata.getKeyColumnName() + " = '" + code + "'");
+					"from " + subClass.getName() + " where " + masterdata.getKeyColumnName() + " = '" + code + "'",MasterData.class);
 
 			logger.debug(query.toString());
 			if (query.getResultList().size() == 0) {
