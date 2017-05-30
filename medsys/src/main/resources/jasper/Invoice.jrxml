@@ -162,7 +162,7 @@
 				</textElement>
 				<text><![CDATA[Bill to:]]></text>
 			</staticText>
-			<textField pattern="EEEEE dd MMMMM yyyy">
+			<textField>
 				<reportElement x="0" y="140" width="180" height="18" uuid="33274f5d-5b7e-4be2-a2ff-65d452a618ed"/>
 				<textElement>
 					<font size="12" isBold="true"/>

@@ -35,7 +35,7 @@
 							<li><spring:url
 									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_ORDER%>"
 									var="addOrder" /> <a href="${addOrder}"><i
-									class="glyphicon glyphicon-plus-sign"></i><span> Create
+									class="glyphicon glyphicon-file"></i><span> Create
 										New Order </span></a></li>
 
 							<li><spring:url
@@ -47,7 +47,7 @@
 							<li><spring:url
 									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_INVOICE%>"
 									var="addInvoice" /> <a href="${addInvoice}"><i
-									class="glyphicon glyphicon-plus-sign"></i><span>
+									class="glyphicon  glyphicon-upload"></i><span>
 										Generate Invoice </span></a></li>
 
 
@@ -60,7 +60,7 @@
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_INVENTORY%>"
 							var="manageProductInv" /> <a href="${manageProductInv}"><i
-							class="glyphicon  glyphicon-list"></i><span> Manage
+							class="glyphicon  glyphicon-check"></i><span> Manage
 								Product Inventory</span></a></li>
 
 					<li class="accordion"><a href="#"><i
@@ -68,12 +68,12 @@
 
 						<ul class="nav nav-pills nav-stacked">
 							<li><spring:url
-									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_INVENTORY%>"
-									var="manageProductInv" /> <a href="${manageProductInv}"><i
+									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_SET%>"
+									var="manageSet" /> <a href="${manageSet}"><i
 									class="glyphicon  glyphicon-list"></i><span> Manage Set</span></a></li>
 							<li><spring:url
-									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_INVENTORY%>"
-									var="manageProductInv" /> <a href="${manageProductInv}"><i
+									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_IN_SET%>"
+									var="manageProductInSet" /> <a href="${manageProductInSet}"><i
 									class="glyphicon  glyphicon-list"></i><span> Manage
 										Products in a Set</span></a></li>
 
@@ -81,13 +81,13 @@
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_GROUP%>"
 							var="manageProductGroup" /> <a href="${manageProductGroup}"><i
-							class="glyphicon  glyphicon-list"></i><span> Manage
+							class="glyphicon  glyphicon-folder-open"></i><span>  Manage
 								Product Group</span></a></li>
 					<li class="nav-header hidden-md">Master Records</li>
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_CUSTOMERS%>"
 							var="manageCustomer" /> <a href="${manageCustomer}"><i
-							class="glyphicon  glyphicon-list"></i><span> Manage
+							class="glyphicon  glyphicon-user"></i><span> Manage
 								Customers</span></a></li>
 					<li>
 					<li class="accordion"><a href="#"><i
@@ -97,13 +97,13 @@
 							<li><spring:url
 									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_COMPANIES%>"
 									var="manageCompany" /> <a href="${manageCompany}"><i
-									class="glyphicon  glyphicon-list"></i><span> Company
+									class="glyphicon  glyphicon-refresh"></i><span> Company
 										Details</span></a></li>
 							<li>
 							<li><spring:url
-									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_CUSTOMERS%>"
-									var="manageCustomer" /> <a href="${manageCustomer}"><i
-									class="glyphicon  glyphicon-list"></i><span> Tax Master</span></a></li>
+									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_TAX_MASTER%>"
+									var="manageTaxMaster" /> <a href="${manageTaxMaster}"><i
+									class="glyphicon  glyphicon-pencil"></i><span> Tax Master</span></a></li>
 							<li>
 						</ul></li>
 
@@ -111,11 +111,11 @@
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_SALES_TAX_REPORT%>"
 							var="viewSalesTax" /> <a href="${viewSalesTax}"><i
-							class="glyphicon glyphicon-list"></i><span> Sales Tax</span></a></li>
+							class="glyphicon  glyphicon-exclamation-sign"></i><span> Sales Tax</span></a></li>
 					<li><spring:url
-							value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_SALES_TAX_REPORT%>"
+							value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_PRODUCT_DEFICIT_REPORT%>"
 							var="productsInDeficit" /> <a href="${productsInDeficit}"><i
-							class="glyphicon glyphicon-list"></i><span> Product
+							class="glyphicon glyphicon-thumbs-down"></i><span> Product
 								Deficit Report</span></a></li>
 
 

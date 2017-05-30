@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2017-03-15T08:15:03 -->
+<!-- 2017-05-30T23:04:46 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="479"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="521"/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter "/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
 	<style name="Title" forecolor="#FFFFFF" fontName="Times New Roman" fontSize="50" isBold="false" pdfFontName="Times-Bold"/>
 	<style name="SubTitle" forecolor="#CCCCCC" fontName="Times New Roman" fontSize="18" isBold="false" pdfFontName="Times-Roman"/>
 	<style name="Column header" forecolor="#666666" fontName="Times New Roman" fontSize="14" isBold="true"/>
@@ -96,7 +96,7 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="Table 2_CH" mode="Opaque" backcolor="#FFE3BF">
+	<style name="Table 2_CH" mode="Opaque" backcolor="#A0A0A0">
 		<box leftPadding="3" rightPadding="3">
 			<pen lineWidth="0.5" lineColor="#000000"/>
 			<topPen lineWidth="0.5" lineColor="#000000"/>
@@ -115,7 +115,7 @@
 		</box>
 		<conditionalStyle>
 			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
-			<style backcolor="#F6EDE1"/>
+			<style backcolor="#F3F3F3"/>
 		</conditionalStyle>
 	</style>
 	<subDataset name="productDataSet" uuid="34c3451e-c0fd-4dfd-af18-e87f3d124d16">
@@ -129,10 +129,13 @@
 	<field name="products" class="java.util.Set"/>
 	<field name="orderId" class="java.lang.Integer"/>
 	<field name="orderNumber" class="java.lang.String"/>
-	<field name="customer.name" class="java.lang.Object"/>
+	<field name="customer.name" class="java.lang.String"/>
+	<field name="customer.address" class="java.lang.String"/>
+	<field name="customer.city" class="java.lang.String"/>
+	<field name="customer.pincode" class="java.lang.String"/>
 	<field name="refSource" class="java.lang.String"/>
-	<field name="orderDate" class="java.sql.Date"/>
 	<field name="patientName" class="java.lang.String"/>
+	<field name="orderDate" class="java.sql.Date"/>
 	<field name="deliveryDate" class="java.sql.Date"/>
 	<title>
 		<band height="436" splitType="Stretch">
@@ -146,9 +149,12 @@
 				</textElement>
 				<text><![CDATA[Deliver to:]]></text>
 			</staticText>
-			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="0" y="115" width="120" height="15" uuid="33274f5d-5b7e-4be2-a2ff-65d452a618ed"/>
-				<textFieldExpression><![CDATA[$F{customer.name}]]></textFieldExpression>
+			<textField>
+				<reportElement x="0" y="115" width="120" height="20" uuid="33274f5d-5b7e-4be2-a2ff-65d452a618ed"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer.name}.toUpperCase()]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="0" y="80" width="556" height="1" uuid="806ce5df-1219-4876-ae0c-ca7405b1f246">
@@ -156,14 +162,17 @@
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
 			</line>
-			<staticText>
+			<textField>
 				<reportElement x="0" y="130" width="120" height="15" uuid="1d3045ed-03d6-4253-a959-aeeb491b73ca"/>
-				<text><![CDATA[Company Address]]></text>
-			</staticText>
-			<staticText>
+				<textElement verticalAlignment="Top">
+					<font fontName="Serif" size="9" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer.address} + "," + $F{customer.city} + " - " + $F{customer.pincode}]]></textFieldExpression>
+			</textField>
+			<textField>
 				<reportElement x="120" y="146" width="120" height="15" uuid="235bf8b6-1e1e-49c7-b59f-7a46c30b8209"/>
-				<text><![CDATA[Reference]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA[$F{refSource}]]></textFieldExpression>
+			</textField>
 			<staticText>
 				<reportElement x="415" y="10" width="50" height="20" uuid="0f86baff-6386-4f3f-b3fe-2388707babe8"/>
 				<box rightPadding="4"/>
@@ -176,9 +185,9 @@
 			</textField>
 			<image hAlign="Center">
 				<reportElement x="0" y="0" width="65" height="60" uuid="94883631-a913-43e2-b182-ab8d77d0181e"/>
-				<imageExpression><![CDATA["./jasper/invoice_logo.png"]]></imageExpression>
+				<imageExpression><![CDATA["./jasper/invoice_logo_bw.png"]]></imageExpression>
 			</image>
-			<textField pattern="EEEEE dd MMMMM yyyy">
+			<textField>
 				<reportElement x="465" y="30" width="91" height="20" uuid="3836ce65-eca3-4cad-a6de-b1818def0a2b"/>
 				<textFieldExpression><![CDATA[$F{orderNumber}]]></textFieldExpression>
 			</textField>
@@ -196,7 +205,7 @@
 				<textElement>
 					<font size="19" isBold="true"/>
 				</textElement>
-				<text><![CDATA[DO]]></text>
+				<text><![CDATA[Divine Orthocare]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="95" y="55" width="205" height="15" uuid="b8cc42fd-b569-497d-834d-7e854040ad18"/>
@@ -208,7 +217,7 @@
 			</staticText>
 			<staticText>
 				<reportElement x="95" y="40" width="285" height="15" uuid="b96f7183-44f8-43ad-ba60-43d8fbf50b6e"/>
-				<text><![CDATA[ | +91 99305 36557]]></text>
+				<text><![CDATA[ +91 22 21660017 | +91 99305 36557]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" positionType="Float" x="0" y="146" width="120" height="16" forecolor="#000000" uuid="dc09c425-e5ad-4a55-ba2e-2036b4a311c9"/>
@@ -224,10 +233,10 @@
 				</textElement>
 				<text><![CDATA[Patient Name :]]></text>
 			</staticText>
-			<staticText>
+			<textField>
 				<reportElement x="120" y="162" width="120" height="15" uuid="7bb9333c-6d84-448c-a9d2-765a799fedd8"/>
-				<text><![CDATA[Patient Name]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA[$F{patientName}]]></textFieldExpression>
+			</textField>
 			<componentElement>
 				<reportElement x="0" y="190" width="549" height="200" uuid="f0ae1e65-dfe0-4252-81d9-cf3180a9c6e1">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
@@ -240,11 +249,13 @@
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{products})]]></dataSourceExpression>
 					</datasetRun>
 					<jr:column width="34" uuid="b6fb1631-94ce-4964-bb26-1ed485dc4365">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
-						<jr:tableHeader style="Table 2_TH" height="30" rowSpan="1"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="28" height="30" uuid="ddca0075-77a3-4f67-9205-3313679a43d8"/>
+								<reportElement x="0" y="0" width="28" height="30" forecolor="#FFFFFF" uuid="ddca0075-77a3-4f67-9205-3313679a43d8"/>
+								<textElement>
+									<font size="10" isBold="true"/>
+								</textElement>
 								<text><![CDATA[Sr No]]></text>
 							</staticText>
 						</jr:columnHeader>
@@ -256,11 +267,13 @@
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="100" uuid="279378b0-34fe-4e92-b9a4-1a195ded3e6a">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
-						<jr:tableHeader style="Table 2_TH" height="30" rowSpan="1"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
 						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="94" height="30" uuid="510dddb2-e7c4-466e-8bed-1c4b94903ff2"/>
+								<reportElement x="0" y="0" width="94" height="30" forecolor="#FFFFFF"  uuid="510dddb2-e7c4-466e-8bed-1c4b94903ff2"/>
+								<textElement>
+									<font size="10" isBold="true"/>
+								</textElement>
 								<text><![CDATA[Product Code]]></text>
 							</staticText>
 						</jr:columnHeader>
@@ -272,11 +285,13 @@
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="360" uuid="75ba6cc0-9053-4c55-b52b-e1043bb85f34">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
-						<jr:tableHeader style="Table 2_TH" height="30" rowSpan="1"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="354" height="30" uuid="510dddb2-e7c4-466e-8bed-1c4b94903ff2"/>
+								<reportElement x="0" y="0" width="354" height="30" forecolor="#FFFFFF" uuid="510dddb2-e7c4-466e-8bed-1c4b94903ff2"/>
+								<textElement>
+									<font size="10" isBold="true"/>
+								</textElement>
 								<text><![CDATA[Product Desc]]></text>
 							</staticText>
 						</jr:columnHeader>
@@ -288,11 +303,13 @@
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="49" uuid="b6fb1631-94ce-4964-bb26-1ed485dc4365">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
-						<jr:tableHeader style="Table 2_TH" height="30" rowSpan="1"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="43" height="30" uuid="ddca0075-77a3-4f67-9205-3313679a43d8"/>
+								<reportElement x="0" y="0" width="43" height="30" forecolor="#FFFFFF"  uuid="ddca0075-77a3-4f67-9205-3313679a43d8"/>
+								<textElement>
+									<font size="10" isBold="true"/>
+								</textElement>
 								<text><![CDATA[Quantity]]></text>
 							</staticText>
 						</jr:columnHeader>
