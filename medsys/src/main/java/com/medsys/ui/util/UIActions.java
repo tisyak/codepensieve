@@ -44,6 +44,8 @@ public class UIActions {
     public static final String LOAD_DELETE_CUSTOMER="customer/loadDelete";
     public static final String DELETE_CUSTOMER="customer/delete";
     
+    public static final String MANAGE_TAX_MASTER="taxmaster/loadManage";
+    
     public static final String MANAGE_COMPANIES="company/loadManage";
     public static final String LIST_ALL_COMPANIES="company/list";
     public static final String LOAD_SEARCH_COMPANY="company/loadSearch";
@@ -97,6 +99,9 @@ public class UIActions {
     public static final String GET_PRODUCT_INVENTORY_REPORT="productinv/download";
     
     
+    public static final String MANAGE_SET="set/loadManage";
+    public static final String MANAGE_PRODUCT_IN_SET="set/loadManageProducts";
+    
     public static final String LIST_ALL_ORDERS="orders/list";
     public static final String LOAD_SEARCH_ORDERS="orders/loadSearch";
     public static final String SEARCH_ORDERS="orders/search";
@@ -140,6 +145,8 @@ public class UIActions {
    
     public static final String LOAD_REQUEST_FOR_SALES_TAX_REPORT = "reports/loadSalesTax";
     public static final String VIEW_SALES_TAX = "reports/salesTax";
+    public static final String LOAD_REQUEST_FOR_PRODUCT_DEFICIT_REPORT = "reports/loadProductDeficit";
+    public static final String VIEW_PRODUCT_DEFICIT = "reports/productDeficit";
     
     public static final String FORGOT_PASSWORD="forgotPassword";
     public static final String LOAD_FORGOT_PASSWORD_OPTIONS="options";

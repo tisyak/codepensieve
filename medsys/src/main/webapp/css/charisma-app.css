@@ -317,18 +317,26 @@ div.center, p.center, img.center {
     margin-left: -2px;
 }
 
+.navbar-default .navbar-brand {
+    color: #178acc; 
+}
+
 .navbar-brand {
     font-family: Arial, serif;
     letter-spacing: 2px;
-    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-    width: 300px;
-    font-size: 17px;
+	color: #178acc;	
+    //text-shadow: 1px 1px 5px rgba(0, 0, 1, 0.5);
+    width: 700px;
+	padding:0px 15px 0px 5px;
+    font-size: 20px;
+    line-height:50px;
+	font-weight:bold;
 }
 
 .navbar-brand img {
     float: left;
-    height: 20px;
-    width: 20px;
+    height: 60px;
+    width: 60px;
     margin-right: 5px;
 }
 
@@ -463,6 +471,9 @@ ul.ajax-loaders {
 
 .navbar {
     border-radius: 0;
+	border-bottom: 4px solid #178acc;
+	background-image:linear-gradient(-90deg, #e3e3e3 , #FFFFFF);/*linear-gradient(#FFA500, #FAFAD2 70%, #FFFACD);*/
+
 }
 
 ul.main-menu li:hover {
@@ -545,6 +556,7 @@ ul.github-buttons li {
 
     .navbar-brand {
         font-family: 'Shojumaru', cursive, Arial, serif;
+		color: #178acc;
         letter-spacing: 2px;
         text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
         width: 40%;

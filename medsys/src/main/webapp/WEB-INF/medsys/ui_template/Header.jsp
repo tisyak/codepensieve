@@ -19,9 +19,9 @@
 			<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span>
 			<span class="icon-bar"></span> <span class="icon-bar"></span>
 		</button>
-		<a class="navbar-brand" href="index.html"> <img
-			alt="MEDSYS Logo" src="<c:url value="/resources/img/logo20.png"/>"
-			class="hidden-xs" /> <span>An Inventory System</span></a>
+		<a class="navbar-brand" href="./"> <img
+			alt="Divine Orthocare Logo" src="<c:url value="/resources/img/logo20.png"/>"
+			class="hidden-xs" /> <span style="width=100px">Divine Orthocare Inventory System</span></a>
 
 		<!-- user dropdown starts -->
 		<div class="btn-group pull-right">
@@ -45,25 +45,6 @@
 			</ul>
 		</div>
 		<!-- user dropdown ends -->
-
-		<!-- theme selector starts -->
-		<!-- <div class="btn-group pull-right theme-container">
-                <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                    <i class="glyphicon glyphicon-tint"></i><span
-                        class="hidden-sm hidden-xs"> Change Theme / Skin</span>
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" id="themes">
-                    <li><a data-value="classic" href="#"><i class="whitespace"></i> Classic</a></li>
-                    <li><a data-value="cerulean" href="#"><i class="whitespace"></i> Cerulean</a></li>
-					<li><a data-value="simplex" href="#"><i class="whitespace"></i> Simplex</a></li>
-                    <li><a data-value="darkly" href="#"><i class="whitespace"></i> Darkly</a></li>
-                    <li><a data-value="lumen" href="#"><i class="whitespace"></i> Lumen</a></li>
-                    <li><a data-value="slate" href="#"><i class="whitespace"></i> Slate</a></li>
-                    <li><a data-value="united" href="#"><i class="whitespace"></i> United</a></li>
-                </ul>
-            </div> -->
-		<!-- theme selector ends -->
 
 		
 
