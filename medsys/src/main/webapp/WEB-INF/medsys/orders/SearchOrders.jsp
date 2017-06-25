@@ -14,6 +14,9 @@
 <spring:url
 	value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_DELETE_ORDER%>"
 	var="deleteOrder" />
+<spring:url
+	value="<%=UIActions.FORWARD_SLASH + UIActions.ORDER_RESTORE_SET%>"
+	var="orderRestoreSet" />
 
 
 
@@ -118,6 +121,7 @@
 								if (order.getOrderStatus().getOrderStatusCode().equals(OrderStatusCode.ACTIVE.getCode())) {
 							%>
 							<li><a href="${deleteOrder}?orderId=<%=order.getOrderId()%>">Delete</a></li>
+							<li><a href="${orderRestoreSet}?orderId=<%=order.getOrderId()%>">Restore Set</a></li>
 							<%
 								}
 							%>

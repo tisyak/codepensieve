@@ -19,10 +19,9 @@
 <spring:url
 	value="<%=UIActions.FORWARD_SLASH + UIActions.ADD_INVOICE%>"
 	var="action" />
-<form:form class="form-horizontal" method="POST" action="${action}"
-	modelAttribute="invoice" autocomplete="off">
+<form:form cssClass="form-horizontal" method="POST" action="${action}" modelAttribute="invoice">
 
-	<form:hidden path="invoiceId" title="invoiceId" />
+	<form:hidden path="invoiceId"/>
 
 	<div class="form-group">
 		<label class="col-sm-2" for="inputOrderNumber">Invoice For
@@ -30,7 +29,7 @@
 		<div class="col-sm-5">
 
 
-			<form:select class="form-control" path="order.orderId">
+			<form:select cssClass="form-control" path="order.orderId">
 				<form:option value="" label="--  Select Order No --" />
 				<c:forEach items="${orderList}" var="order">
 					<form:option value="${order.orderId}">${order.orderNumber}</form:option>
@@ -43,7 +42,7 @@
 		<div class="col-sm-4">
 			<form:input disabled="true" path="invoiceNo" cssClass="form-control"
 				title="invoiceNo" />
-			<form:hidden path="invoiceNo" title="invoiceNo" />
+			<form:hidden path="invoiceNo" />
 		</div>
 	</div>
 
@@ -54,7 +53,7 @@
 		<div class="col-sm-5">
 
 
-			<form:select class="form-control" path="customer.customerId">
+			<form:select cssClass="form-control" path="customer.customerId">
 				<form:option value="" label="--  Select  --" />
 				<c:forEach items="${customerList}" var="customer">
 					<form:option value="${customer.customerId}">${customer.name}</form:option>
@@ -63,10 +62,9 @@
 			<form:errors path="customer.customerId" cssClass="error" />
 		</div>
 
-		<label class="col-sm-1" for="inputInvoiceDate">Invoice Dt</label>
+		<label class="col-sm-1" for="inputInvoiceDate">Inv Date</label>
 		<div class="col-sm-4">
-			<form:input path="invoiceDate" placeholder="Invoice Date"
-				cssClass="form-control" />
+			<form:input path="invoiceDate" cssClass="form-control" />
 		</div>
 	</div>
 
@@ -75,12 +73,12 @@
 		<label class="col-sm-2" for="inputReferredBy">Referred By</label>
 		<div class="col-sm-5">
 			<form:input path="refSource" cssClass="form-control"
-				title="refSource" autocomplete="off" />
+				title="refSource" />
 		</div>
 		<form:errors path="refSource" cssClass="error" />
 		<label class="col-sm-1" for="inputPaymentTerms">Payment Terms</label>
 		<div class="col-sm-4">
-			<form:select class="form-control"
+			<form:select cssClass="form-control"
 				path="paymentTerms.paymentTermsId">
 				<form:option value="" label="--  Select  --" />
 				<c:forEach items="${paymentTermsList}" var="paymentTerms">
@@ -95,7 +93,7 @@
 		<label class="col-sm-2" for="inputPatientName">PatientName</label>
 		<div class="col-sm-5">
 			<form:input path="patientName" cssClass="form-control"
-				title="patientName" autocomplete="off" />
+				title="patientName" />
 		</div>
 		<form:errors path="patientName" cssClass="error" />
 		<label class="col-sm-1" for="inputInvoiceNumber">Invoice
@@ -103,8 +101,27 @@
 		<div class="col-sm-4">
 			<form:input path="invoiceStatus.invoiceStatusDesc" cssClass="form-control"
 				title="invoiceStatus" disabled="true"/>
-			<form:hidden path="invoiceStatus.invoiceStatusId" title="invoiceStatus" />
+			<form:hidden path="invoiceStatus.invoiceStatusId"/>
 		</div>
+	</div>
+	
+	<div class="form-group">
+	<label class="col-sm-2" for="inputPatientInfo">Patient Age / Gender</label>
+		<div class="col-sm-5">
+			<form:input path="patientInfo" cssClass="form-control"
+				title="patientInfo" />
+		</div>
+		<form:errors path="patientInfo" cssClass="error" />
+		<div class="col-sm-1">
+		<form:checkbox path="gstInvoice" title="gstInvoice"  /> 
+				</div>
+				<label class="col-sm-2" for="gstInvoice">GST Invoice</label>
+		<form:errors path="gstInvoice" cssClass="error" />	
+		<div class="col-sm-1">
+		<form:checkbox path="billToPatient" title="billToPatient"  /> 
+				</div>
+				<label class="col-sm-2" for="billToPatient">Bill to patient</label>
+		<form:errors path="billToPatient" cssClass="error" />		
 	</div>
 
 

@@ -65,7 +65,7 @@ public class SetBDImpl implements SetBD {
 		
 		for(SetPdtTemplate pdtTemplate: setPdtTemplates){
 			try{
-				ProductInv productInv = productInvBD.getProduct(pdtTemplate.getProduct().getProductId());
+				ProductInv productInv = productInvBD.getProductByCode(pdtTemplate.getProduct().getProductCode());
 				pdtTemplate.setAvailableQty(productInv.getAvailableQty());
 			}catch(EmptyResultDataAccessException e){ 
 				logger.debug("Product "+ pdtTemplate.getProduct().getProductCode() +" not found in Inventory");
@@ -84,7 +84,7 @@ public class SetBDImpl implements SetBD {
 		
 		for(SetPdtTemplate pdtTemplate: setPdtTemplates){
 			try{
-				ProductInv productInv = productInvBD.getProduct(pdtTemplate.getProduct().getProductId());
+				ProductInv productInv = productInvBD.getProductByCode(pdtTemplate.getProduct().getProductCode());
 				pdtTemplate.setAvailableQty(productInv.getAvailableQty());
 			}catch(EmptyResultDataAccessException e){ 
 				logger.debug("Product "+ pdtTemplate.getProduct().getProductCode() +" not found in Inventory");

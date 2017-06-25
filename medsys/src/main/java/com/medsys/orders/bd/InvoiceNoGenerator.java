@@ -1,53 +1,10 @@
-package com.medsys.test;
+package com.medsys.orders.bd;
 
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.GregorianCalendar;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-public class TestGenerateAlphanumericNos {
-
-	public static void main(String[] args) {
-		int num_of_ids = 5; // Number of "ids" to generate (26*26*26*999
-									// + 1 <-- To get ).
-		int i = 0; // Loop counter.
-		//PrintWriter writer = null;
-		try {
-			//writer = new PrintWriter("F:\\theGenerateAlphanumericNos.txt", "UTF-8");
-			
-			String invNumber = "INV-2017-AAA-000";
-			
-			while (i <= num_of_ids) {
-
-				invNumber = getNextInvoiceNumber(invNumber);
-				//writer.print(invNumber + "\t");
-
-				System.out.println(i + " : " + invNumber); // Print out
-				// the id.
-
-				i++;
-
-			}
-
-			//writer.close();
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.out.println("Halting process. Exception at " + i + ": " + e.getMessage());
-			/*if (writer != null) {
-				writer.println("Halting process. Exception at " + i + ": " + e.getMessage());
-				writer.close();
-			}*/
-		}
-
-	}
-
-	@Autowired
-	public static String getNextInvoiceNumber(String prevInvoiceNumber) throws Exception {
+public class InvoiceNoGenerator {
+	
+	public static synchronized  String getNextInvoiceNumber(String prevInvoiceNumber) throws Exception {
 
 		String[] arrSplitInvNumber = prevInvoiceNumber.split("-");
 
@@ -82,8 +39,7 @@ public class TestGenerateAlphanumericNos {
 		// make it 4 digits.
 		return (arrSplitInvNumber[0] + "-" + currentYear + "-" + new String(str) + "-" + id);
 	}
-
-	@Autowired
+	
 	public static void incrementString(char[] str) throws Exception {
 		boolean someCharsAreNotZ = false;
 		for (int pos = str.length - 1; pos >= 0; pos--) {
@@ -99,4 +55,5 @@ public class TestGenerateAlphanumericNos {
 			throw new Exception("End of String combinations reached!");
 		}
 	}
+
 }

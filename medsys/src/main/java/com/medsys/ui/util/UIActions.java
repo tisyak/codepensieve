@@ -110,6 +110,7 @@ public class UIActions {
     public static final String EDIT_ORDER="orders/edit";
     public static final String SAVE_ORDER="orders/save";
     public static final String LOAD_DELETE_ORDER="orders/loadDelete";
+    public static final String ORDER_RESTORE_SET="orders/restoreSet";
     public static final String DELETE_ORDER="orders/delete";
     public static final String GET_ORDER_REPORT="orders/download";
     

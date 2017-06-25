@@ -21,6 +21,7 @@ import com.medsys.adminuser.bd.AdminUserBD;
 import com.medsys.adminuser.model.AdminUser;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
+import com.medsys.ui.util.UIConstants;
  
 
  
@@ -63,13 +64,13 @@ public class AdminUserController  extends SuperController  {
  
         if (result.hasErrors()) {
             logger.info("adminUser-add error: " + result.toString());
-            redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.adminuser", result);
+            redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), result);
             redirectAttrs.addFlashAttribute("adminUser", adminUser);
             return UIActions.REDIRECT + UIActions.LIST_ADMIN_USERS;
         } else {
         	adminUserBD.addUser(adminUser);
             String message = "Admin User " + adminUser.getUsername() + " was successfully added";
-            redirectAttrs.addFlashAttribute("message", message);
+            redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
             return UIActions.REDIRECT + UIActions.LIST_ADMIN_USERS;
         }
     }
@@ -101,17 +102,17 @@ public class AdminUserController  extends SuperController  {
  
         if (action.equals(messageSource.getMessage("button.action.cancel", null, Locale.US))) {
             String message = "Admin User " + adminuser.getUsername() + " edit cancelled";
-            redirectAttrs.addFlashAttribute("message", message);
+            redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
         } else if (result.hasErrors()) {
             logger.info("Adminuser-edit error: " + result.toString());
-            redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.adminuser", result);
+            redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), result);
             redirectAttrs.addFlashAttribute("adminuser", adminuser);
             return "redirect:/adminuser/edit?username=" + adminuser.getUsername();
         } else if (action.equals(messageSource.getMessage("button.action.save",  null, Locale.US))) {
             logger.info("Adminuser/edit-POST:  " + adminuser.toString());
             adminUserBD.updateUser(adminuser);
             String message = "Adminuser " + adminuser.getUsername() + " was successfully edited";
-            redirectAttrs.addFlashAttribute("message", message);
+            redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
         }
  
         return UIActions.REDIRECT + UIActions.LIST_ADMIN_USERS;
@@ -129,17 +130,17 @@ public class AdminUserController  extends SuperController  {
  
         if (phase.equals(messageSource.getMessage("button.action.cancel", null, Locale.US))) {
             String message = "Adminuser delete was cancelled.";
-            model.addAttribute("message", message);
+            model.addAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
             return UIActions.REDIRECT + UIActions.LIST_ADMIN_USERS;
         } else if (phase.equals(messageSource.getMessage("button.action.stage", null, Locale.US))) {
             String message = "Adminuser " + adminuser.getUsername() + " queued for display.";
             model.addAttribute("adminuser", adminuser);
-            model.addAttribute("message", message);
+            model.addAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
             return "adminuser-delete";
         } else if (phase.equals(messageSource.getMessage("button.action.delete", null, Locale.US))) {
         	adminUserBD.deleteUser(adminuser.getId());
             String message = "Adminuser " + adminuser.getUsername() + " was successfully deleted";
-            model.addAttribute("message", message);
+            model.addAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
             return UIActions.REDIRECT + UIActions.LIST_ADMIN_USERS;
         }
  

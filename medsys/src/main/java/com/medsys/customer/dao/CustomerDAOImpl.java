@@ -93,6 +93,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 		customerToUpdate.setEmail(customer.getEmail());
 		customerToUpdate.setMobileNo(customer.getMobileNo());
 		customerToUpdate.setName(customer.getName());
+		customerToUpdate.setGstin(customer.getGstin());
 		customerToUpdate.setAddress(customer.getAddress());
 		customerToUpdate.setCity(customer.getCity());
 		customerToUpdate.setPincode(customer.getPincode());

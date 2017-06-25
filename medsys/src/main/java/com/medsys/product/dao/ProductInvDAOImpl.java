@@ -45,16 +45,16 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ProductInv getProduct(Integer productId) {
-		logger.debug("ProductInvDAOImpl.getProductByProductId() - [" + productId + "]");
+	public ProductInv getProduct(Integer productInvId) {
+		logger.debug("ProductInvDAOImpl.getProductByProductId() - [" + productInvId + "]");
 		Query<ProductInv> query = getCurrentSession()
-				.createQuery("from ProductInv where product.productId = " + productId + "");
+				.createQuery("from ProductInv where productInvId = " + productInvId + "");
 		// query.productParameter("productId", productId.toString());
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
-			logger.debug("ProductInv [" + productId + "] not found");
-			throw new EmptyResultDataAccessException("ProductInv [" + productId + "] not found", 1);
+			logger.debug("ProductInv [" + productInvId + "] not found");
+			throw new EmptyResultDataAccessException("ProductInv [" + productInvId + "] not found", 1);
 		} else {
 
 			logger.debug("ProductInv List Size: " + query.getResultList().size());
@@ -211,7 +211,7 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 	public List<ProductInv> searchForProduct(ProductInv product) {
 		logger.debug("ProductInvDAOImpl.searchForProduct() - [" + product.toString() + "]");
 		Query<ProductInv> query = getCurrentSession().createQuery(
-				"from ProductInv where lower(product.productCode) like :productCode  order by product.productCode asc");
+				"from ProductInv where lower(product.productCode) like :productCode  order by product.productCode asc",ProductInv.class);
 
 		if (product.getProduct().getProductCode() != null) {
 			query.setParameter("productCode", "%" + product.getProduct().getProductCode().toLowerCase() + "%");
@@ -246,6 +246,12 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 		}
 		logger.debug("Deleted Successfully: " + productInv.getProduct().getProductCode());
 		return new Response(true, null);
+	}
+
+	@Override
+	public int getCountOfProductsInDeficit() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

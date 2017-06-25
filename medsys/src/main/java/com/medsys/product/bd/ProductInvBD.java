@@ -10,7 +10,7 @@ public interface ProductInvBD {
 
 	public Response addProduct(ProductInv product);
 	
-	public ProductInv getProduct(Integer productId);
+	public ProductInv getProduct(Integer productInvId);
 	
 	public ProductInv getProductByCode(String productCode);
 
@@ -31,6 +31,8 @@ public interface ProductInvBD {
 	public Response updateProduct(ProductInv product, Integer qtyTobeAdded, Integer qtyTobeDiscarded);
 	
 	public Response deleteProduct(ProductInv product);
+
+	public int getCountOfProductsInDeficit();
 
 	
 

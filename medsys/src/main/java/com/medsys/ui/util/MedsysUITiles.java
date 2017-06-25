@@ -40,6 +40,8 @@ public enum MedsysUITiles {
 	ADD_INVOICE("invoices.AddInvoice"),
 
 	EDIT_INVOICE("invoices.EditInvoice"),
+	
+	EDIT_GST_INVOICE("invoices.EditGSTInvoice"),
 
 	CONFIRM_DELETE_INVOICE("invoices.DeleteInvoice"),
 	

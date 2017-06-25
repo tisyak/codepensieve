@@ -14,9 +14,15 @@ public class SalesTax {
 	
 	private Date toDate;
 
-	private BigDecimal totalSalesTax;
+	private BigDecimal totalVATTax;
+	
+	private BigDecimal totalCGSTTax;
+	
+	private BigDecimal totalSGSTTax;
 
-	java.util.Set<Invoice> invoices;
+	java.util.Set<Invoice> invoicesHavingVAT;
+	java.util.Set<Invoice> invoicesHavingCGST;
+	java.util.Set<Invoice> invoicesHavingSGST;
 
 	public Date getFromDate() {
 		return fromDate;
@@ -34,26 +40,58 @@ public class SalesTax {
 		this.toDate = toDate;
 	}
 
-	public BigDecimal getTotalSalesTax() {
-		return totalSalesTax;
+	public BigDecimal getTotalVATTax() {
+		return totalVATTax;
 	}
 
-	public void setTotalSalesTax(BigDecimal totalSalesTax) {
-		this.totalSalesTax = totalSalesTax;
+	public void setTotalVATTax(BigDecimal totalVATTax) {
+		this.totalVATTax = totalVATTax;
 	}
 
-	public java.util.Set<Invoice> getInvoices() {
-		return invoices;
+	public BigDecimal getTotalCGSTTax() {
+		return totalCGSTTax;
 	}
 
-	public void setInvoices(java.util.Set<Invoice> invoices) {
-		this.invoices = invoices;
+	public void setTotalCGSTTax(BigDecimal totalCGSTTax) {
+		this.totalCGSTTax = totalCGSTTax;
+	}
+
+	public BigDecimal getTotalSGSTTax() {
+		return totalSGSTTax;
+	}
+
+	public void setTotalSGSTTax(BigDecimal totalSGSTTax) {
+		this.totalSGSTTax = totalSGSTTax;
+	}
+
+	public java.util.Set<Invoice> getInvoicesHavingVAT() {
+		return invoicesHavingVAT;
+	}
+
+	public void setInvoicesHavingVAT(java.util.Set<Invoice> invoicesHavingVAT) {
+		this.invoicesHavingVAT = invoicesHavingVAT;
+	}
+
+	public java.util.Set<Invoice> getInvoicesHavingCGST() {
+		return invoicesHavingCGST;
+	}
+
+	public void setInvoicesHavingCGST(java.util.Set<Invoice> invoicesHavingCGST) {
+		this.invoicesHavingCGST = invoicesHavingCGST;
+	}
+
+	public java.util.Set<Invoice> getInvoicesHavingSGST() {
+		return invoicesHavingSGST;
+	}
+
+	public void setInvoicesHavingSGST(java.util.Set<Invoice> invoicesHavingSGST) {
+		this.invoicesHavingSGST = invoicesHavingSGST;
 	}
 
 	@Override
 	public String toString() {
-		return "SalesTax [fromDate=" + fromDate + ", toDate=" + toDate + ", totalSalesTax=" + totalSalesTax
-				+ ", invoices=" + invoices + "]";
+		return "SalesTax [fromDate=" + fromDate + ", toDate=" + toDate + ", totalVATTax=" + totalVATTax
+				+ ", totalCGSTTax=" + totalCGSTTax + ", totalSGSTTax=" + totalSGSTTax + "]";
 	}
 
 }

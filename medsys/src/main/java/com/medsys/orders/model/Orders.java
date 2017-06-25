@@ -38,7 +38,6 @@ public class Orders {
 	@Column(name = "order_id", columnDefinition = "serial")
 	private Integer orderId;
 
-	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 20, message = "{error.field.max}")
 	@Column(name = "order_number", length = 20)
 	private String orderNumber;
@@ -83,17 +82,6 @@ public class Orders {
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "orderId")
 	java.util.Set<OrderProductSet> products;
-
-	public Orders() {}
-
-	public Orders(boolean generateOrderNumber) {
-		super();
-		if (generateOrderNumber) {
-			Date date = new Date();
-			String modifiedDate = new SimpleDateFormat("yyMMdd").format(date);
-			this.setOrderNumber("RD-" + modifiedDate + "-" + RandomStringUtils.random(4, true, true));
-		}
-	}
 
 	public static void setLogger(Logger logger) {
 		Orders.logger = logger;

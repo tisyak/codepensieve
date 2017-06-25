@@ -52,7 +52,8 @@
 <%
 	Invoice invoice = (Invoice) request.getAttribute("invoice");
 
-	pageContext.setAttribute("vatTypeList", request.getAttribute("vatTypeList"));
+	pageContext.setAttribute("cgstTypeList", request.getAttribute("cgstTypeList"));
+	pageContext.setAttribute("sgstTypeList", request.getAttribute("sgstTypeList"));
 	pageContext.setAttribute("setList", request.getAttribute("setList"));
 	pageContext.setAttribute("pdtGroupList", request.getAttribute("pdtGroupList"));
 
@@ -87,7 +88,7 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['invoiceProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','VAT %','VAT Amount','Discount','Total', 'Actions'],
+		   	colNames:['invoiceProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','CGST %','CGST Amount','SGST %','SGST Amount','Discount','Total', 'Actions'],
 		   	colModel:[
 		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
 		   		{name:'setId',index:'setId',  hidden: true,edittype:"select",editable: true, editrules: { edithidden: true }, 
@@ -181,15 +182,17 @@
 				{name:'product.productCode',index:'product.productCode', width: 40 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
 		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
-		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30},
-		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
-		   		{name:'vatType.taxId',index:'vatType.taxId', width:15,formatter: 'select',edittype:"select",editable: true, editoptions: { value: ${vatTypeList}}},
-				{name:'vatAmount',index:'vatAmount',width:20,editrules: { edithidden: true }, width:30, formatter:'currency',  
+		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30,align:'right'},
+		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} ,align:'center'},
+		   		{name:'cgstType.taxId',index:'cgstType.taxId', width:15,formatter: 'select',edittype:"select",editable: true, editoptions: { value: ${cgstTypeList}},align:'right'},
+		   		{name:'cgstAmount',index:'cgstAmount',width:20,editrules: { edithidden: true }, width:30, align:'right'},
+		   		{name:'sgstType.taxId',index:'sgstType.taxId', width:15,formatter: 'select',edittype:"select",editable: true, editoptions: { value: ${sgstTypeList}},align:'right'},
+				{name:'sgstAmount',index:'sgstAmount',width:20,editrules: { edithidden: true }, width:30, formatter:'currency',  
 				/*formatter: function (cellValue, option, rowObject) {
 								alert('value8: ' + rowObject.ratePerUnit + ' value9: ' + rowObject.qty + ' value10: ' + rowObject['vatType.taxId']);
 								return parseFloat(rowObject.ratePerUnit, 10) * parseFloat(rowObject.qty, 10) * parseFloat(rowObject['vatType.taxId'], 10);
 				},*/ formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
-				{name:'discount',index:'discount', editable: true, editrules: { edithidden: true }, width:30},
+				{name:'discount',index:'discount', editable: true, editrules: { edithidden: true }, width:30,align:'right'},
 		   		{name:'totalPrice',index:'totalPrice',editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',
@@ -241,7 +244,8 @@
 			loadComplete: function () {
 				var $this = $(this),
 					totalAmount = $this.jqGrid("getCol", "totalPrice", false, "sum"),
-					taxSum = $this.jqGrid("getCol", "vatAmount", false, "sum"),
+					cgstTaxSum = $this.jqGrid("getCol", "cgstAmount", false, "sum"),
+					sgstTaxSum = $this.jqGrid("getCol", "sgstAmount", false, "sum"),
 					totalDiscount = $this.jqGrid("getCol", "discount", false, "sum"),
 					localData = $this.jqGrid("getGridParam", "data"),
 					totalRows = localData.length,
@@ -249,8 +253,9 @@
 					$footerRow = $(this.grid.sDiv).find("tr.footrow"),
                     $secondFooterRow = $(this.grid.sDiv).find("tr.myfootrow"),
                     $thirdFooterRow = $(this.grid.sDiv).find("tr.mythirdfootrow"),
+					$fourthFooterRow = $(this.grid.sDiv).find("tr.myfourthfootrow"),
 					i;
-
+				
 					if ($secondFooterRow.length === 0) {
                         // add second row of the footer if it's not exist
                         $secondFooterRow = $footerRow.clone();
@@ -272,21 +277,37 @@
                         });
                         $thirdFooterRow.insertAfter($secondFooterRow);
                     } 
+					
+					if ($fourthFooterRow.length === 0) {
+                        // add third row of the footer if it's not exist
+                        $fourthFooterRow = $footerRow.clone();
+                        $fourthFooterRow.removeClass("footrow").addClass("myfourthfootrow ui-widget-content");
+                        $fourthFooterRow.attr('id', 'fourthFooterRow');
+                        $fourthFooterRow.children("td").each(function () {
+                            this.style.width = ""; // remove width from inline CSS
+                        });
+                        $fourthFooterRow.insertAfter($thirdFooterRow);
+                    } 
 
                     //FIRST FOOTER ROW
-                    $this.jqGrid("footerData", "set",  {"ratePerUnit": "Total VAT:", "vatAmount": taxSum});
-                    //SECOND FOOTER ROW
-                    $secondFooterRow.find(">td[aria-describedby=" + this.id + "_ratePerUnit]")
-					.text("Total Discount:");
-					$secondFooterRow.find(">td[aria-describedby=" + this.id + "_vatAmount]")
-						.text(totalDiscount);
+                    $this.jqGrid("footerData", "set",  {"ratePerUnit": "Total CGST:", "cgstAmount": cgstTaxSum});
+					//SECOND FOOTER ROW
+                   $secondFooterRow.find(">td[aria-describedby=" + this.id + "_ratePerUnit]")
+					.text("Total SGST:");
+					$secondFooterRow.find(">td[aria-describedby=" + this.id + "_cgstAmount]")
+						.text(sgstTaxSum);
                     //THIRD FOOTER ROW
                     $thirdFooterRow.find(">td[aria-describedby=" + this.id + "_ratePerUnit]")
+					.text("Total Discount:");
+					$thirdFooterRow.find(">td[aria-describedby=" + this.id + "_cgstAmount]")
+						.text(totalDiscount);
+                    //THIRD FOOTER ROW
+                    $fourthFooterRow.find(">td[aria-describedby=" + this.id + "_ratePerUnit]")
 					.text("Grand Total:");
-					$thirdFooterRow.find(">td[aria-describedby=" + this.id + "_totalPrice]")
+					$fourthFooterRow.find(">td[aria-describedby=" + this.id + "_totalPrice]")
 						.text(totalAmount);
+						
 
-				
 			},
 		    jsonReader : {
 		        root: "rows",
@@ -326,9 +347,27 @@
 		);
 		
 		$("#grid").navButtonAdd('#pager',
-				{ 	caption:"Pdf", 
+				{ 	caption:"Org Pdf", 
 					buttonicon:"ui-icon-arrowreturn-1-s", 
-					onClickButton: downloadPdf,
+					onClickButton: downloadOrgPdf,
+					position: "last", 
+					title:"", 
+					cursor: "pointer"
+				} 
+			);
+		$("#grid").navButtonAdd('#pager',
+				{ 	caption:"Dup Pdf", 
+					buttonicon:"ui-icon-arrowreturn-1-s", 
+					onClickButton: downloadDupPdf,
+					position: "last", 
+					title:"", 
+					cursor: "pointer"
+				} 
+			);
+		$("#grid").navButtonAdd('#pager',
+				{ 	caption:"Trp Pdf", 
+					buttonicon:"ui-icon-arrowreturn-1-s", 
+					onClickButton: downloadTrpPdf,
 					position: "last", 
 					title:"", 
 					cursor: "pointer"
@@ -438,9 +477,11 @@
         
         function downloadXls() {download('xls');}
     	
-    	function downloadPdf() {download('pdf');}
+    	function downloadOrgPdf() {download('pdf','original');}
+    	function downloadDupPdf() {download('pdf','duplicate');}
+    	function downloadTrpPdf() {download('pdf','triplicate');}
     	
-    	function download(type) {
+    	function download(type,billVersion) {
     		// Retrieve download token
     		// When token is received, proceed with download
     		$.get('${downloadTokenUrl}', function(response) {
@@ -459,7 +500,7 @@
     			
     			// Start download
 				var invoiceId=${invoiceId} + "";
-    			var win = window.open('${downloadUrl}'+'?token='+token+'&invoiceId='+invoiceId+'&type='+type , '_blank');
+    			var win = window.open('${downloadUrl}'+'?token='+token+'&invoiceId='+invoiceId+'&type='+type+'&billVersion='+billVersion , '_blank');
     			if (win) {
     			    //Browser has allowed it to be opened
     			    win.focus();
@@ -467,8 +508,8 @@
     			    //Browser has blocked it
     			    alert('Please allow popups for this Site');
     			}
-    			/* // Check periodically if download has started
-    			var frequency = 1000;
+    			// Check periodically if download has started
+    			/*var frequency = 1000;
     			var timer = setInterval(function() {
     				$.get('${downloadProgressUrl}', {token: token}, 
     						function(response) {
@@ -479,14 +520,14 @@
     								clearInterval(timer);
     							}
     					});
-    			}, frequency); */
+    			}, frequency);*/
     			
     		});
     	}
 </script>
 
 
-<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.SAVE_INVOICE%>"
+<spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.ADD_INVOICE%>"
 	var="action" />
 <form:form class="form-horizontal" method="POST" action="${action}"
 	modelAttribute="invoice" autocomplete="off">
@@ -515,8 +556,9 @@
 		<div class="col-sm-4">
 			<form:input disabled="true" path="invoiceNo" cssClass="form-control"
 				title="invoiceNo" />
-			<form:hidden path="invoiceNo" />
-			<form:hidden path="invoiceId" />
+			<form:hidden path="invoiceNo" title="invoiceNo" />
+			<form:hidden path="invoiceId" title="invoiceId" />
+			<form:hidden path="invoiceId" title="invoiceId" />
 		</div>
 	</div>
 
@@ -579,6 +621,7 @@
 				title="invoiceStatus" />
 		</div>
 	</div>
+	
 	
 	<div class="form-group">
 	<label class="col-sm-2" for="inputPatientInfo">Patient Age / Gender</label>

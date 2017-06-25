@@ -2,6 +2,7 @@ package com.medsys.product.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -42,11 +43,11 @@ public class ProductInv implements Serializable {
 	private Integer orgQty; 
 	
 	@NotNull
-	@Column(name = "price")
+	@Column(name = "price",precision = 15, scale=0)
 	private BigDecimal price; 
 
 	@NotNull
-	@Column(name = "mrp")
+	@Column(name = "mrp",precision = 15, scale=0)
 	private BigDecimal mrp; 
 	
 	@NotNull
@@ -102,7 +103,11 @@ public class ProductInv implements Serializable {
 	}
 
 	public void setPrice(BigDecimal price) {
-		this.price = price;
+		if (price != null) {
+			this.price = price.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.price = price;
+		}
 	}
 
 	public BigDecimal getMrp() {
@@ -110,7 +115,11 @@ public class ProductInv implements Serializable {
 	}
 
 	public void setMrp(BigDecimal mrp) {
-		this.mrp = mrp;
+		if (mrp != null) {
+			this.mrp = mrp.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.mrp = mrp;
+		}
 	}
 
 	public Integer getSoldQty() {

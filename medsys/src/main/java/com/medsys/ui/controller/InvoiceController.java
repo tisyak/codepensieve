@@ -1,6 +1,7 @@
 package com.medsys.ui.controller;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,16 +24,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.medsys.adminuser.model.Roles;
+import com.medsys.common.model.Response;
 import com.medsys.customer.bd.CustomerBD;
 import com.medsys.master.bd.MasterDataBD;
 import com.medsys.master.model.InvoiceStatusCode;
 import com.medsys.master.model.InvoiceStatusMaster;
 import com.medsys.master.model.MasterData;
+import com.medsys.master.model.OrderStatusCode;
 import com.medsys.master.model.PaymentTermsMaster;
 import com.medsys.master.model.TaxMaster;
+import com.medsys.master.model.TaxType;
 import com.medsys.orders.bd.InvoiceBD;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.Invoice;
+import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.ProductGroupBD;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.ProductGroup;
@@ -41,6 +46,7 @@ import com.medsys.ui.jasper.service.InvoiceReportDownloadService;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.UIConstants;
+import com.medsys.util.CalendarUtility;
 import com.medsys.util.EpMessage;
 
 @Controller
@@ -62,7 +68,7 @@ public class InvoiceController extends SuperController {
 
 	@Autowired
 	private MasterDataBD masterDataBD;
-	
+
 	@Autowired
 	private ProductGroupBD productGroupBD;
 
@@ -125,42 +131,79 @@ public class InvoiceController extends SuperController {
 
 		logger.info("IN: Invoice/loadAdd-GET");
 		model.addAttribute("customerList", customerBD.getAllCustomers());
-		
-		model.addAttribute("paymentTermsList", masterDataBD.getAll(PaymentTermsMaster.class));
-		// TODO: Change this to a order range of last 3 months
-		model.addAttribute("orderList", orderBD.getAllOrders());
 
-		invoice = new Invoice(true);
-		invoice.setInvoiceStatus((InvoiceStatusMaster) masterDataBD.getbyCode(InvoiceStatusMaster.class, InvoiceStatusCode.ACTIVE.getCode()));
+		model.addAttribute("paymentTermsList", masterDataBD.getAll(PaymentTermsMaster.class));
+		List<Orders> lstOrdersLastThreeMonths = getOrdersForLastThreeMonths();
+		model.addAttribute("orderList", lstOrdersLastThreeMonths);
+		invoice.setInvoiceStatus((InvoiceStatusMaster) masterDataBD.getbyCode(InvoiceStatusMaster.class,
+				InvoiceStatusCode.ACTIVE.getCode()));
 		model.addAttribute("invoice", invoice);
 		return MedsysUITiles.ADD_INVOICE.getTile();
 	}
 
+	private List<Orders> getOrdersForLastThreeMonths() {
+		Date startDate = CalendarUtility.getStartDateForLastThreeMonths();
+		Date endDate = CalendarUtility.getEndDateAndTimeOfToday();
+		return orderBD.searchForOrdersInDateRange(startDate, endDate);
+
+	}
+
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.ADD_INVOICE, method = RequestMethod.POST)
-	public String addInvoice(@Valid @ModelAttribute Invoice invoice, 
-			Model model, BindingResult result,
+	public String addInvoice(@Valid @ModelAttribute Invoice invoice, Model model, BindingResult result,
 			RedirectAttributes redirectAttrs, HttpServletRequest request) {
 
 		logger.info("IN: Invoice/add-POST");
 
 		if (result.hasErrors()) {
-			logger.info("Invoice-add error: " + result.toString());
-			redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.Invoice", result);
-			redirectAttrs.addFlashAttribute("invoice", invoice);
-			return MedsysUITiles.ADD_INVOICE.getTile();
+			logger.error("Bindingresult Invoice-add error: " + result.hasErrors() + ".Error: " + result.getAllErrors()
+					+ result.getErrorCount());
+			model.addAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), result);
+			model.addAttribute("invoice", invoice);
+			return UIActions.FORWARD + UIActions.LOAD_ADD_INVOICE;
 		} else {
 			logger.info("Invoice-add: " + invoice);
-			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			invoice.setUpdateBy(auth.getName());
-			invoice.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
-			invoiceBD.addInvoice(invoice);
-			String message = "Invoice " + invoice.getInvoiceId() + " was successfully added";
+			try {
+				Orders invOrder = orderBD.getOrder(invoice.getOrder().getOrderId());
+				logger.info("Order: " + invOrder);
+				if (!invOrder.getOrderStatus().getOrderStatusCode().equals(OrderStatusCode.SET_RESTORED.getCode())) {
+					String error = "Order Set status is "
+							+ OrderStatusCode.getOrderStatusCode(invOrder.getOrderStatus().getOrderStatusCode())
+							+ ".Expected status is " + OrderStatusCode.SET_RESTORED + ".Unable to raise invoice.";
+					logger.error("Invoice-add error in Order Status: " + error);
+					model.addAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), error);
+					model.addAttribute("invoice", invoice);
+					return UIActions.FORWARD + UIActions.LOAD_ADD_INVOICE;
+				}
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				invoice.setUpdateBy(auth.getName());
+				invoice.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
+				invoice.setInvoiceStatus((InvoiceStatusMaster) masterDataBD.getbyCode(InvoiceStatusMaster.class,
+						InvoiceStatusCode.ACTIVE.getCode()));
+				Response response = invoiceBD.addInvoice(invoice);
+				if (response.isStatus()) {
+					String message = "Invoice " + invoice.getInvoiceId() + " was successfully added";
 
-			logger.info("Invoice-add: " + message + "\n Invoice: " + invoice + " setting the same in request");
-			// Unable to directly update the modelAttribute. Hence, setting
-			// invoiceId separately in request
-			redirectAttrs.addFlashAttribute("invoiceId", invoice.getInvoiceId());
-			return UIActions.REDIRECT + UIActions.EDIT_INVOICE;
+					logger.info("Invoice-add: " + message + "\n Invoice: " + invoice + " setting the same in request");
+					// Unable to directly update the modelAttribute. Hence,
+					// setting
+					// invoiceId separately in request
+					redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
+					redirectAttrs.addFlashAttribute("invoiceId", invoice.getInvoiceId());
+
+					return UIActions.REDIRECT + UIActions.EDIT_INVOICE;
+				} else {
+					logger.info("Unable to add Invoice. Invoice-add error: " + response.getError().getErrorCode());
+					model.addAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), response.getError().getErrorCode());
+					model.addAttribute("invoice", invoice);
+					return UIActions.FORWARD + UIActions.LOAD_ADD_INVOICE;
+				}
+			} catch (Exception e) {
+				logger.info("Invoice-add error: " + e.getMessage());
+				model.addAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), e.getMessage());
+				model.addAttribute("invoice", invoice);
+				return UIActions.FORWARD + UIActions.LOAD_ADD_INVOICE;
+			}
+
 		}
 	}
 
@@ -168,72 +211,96 @@ public class InvoiceController extends SuperController {
 	public String loadEditInvoicePage(@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
 			Model model) {
 		logger.info("IN: Invoice/edit-GET:  invoice to query = " + invoiceId);
-		
-		if(invoiceId==null){
+
+		if (invoiceId == null) {
 			logger.info("Checking in model for invoiceId = " + model.asMap().get("invoiceId"));
 			invoiceId = (Integer) model.asMap().get("invoiceId");
 		}
-		
+
+		Invoice invoice = null;
+
 		if (!model.containsAttribute("invoice")) {
 
 			logger.info("Adding Invoice object to model");
-			Invoice invoice = invoiceBD.getInvoice(invoiceId);
+			invoice = invoiceBD.getInvoice(invoiceId);
 			logger.info("Invoice/edit-GET:  " + invoice);
 			model.addAttribute("invoice", invoice);
+		} else {
+			invoice = (Invoice) model.asMap().get("invoice");
 		}
 		model.addAttribute("customerList", customerBD.getAllCustomers());
-		
+
 		model.addAttribute("paymentTermsList", masterDataBD.getAll(PaymentTermsMaster.class));
-		// TODO: Change this to a order range of last 3 months
-		model.addAttribute("orderList", orderBD.getAllOrders());
+		List<Orders> lstOrdersLastThreeMonths = getOrdersForLastThreeMonths();
+		model.addAttribute("orderList", lstOrdersLastThreeMonths);
 
 		/**
 		 * START Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
-		
+
 		/** Set Listing for ADD Product Filter **/
 		List<Set> setMasterList = setBD.getAllSet();
 		String setList = "{";
 		for (Set set : setMasterList) {
-			setList += "'"+set.getSetId() + "':'" + set.getSetName() + "',";
+			setList += "'" + set.getSetId() + "':'" + set.getSetName() + "',";
 		}
-		setList = setList.substring(0, setList.length()-1);
-		setList+="}";
+		setList = setList.substring(0, setList.length() - 1);
+		setList += "}";
 		// Figure out how to cache all these values
 		model.addAttribute("setList", setList);
-		
+
 		/** ProductGroup Listing for ADD Product Filter **/
 		List<ProductGroup> productGroupMasterList = productGroupBD.getAllProductGroup();
 		String pdtGroupList = "{";
 		for (ProductGroup productGroup : productGroupMasterList) {
-			pdtGroupList += "'"+productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
+			pdtGroupList += "'" + productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
 		}
-		pdtGroupList = pdtGroupList.substring(0, pdtGroupList.length()-1);
-		pdtGroupList+="}";
+		pdtGroupList = pdtGroupList.substring(0, pdtGroupList.length() - 1);
+		pdtGroupList += "}";
 		// Figure out how to cache all these values
 		model.addAttribute("pdtGroupList", pdtGroupList);
 
 		/** VAT Listing for ADD Product Filter **/
 		List<MasterData> taxMasterList = masterDataBD.getAll(TaxMaster.class);
 		String vatTypeList = "{";
+		String cgstTypeList = "{";
+		String sgstTypeList = "{";
 		for (MasterData txMd : taxMasterList) {
 			TaxMaster taxMaster = (TaxMaster) txMd;
-			vatTypeList+= "'"+taxMaster.getTaxId() + "':'" + taxMaster.getTaxDesc() + "',";
+			switch (TaxType.getTaxTypeByCode(taxMaster.getTaxType())) {
+			case VAT:
+				vatTypeList += "'" + taxMaster.getTaxId() + "':'" + taxMaster.getTaxDesc() + "',";
+				break;
+			case CGST:
+				cgstTypeList += "'" + taxMaster.getTaxId() + "':'" + taxMaster.getTaxDesc() + "',";
+				break;
+			case SGST:
+				sgstTypeList += "'" + taxMaster.getTaxId() + "':'" + taxMaster.getTaxDesc() + "',";
+				break;
+			}
+
 		}
-		vatTypeList = vatTypeList.substring(0, vatTypeList.length()-1);
-		vatTypeList+="}";
+		vatTypeList = vatTypeList.substring(0, vatTypeList.length() - 1);
+		cgstTypeList = cgstTypeList.substring(0, cgstTypeList.length() - 1);
+		sgstTypeList = sgstTypeList.substring(0, sgstTypeList.length() - 1);
+		vatTypeList += "}";
+		cgstTypeList += "}";
+		sgstTypeList += "}";
 		// TODO: Figure out how to cache all these values
 		model.addAttribute("vatTypeList", vatTypeList);
-		
-		
+		model.addAttribute("cgstTypeList", cgstTypeList);
+		model.addAttribute("sgstTypeList", sgstTypeList);
+
 		/**
 		 * END Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
-
-
-		return MedsysUITiles.EDIT_INVOICE.getTile();
+		if (invoice.isGstInvoice()) {
+			return MedsysUITiles.EDIT_GST_INVOICE.getTile();
+		} else {
+			return MedsysUITiles.EDIT_INVOICE.getTile();
+		}
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.SAVE_INVOICE, method = RequestMethod.POST)
@@ -244,7 +311,7 @@ public class InvoiceController extends SuperController {
 
 		if (result.hasErrors()) {
 			logger.info("Invoice-edit error: " + result.toString());
-			redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.Invoice", result);
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), result);
 			redirectAttrs.addFlashAttribute("invoice", invoice);
 			request.setAttribute("invoiceId", invoice.getInvoiceId());
 			return UIActions.REDIRECT + UIActions.EDIT_INVOICE;
@@ -255,7 +322,7 @@ public class InvoiceController extends SuperController {
 			invoice.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 			invoiceBD.updateInvoice(invoice);
 			String message = "Invoice " + invoice.getInvoiceId() + " was successfully edited";
-			redirectAttrs.addFlashAttribute("message", message);
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
 		}
 
 		return UIActions.REDIRECT + UIActions.LIST_ALL_INVOICES;
@@ -280,14 +347,14 @@ public class InvoiceController extends SuperController {
 
 		invoiceBD.deleteInvoice(invoiceId);
 		String message = "Invoice with invoiceId: " + invoiceId + " was successfully deleted";
-		model.addAttribute("message", message);
+		model.addAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
 		return UIActions.REDIRECT + UIActions.LIST_ALL_INVOICES;
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_INVOICE_REPORT)
 	public void download(@RequestParam String type, @RequestParam String token, @RequestParam Integer invoiceId,
-			HttpServletResponse response) {
+			@RequestParam(required = false) String billVersion, HttpServletResponse response) {
 		logger.debug("Requesting download of type: " + type + " with token: " + token);
-		invoiceReportDownloadService.download(type, token, invoiceId, response);
+		invoiceReportDownloadService.download(type, token, invoiceId, billVersion, response);
 	}
 }

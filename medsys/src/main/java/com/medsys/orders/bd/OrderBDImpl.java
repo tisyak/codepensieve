@@ -1,5 +1,6 @@
 package com.medsys.orders.bd;
 
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -11,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.exception.SysException;
+import com.medsys.master.bd.MasterDataBD;
+import com.medsys.master.model.OrderStatusCode;
+import com.medsys.master.model.OrderStatusMaster;
 import com.medsys.orders.dao.OrderDAO;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
@@ -25,6 +29,9 @@ public class OrderBDImpl implements OrderBD {
 
 	@Autowired
 	private OrderDAO orderDAO;
+
+	@Autowired
+	private MasterDataBD masterDataBD;
 
 	@Autowired
 	private ProductInvBD productInvBD;
@@ -66,6 +73,12 @@ public class OrderBDImpl implements OrderBD {
 	public List<Orders> searchForOrders(Orders order) {
 		return orderDAO.searchForOrders(order);
 	}
+	
+	@Override
+	public List<Orders> searchForOrdersInDateRange(Date startDate, Date endDate) {
+		return orderDAO.searchForOrdersInDateRange(startDate,endDate);
+	}
+
 
 	@Override
 	public List<OrderProductSet> getAllProductsInOrder(Integer orderId) {
@@ -73,7 +86,7 @@ public class OrderBDImpl implements OrderBD {
 		List<OrderProductSet> orderProducts = orderDAO.getAllProductsInOrder(orderId);
 		for (OrderProductSet product : orderProducts) {
 			try {
-				ProductInv productInv = productInvBD.getProduct(product.getProduct().getProductId());
+				ProductInv productInv = productInvBD.getProductByCode(product.getProduct().getProductCode());
 				product.setAvailableQty(productInv.getAvailableQty());
 			} catch (EmptyResultDataAccessException e) {
 				logger.debug("Product " + product.getProduct().getProductCode() + " not found in Inventory");
@@ -140,7 +153,7 @@ public class OrderBDImpl implements OrderBD {
 					orgOrderProductSet.setQty(orderProductSet.getQty());
 					return orderDAO.updateProductInOrder(orgOrderProductSet);
 				} catch (SysException e) {
-					logger.error("System Exception: " +e.getMessage() );
+					logger.error("System Exception: " + e.getMessage());
 					return new Response(false, e.getErrorCode());
 				}
 			} else {
@@ -156,17 +169,76 @@ public class OrderBDImpl implements OrderBD {
 	}
 
 	@Override
+	@Transactional
 	public Response deleteProductFromOrder(OrderProductSet orderProductSet) {
 		logger.debug("DELETE orderProductSet: " + orderProductSet);
-
+		String restoreError = "Following product QTY couldn't be restored: ";
+		boolean firstPdtInError = true;
 		// Managing product inventory before updating product to the order
 		try {
 			productInvBD.disengageProduct(orderProductSet.getProduct().getProductCode(), orderProductSet.getQty());
 			return orderDAO.deleteProductFromOrder(orderProductSet);
 		} catch (SysException e) {
-			return new Response(false, e.getErrorCode());
+			if (firstPdtInError) {
+				restoreError += orderProductSet.getProduct().getProductCode();
+			} else {
+				restoreError += " , " + orderProductSet.getProduct().getProductCode();
+			}
+			Response response = new Response(false, e.getErrorCode());
+			response.setRemarks(restoreError);
+			return response;
 		}
 
 	}
 
+	@Override
+	public Response updateOrderStatus(Orders order) {
+		logger.debug("Update Order status for : " + order.getOrderId());
+		return orderDAO.updateOrderStatus(order);
+	}
+
+	@Override
+	@Transactional
+	public Response restoreSet(Integer orderId) {
+
+		Response response = new Response(true, null);
+		String restoreError = "Order Status update failed! Following product QTY couldn't be restored: ";
+		boolean firstPdtInError = true;
+		logger.info("Response of order status update: " + response);
+
+		List<OrderProductSet> lstOrderProductSet = getAllProductsInOrder(orderId);
+		for (OrderProductSet orderProductSet : lstOrderProductSet) {
+			try {
+				productInvBD.disengageProduct(orderProductSet.getProduct().getProductCode(), orderProductSet.getQty());
+			} catch (SysException e) {
+				logger.error("Error in restoring set in order: " + e.getMessage());
+				if (firstPdtInError) {
+					restoreError += orderProductSet.getProduct().getProductCode();
+				} else {
+					restoreError += " , " + orderProductSet.getProduct().getProductCode();
+				}
+				response = new Response(false, e.getErrorCode());
+				response.setRemarks(restoreError);
+			}
+		}
+		if (response.isStatus()) {
+			Orders order = getOrder(orderId);
+			order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class,
+					OrderStatusCode.SET_RESTORED.getCode()));
+			response = updateOrderStatus(order);
+		}
+		return response;
+	}
+
+	@Override
+	public int getCountOfTotalOrdersInMonth() {
+		return  orderDAO.getCountOfTotalOrdersInMonth();
+	}
+
+	@Override
+	public int getCountOfTotalOrdersForYear() {
+		return  orderDAO.getCountOfTotalOrdersForYear();
+	}
+
+	
 }

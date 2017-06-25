@@ -58,10 +58,11 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['customerId','Name', 'Email','Contact No','Address', 'City','Pincode', 'Actions'],
+		   	colNames:['customerId','Name','GSTIN', 'Email','Contact No','Address', 'City','Pincode', 'Actions'],
 		   	colModel:[
 		   		{name:'customerId',index:'id',  hidden:true},
 		   		{name:'name',index:'name',width:50, editable: true},
+		   		{name:'gstin',index:'gstin',width:50, editable: true},
 		   		{name:'email',index:'email',width:50,editable: true},
 				{name:'mobileNo',index:'mobileNo', width:20 ,editable: true},
 				{name:'address',index:'address', width:150, editable: true},

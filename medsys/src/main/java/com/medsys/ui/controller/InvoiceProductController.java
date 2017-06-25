@@ -26,6 +26,7 @@ import com.medsys.common.model.Response;
 import com.medsys.master.bd.MasterDataBD;
 import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.bd.InvoiceBD;
+import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.InvoiceProduct;
 import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.model.ProductMaster;
@@ -48,7 +49,8 @@ public class InvoiceProductController {
 	@Autowired
 	private ProductMasterBD productMasterBD;
 
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LIST_ALL_PRODUCT_INVOICES, produces = "application/json")
+	@RequestMapping(value = UIActions.FORWARD_SLASH
+			+ UIActions.LIST_ALL_PRODUCT_INVOICES, produces = "application/json")
 	public @ResponseBody JqgridResponse<?> records(@RequestParam("_search") Boolean search,
 			@RequestParam(value = "filters", required = false) String filters,
 			@RequestParam(value = "invoiceProductSetId", required = false) Integer invoiceProductSetId,
@@ -71,19 +73,18 @@ public class InvoiceProductController {
 
 		logger.debug("Products in invoice: " + invoiceProducts);
 
-			JqgridResponse<InvoiceProduct> response = new JqgridResponse<InvoiceProduct>();
-			response.setRows(invoiceProducts);
+		JqgridResponse<InvoiceProduct> response = new JqgridResponse<InvoiceProduct>();
+		response.setRows(invoiceProducts);
 
-			response.setRecords(Integer.valueOf(invoiceProducts.size()).toString());
-			// Single page to display all products part of the set chosen for
-			// invoice.
-			response.setTotal(Integer.valueOf(1).toString());
-			response.setPage(Integer.valueOf(1).toString());
+		response.setRecords(Integer.valueOf(invoiceProducts.size()).toString());
+		// Single page to display all products part of the set chosen for
+		// invoice.
+		response.setTotal(Integer.valueOf(1).toString());
+		response.setPage(Integer.valueOf(1).toString());
 
-			logger.debug("Products already exist in invoice. Loading response from Invoice Product List: " + response);
+		logger.debug("Products already exist in invoice. Loading response from Invoice Product List: " + response);
 
-			return response;
-		
+		return response;
 
 	}
 
@@ -100,25 +101,38 @@ public class InvoiceProductController {
 			@RequestParam(value = "qty", required = false) Integer qty,
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
 			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId,
+			@RequestParam(value = "cgstType.taxId", required = false) Integer cgstTypeId,
+			@RequestParam(value = "sgstType.taxId", required = false) Integer sgstTypeId,
+			@RequestParam(value = "discount", required = false) BigDecimal discount,
 			HttpServletResponse httpServletResponse) {
-	
+
 		logger.debug("Call to add product to invoice.");
-		
+
 		ProductMaster product = productMasterBD.getProduct(productId);
 		InvoiceProduct newInvoiceProduct = new InvoiceProduct();
 		newInvoiceProduct.setInvoiceId(invoiceId);
 		newInvoiceProduct.setProduct(product);
 		newInvoiceProduct.setQty(qty);
 		newInvoiceProduct.setRatePerUnit(ratePerUnit);
-		TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
-		newInvoiceProduct.setVatType(appliedVatType);
-		
+
+		Invoice parentInv = invoiceBD.getInvoice(invoiceId);
+		if (!parentInv.isGstInvoice()) {
+			TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
+			newInvoiceProduct.setVatType(appliedVatType);
+		} else {
+			TaxMaster appliedCgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, cgstTypeId);
+			newInvoiceProduct.setCgstType(appliedCgstType);
+			TaxMaster appliedSgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, sgstTypeId);
+			newInvoiceProduct.setSgstType(appliedSgstType);
+		}
+		newInvoiceProduct.setDiscount(discount);
+
 		logger.debug("Adding the product to invoice: " + newInvoiceProduct);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		newInvoiceProduct.setUpdateBy(auth.getName());
 		newInvoiceProduct.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		Response response = invoiceBD.addProductToInvoice(newInvoiceProduct);
-		if(!response.isStatus()){
+		if (!response.isStatus()) {
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return response;
@@ -131,13 +145,16 @@ public class InvoiceProductController {
 			@RequestParam(value = "qty", required = false) Integer qty,
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
 			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId,
+			@RequestParam(value = "cgstType.taxId", required = false) Integer cgstTypeId,
+			@RequestParam(value = "sgstType.taxId", required = false) Integer sgstTypeId,
+			@RequestParam(value = "discount", required = false) BigDecimal discount,
 			HttpServletResponse httpServletResponse) {
 
-		logger.debug("invoiceId in request: "+invoiceId);
-		logger.debug("productId in request: "+productId);
+		logger.debug("invoiceId in request: " + invoiceId);
+		logger.debug("productId in request: " + productId);
 		InvoiceProduct invoiceProduct = invoiceBD.getProductInInvoice(id);
-		logger.debug("InvoiceProduct from DB: "+invoiceProduct);
-		
+		logger.debug("InvoiceProduct from DB: " + invoiceProduct);
+
 		if (invoiceProduct.getInvoiceId().equals(invoiceId)
 				&& invoiceProduct.getProduct().getProductId().equals(productId)) {
 			InvoiceProduct toBeUpdatedInvoiceProduct = new InvoiceProduct();
@@ -148,30 +165,36 @@ public class InvoiceProductController {
 			toBeUpdatedInvoiceProduct.setRatePerUnit(ratePerUnit);
 			TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
 			toBeUpdatedInvoiceProduct.setVatType(appliedVatType);
-			
+			TaxMaster appliedCgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, cgstTypeId);
+			toBeUpdatedInvoiceProduct.setCgstType(appliedCgstType);
+			TaxMaster appliedSgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, sgstTypeId);
+			toBeUpdatedInvoiceProduct.setSgstType(appliedSgstType);
+			toBeUpdatedInvoiceProduct.setDiscount(discount);
 			logger.debug("Adding the product to invoice: " + toBeUpdatedInvoiceProduct);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			toBeUpdatedInvoiceProduct.setUpdateBy(auth.getName());
 			toBeUpdatedInvoiceProduct.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 			Response response = invoiceBD.updateProductInInvoice(toBeUpdatedInvoiceProduct);
-			if(!response.isStatus()){
+			if (!response.isStatus()) {
 				httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			}
 			return response;
 		} else {
-			logger.debug("Error in updating the product in invoice: " + invoiceProduct + ".\nThe invoiceId and productCodes in request do not match with System data") ;
+			logger.debug("Error in updating the product in invoice: " + invoiceProduct
+					+ ".\nThe invoiceId and productCodes in request do not match with System data");
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return new Response(false, EpSystemError.SYSTEM_INTERNAL_ERROR);
 		}
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer invoiceProductSetId,HttpServletResponse httpServletResponse) {
+	public @ResponseBody Response delete(@RequestParam Integer invoiceProductSetId,
+			HttpServletResponse httpServletResponse) {
 
 		InvoiceProduct invoiceProductSet = invoiceBD.getProductInInvoice(invoiceProductSetId);
 		logger.debug("Deleting the product in invoice: " + invoiceProductSet);
 		Response response = invoiceBD.deleteProductFromInvoice(invoiceProductSet);
-		if(!response.isStatus()){
+		if (!response.isStatus()) {
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return response;

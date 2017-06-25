@@ -1,5 +1,6 @@
 package com.medsys.orders.bd;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +33,20 @@ public interface InvoiceBD {
 	public Response deleteProductFromInvoice(InvoiceProduct invoiceProduct);
 
 	public List<Invoice> searchForInvoice(Date fromDate, Date toDate);
+
+	public BigDecimal getTotalSalesAmountInMonth();
+
+	public int getCountOfTotalInvoicesInMonth();
+
+	public int getCountOfCustomerBilledInMonth();
+
+	public BigDecimal getTotalSalesAmountInYear();
+
+	public int getCountOfTotalInvoicesForYear();
+
+	public BigDecimal getTotalVATInYear();
+
+	public int getCountOfCustomerBilledForYear();
 
 	
 

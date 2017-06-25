@@ -17,16 +17,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
+import com.medsys.master.bd.MasterDataBD;
+import com.medsys.master.model.SeedMaster;
+import com.medsys.master.model.SeedMasterKey;
+import com.medsys.orders.bd.InvoiceNoGenerator;
 import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.InvoiceProduct;
+import com.medsys.util.CalendarUtility;
 import com.medsys.util.EpSystemError;
 
 @Repository
 public class InvoiceDAOImpl implements InvoiceDAO {
 
 	static Logger logger = LoggerFactory.getLogger(InvoiceDAOImpl.class);
+
+	@Autowired
+	private MasterDataBD masterDataBD;
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -36,11 +45,18 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	}
 
 	@Override
+	@Transactional
 	public Response addInvoice(Invoice invoice) {
 		logger.debug("Saving invoice to DB.");
 		try {
+			SeedMaster lastInvoiceNo = (SeedMaster) masterDataBD.getbyCode(SeedMaster.class,
+					SeedMasterKey.LATEST_INVOICE_NO);
+			String nextInvoiceNo = InvoiceNoGenerator.getNextInvoiceNumber(lastInvoiceNo.getSeedValue());
+			invoice.setInvoiceNo(nextInvoiceNo);
 			getCurrentSession().save(invoice);
-		} catch (HibernateException he) {
+			lastInvoiceNo.setSeedValue(nextInvoiceNo);
+			masterDataBD.update(SeedMaster.class, lastInvoiceNo);
+		} catch (Exception he) {
 			logger.debug("Unable to save object. Exception: " + he.getMessage());
 			return new Response(false, EpSystemError.DB_EXCEPTION);
 		}
@@ -99,6 +115,9 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		invoiceToUpdate.setInvoiceDate(invoice.getInvoiceDate());
 		invoiceToUpdate.setPaymentTerms(invoice.getPaymentTerms());
 		invoiceToUpdate.setPatientName(invoice.getPatientName());
+		invoiceToUpdate.setPatientInfo(invoice.getPatientInfo());
+		invoiceToUpdate.setBillToPatient(invoice.getBillToPatient());
+		invoiceToUpdate.setGstInvoice(invoice.getGstInvoice());
 		invoiceToUpdate.setRefSource(invoice.getRefSource());
 		invoiceToUpdate.setUpdateBy(invoice.getUpdateBy());
 		invoiceToUpdate.setUpdateTimestamp(invoice.getUpdateTimestamp());
@@ -158,7 +177,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		} else {
 			query.setParameter("fromDate", null);
 		}
-		
+
 		if (toDate != null) {
 			query.setParameter("toDate", toDate, TemporalType.DATE);
 		} else {
@@ -179,14 +198,13 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		}
 	}
 
-	
 	@Override
 	public List<InvoiceProduct> getAllProductsInInvoice(Integer invoiceId) {
 		logger.debug("Fetching all products in Invoice: " + invoiceId);
 		getCurrentSession().flush();
 		return getCurrentSession().createQuery(
-				"from InvoiceProduct " + " where invoiceId = " + invoiceId + " order by product.productCode asc ",InvoiceProduct.class)
-				.getResultList();
+				"from InvoiceProduct " + " where invoiceId = " + invoiceId + " order by product.productCode asc ",
+				InvoiceProduct.class).getResultList();
 	}
 
 	@Override
@@ -226,6 +244,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		invoiceProductToUpdate.setTotalBeforeTax(invoiceProduct.getTotalBeforeTax());
 		invoiceProductToUpdate.setTotalPrice(invoiceProduct.getTotalPrice());
 		invoiceProductToUpdate.setVatAmount(invoiceProduct.getVatAmount());
+		invoiceProductToUpdate.setCgstAmount(invoiceProduct.getCgstAmount());
+		invoiceProductToUpdate.setSgstAmount(invoiceProduct.getSgstAmount());
 		invoiceProductToUpdate.setUpdateBy(invoiceProduct.getUpdateBy());
 		invoiceProductToUpdate.setUpdateTimestamp(invoiceProduct.getUpdateTimestamp());
 		getCurrentSession().update(invoiceProductToUpdate);
@@ -251,13 +271,31 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 				.createQuery("SELECT SUM(totalBeforeTax) from InvoiceProduct where invoiceId = " + invoiceId)
 				.getSingleResult();
 	}
-	
+
 	@Override
 	public BigDecimal calculateTotalVATForInvoice(Integer invoiceId) {
-		logger.debug("Calculating total tax for all products in Invoice: " + invoiceId);
+		logger.debug("Calculating total VAT tax for all products in Invoice: " + invoiceId);
 		getCurrentSession().flush();
 		return (BigDecimal) getCurrentSession()
 				.createQuery("SELECT SUM(vatAmount) from InvoiceProduct where invoiceId = " + invoiceId)
+				.getSingleResult();
+	}
+
+	@Override
+	public BigDecimal calculateTotalCGSTForInvoice(Integer invoiceId) {
+		logger.debug("Calculating total CGST tax for all products in Invoice: " + invoiceId);
+		getCurrentSession().flush();
+		return (BigDecimal) getCurrentSession()
+				.createQuery("SELECT SUM(cgstAmount) from InvoiceProduct where invoiceId = " + invoiceId)
+				.getSingleResult();
+	}
+
+	@Override
+	public BigDecimal calculateTotalSGSTForInvoice(Integer invoiceId) {
+		logger.debug("Calculating total SGST tax for all products in Invoice: " + invoiceId);
+		getCurrentSession().flush();
+		return (BigDecimal) getCurrentSession()
+				.createQuery("SELECT SUM(sgstAmount) from InvoiceProduct where invoiceId = " + invoiceId)
 				.getSingleResult();
 	}
 
@@ -268,6 +306,127 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		return (BigDecimal) getCurrentSession()
 				.createQuery("SELECT SUM(totalPrice) from InvoiceProduct where invoiceId = " + invoiceId)
 				.getSingleResult();
+	}
+
+	@Override
+	public BigDecimal calculateTotalDiscountInInvoice(Integer invoiceId) {
+		logger.debug("Calculating total Discount for all products in Invoice: " + invoiceId);
+		getCurrentSession().flush();
+		return (BigDecimal) getCurrentSession()
+				.createQuery("SELECT SUM(discount) from InvoiceProduct where invoiceId = " + invoiceId)
+				.getSingleResult();
+	}
+
+	@Override
+	public BigDecimal getTotalSalesAmountInYear() {
+		Date startDate = CalendarUtility.getFirstDateOfYear();
+		Date endDate = CalendarUtility.getLastDateOfYear();
+		logger.debug("getTotalSalesAmountInYear for the Year - [" + startDate + " - " + endDate + "]");
+		return getTotalSalesAmountInDateRange(startDate, endDate);
+	}
+
+	@Override
+	public BigDecimal getTotalSalesAmountInMonth() {
+		Date startDate = CalendarUtility.getFirstDateOfMonth();
+		Date endDate = CalendarUtility.getLastDateOfMonth();
+		logger.debug("getTotalSalesAmountInMonth for  - [" + startDate + " - " + endDate + "]");
+		return getTotalSalesAmountInDateRange(startDate, endDate);
+	}
+
+	@Override
+	public BigDecimal getTotalSalesAmountInDateRange(Date startDate, Date endDate) {
+		logger.debug("getTotalSalesAmountInDateRange for - [" + startDate + " - " + endDate + "]");
+		Query<BigDecimal> sumQuery = getCurrentSession().createQuery(
+				"select sum(totalAmount) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ",
+				BigDecimal.class);
+		sumQuery.setParameter("stDate", startDate, TemporalType.DATE);
+		sumQuery.setParameter("edDate", endDate, TemporalType.DATE);
+		logger.debug(sumQuery.toString());
+		return sumQuery.getSingleResult();
+	}
+
+	@Override
+	public int getCountOfTotalInvoicesForYear() {
+		Date startDate = CalendarUtility.getFirstDateOfYear();
+		Date endDate = CalendarUtility.getLastDateOfYear();
+		logger.debug("getCountOfTotalInvoicesForYear for the Year - [" + startDate + " - " + endDate + "]");
+		return getCountOfTotalInvoicesInDateRange(startDate, endDate);
+	}
+
+	@Override
+	public int getCountOfTotalInvoicesInMonth() {
+		Date begining, end;
+		begining = CalendarUtility.getFirstDateOfMonth();
+		end = CalendarUtility.getLastDateOfMonth();
+		logger.debug("getCountOfTotalInvoicesInMonth() for the Month - [" + begining + " - " + end + "]");
+		return getCountOfTotalInvoicesInDateRange(begining, end);
+	}
+
+	@Override
+	public int getCountOfTotalInvoicesInDateRange(Date startDate, Date endDate) {
+		logger.debug("getCountOfTotalInvoicesInDateRange for  [" + startDate + " - " + endDate + "]");
+
+		Query<Long> countQuery = getCurrentSession()
+				.createQuery("select count(*) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ", Long.class);
+
+		countQuery.setParameter("stDate", startDate, TemporalType.DATE);
+		countQuery.setParameter("edDate", endDate, TemporalType.DATE);
+
+		logger.debug(countQuery.toString());
+
+		return countQuery.getSingleResult().intValue();
+	}
+
+	@Override
+	public BigDecimal getTotalVATInYear() {
+		Date startDate = CalendarUtility.getFirstDateOfYear();
+		Date endDate = CalendarUtility.getLastDateOfYear();
+		return getTotalVATInDateRange(startDate, endDate);
+	}
+
+	@Override
+	public BigDecimal getTotalVATInDateRange(Date startDate, Date endDate) {
+		logger.debug("getTotalVATInDateRange for - [" + startDate + " - " + endDate + "]");
+
+		Query<BigDecimal> sumQuery = getCurrentSession().createQuery(
+				"select sum(totalVat) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ", BigDecimal.class);
+
+		sumQuery.setParameter("stDate", startDate, TemporalType.DATE);
+		sumQuery.setParameter("edDate", endDate, TemporalType.DATE);
+
+		logger.debug(sumQuery.toString());
+
+		return sumQuery.getSingleResult();
+	}
+
+	@Override
+	public int getCountOfCustomerBilledForYear() {
+		Date startDate = CalendarUtility.getFirstDateOfYear();
+		Date endDate = CalendarUtility.getLastDateOfYear();
+		return getCountOfCustomerBilledInDateRange(startDate, endDate);
+	}
+
+	@Override
+	public int getCountOfCustomerBilledInMonth() {
+		Date startDate = CalendarUtility.getFirstDateOfMonth();
+		Date endDate = CalendarUtility.getLastDateOfMonth();
+		return getCountOfCustomerBilledInDateRange(startDate, endDate);
+	}
+
+	@Override
+	public int getCountOfCustomerBilledInDateRange(Date startDate, Date endDate) {
+		logger.debug("getCountOfCustomerBilledInDateRange for - [" + startDate + " - " + endDate + "]");
+
+		Query<Long> sumQuery = getCurrentSession().createQuery(
+				"select count(distinct customer) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ",
+				Long.class);
+
+		sumQuery.setParameter("stDate", startDate, TemporalType.DATE);
+		sumQuery.setParameter("edDate", endDate, TemporalType.DATE);
+
+		logger.debug(sumQuery.toString());
+
+		return sumQuery.getSingleResult().intValue();
 	}
 
 }

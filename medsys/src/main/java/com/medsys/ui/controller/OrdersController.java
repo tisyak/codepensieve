@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.medsys.adminuser.model.Roles;
+import com.medsys.common.model.Response;
 import com.medsys.customer.bd.CustomerBD;
 import com.medsys.master.bd.MasterDataBD;
 import com.medsys.master.model.OrderStatusCode;
@@ -50,7 +51,7 @@ public class OrdersController extends SuperController {
 
 	@Autowired
 	private SetBD setBD;
-	
+
 	@Autowired
 	private MasterDataBD masterDataBD;
 
@@ -114,9 +115,9 @@ public class OrdersController extends SuperController {
 		logger.info("IN: Order/loadAdd-GET");
 		model.addAttribute("customerList", customerBD.getAllCustomers());
 		model.addAttribute("setList", setBD.getAllSet());
-		order = new Orders(true);
-		model.addAttribute("order", order);
-		order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class, OrderStatusCode.ACTIVE.getCode()));
+		model.addAttribute("order", new Orders());
+		order.setOrderStatus(
+				(OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class, OrderStatusCode.ACTIVE.getCode()));
 		return MedsysUITiles.ADD_ORDER.getTile();
 	}
 
@@ -128,7 +129,7 @@ public class OrdersController extends SuperController {
 
 		if (result.hasErrors()) {
 			logger.info("Order-add error: " + result.toString());
-			redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.Order", result);
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), result.getAllErrors());
 			redirectAttrs.addFlashAttribute("order", order);
 			return MedsysUITiles.ADD_ORDER.getTile();
 		} else {
@@ -136,6 +137,8 @@ public class OrdersController extends SuperController {
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			order.setUpdateBy(auth.getName());
 			order.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
+			order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class,
+					OrderStatusCode.ACTIVE.getCode()));
 			ordersBD.addOrder(order);
 			String message = "Order " + order.getOrderId() + " was successfully added";
 
@@ -143,22 +146,21 @@ public class OrdersController extends SuperController {
 			// Unable to directly update the modelAttribute. Hence, setting
 			// orderId separately in request
 			request.setAttribute("updatedOrderId", order.getOrderId());
-			redirectAttrs.addFlashAttribute("updatedOrderId",order.getOrderId());
+			redirectAttrs.addFlashAttribute("updatedOrderId", order.getOrderId());
 			return UIActions.REDIRECT + UIActions.EDIT_ORDER;
 		}
 	}
 
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_PRODUCT_ORDER, method = {RequestMethod.POST, RequestMethod.GET})
-	public String loadAddProductsToOrder(
-			@RequestParam(value = "updatedOrderId", required = false) Integer orderId,
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_PRODUCT_ORDER, method = { RequestMethod.POST,
+			RequestMethod.GET })
+	public String loadAddProductsToOrder(@RequestParam(value = "updatedOrderId", required = false) Integer orderId,
 			Model model) {
-		
-		if(orderId == null){
+
+		if (orderId == null) {
 			logger.info("Checking in model for updatedOrderId = " + model.asMap().get("updatedOrderId"));
 			orderId = (Integer) model.asMap().get("updatedOrderId");
 		}
-		
-		
+
 		logger.info(" IN: Order/loadAddProductsToOrder-POST orderId : " + orderId);
 		model.addAttribute("order", ordersBD.getOrder(orderId));
 		return MedsysUITiles.ADD_PRODUCTS_IN_ORDER.getTile();
@@ -167,12 +169,12 @@ public class OrdersController extends SuperController {
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.EDIT_ORDER, method = RequestMethod.GET)
 	public String loadEditOrdersPage(@RequestParam(value = "orderId", required = false) Integer orderId, Model model) {
 		logger.info("IN: Order/edit-GET:  order to query = " + orderId);
-		
-		if(orderId == null){
+
+		if (orderId == null) {
 			logger.info("Checking in model for updatedOrderId = " + model.asMap().get("updatedOrderId"));
 			orderId = (Integer) model.asMap().get("updatedOrderId");
 		}
-		
+
 		if (!model.containsAttribute("order")) {
 
 			logger.info("Adding Order object to model");
@@ -194,7 +196,7 @@ public class OrdersController extends SuperController {
 
 		if (result.hasErrors()) {
 			logger.info("Order-edit error: " + result.toString());
-			redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.Order", result);
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), result.getAllErrors());
 			redirectAttrs.addFlashAttribute("order", order);
 			request.setAttribute("orderId", order.getOrderId());
 			return UIActions.REDIRECT + UIActions.EDIT_ORDER;
@@ -205,7 +207,7 @@ public class OrdersController extends SuperController {
 			order.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 			ordersBD.updateOrder(order);
 			String message = "Order " + order.getOrderId() + " was successfully edited";
-			redirectAttrs.addFlashAttribute("message", message);
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
 		}
 
 		return UIActions.REDIRECT + UIActions.LIST_ALL_ORDERS;
@@ -218,7 +220,6 @@ public class OrdersController extends SuperController {
 		Orders order = ordersBD.getOrder(orderId);
 		logger.info("Order/delete-GET:  " + order.toString());
 		model.addAttribute("order", order);
-
 		return MedsysUITiles.CONFIRM_DELETE_ORDER.getTile();
 	}
 
@@ -229,7 +230,27 @@ public class OrdersController extends SuperController {
 
 		ordersBD.deleteOrder(orderId);
 		String message = "Order with orderId: " + orderId + " was successfully deleted";
-		model.addAttribute("message", message);
+		model.addAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
+		return UIActions.REDIRECT + UIActions.LIST_ALL_ORDERS;
+	}
+
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.ORDER_RESTORE_SET, method = RequestMethod.GET)
+	public String orderRestoreSet(@RequestParam(value = "orderId", required = true) Integer orderId, Model model,
+			RedirectAttributes redirectAttrs) {
+
+		logger.info("IN: Order/restoreSet-GET:  order to query = " + orderId);
+		Response response = ordersBD.restoreSet(orderId);
+		logger.info("Order/restoreSet-GET:  response " + response);
+		String message = null;
+		if (response.isStatus()) {
+			message = "Set in Order " + orderId + " was restored successfully";
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
+		} else {
+			message = "Restoration of set in Order " + orderId + " was incomplete.Error: " + response.getError()
+					+ ".Comments: " + response.getRemarks();
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_SYSTEM_ERROR.getValue(), message);
+		}
+		
 		return UIActions.REDIRECT + UIActions.LIST_ALL_ORDERS;
 	}
 

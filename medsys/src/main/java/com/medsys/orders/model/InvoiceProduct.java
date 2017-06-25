@@ -2,6 +2,7 @@ package com.medsys.orders.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -45,7 +46,7 @@ public class InvoiceProduct  implements Serializable  {
 	private ProductMaster product;
 
 	@NotNull
-	@Column(name = "rate_per_unit")
+	@Column(name = "rate_per_unit",precision = 15, scale = 0)
 	private BigDecimal ratePerUnit;
 
 	@NotNull
@@ -53,21 +54,37 @@ public class InvoiceProduct  implements Serializable  {
 	private Integer qty;
 
 	@NotNull
-	@Column(name = "total_before_tax")
+	@Column(name = "total_before_tax",precision = 15, scale=0)
 	private BigDecimal totalBeforeTax;
 	
 	@NotNull
-	@Column(name = "total")
+	@Column(name = "total",precision = 15, scale=0)
 	private BigDecimal totalPrice;
 
-	@NotNull
-	@Column(name = "vat_amount")
+	@Column(name = "vat_amount",precision = 15, scale=0)
 	private BigDecimal vatAmount;
 
 	@ManyToOne
 	@JoinColumn(name = "vat_type", referencedColumnName = "tax_id")
 	private TaxMaster vatType;
+	
+	@Column(name = "cgst_amount",precision = 15, scale=0)
+	private BigDecimal cgstAmount;
 
+	@ManyToOne
+	@JoinColumn(name = "cgst_type", referencedColumnName = "tax_id")
+	private TaxMaster cgstType;
+	
+	@Column(name = "sgst_amount",precision = 15, scale=0)
+	private BigDecimal sgstAmount;
+
+	@ManyToOne
+	@JoinColumn(name = "sgst_type", referencedColumnName = "tax_id")
+	private TaxMaster sgstType;
+	
+	@Column(name = "discount",precision = 15, scale=0)
+	private BigDecimal discount;
+	
 	@Transient
 	private Integer availableQty; 
 	
@@ -109,7 +126,11 @@ public class InvoiceProduct  implements Serializable  {
 	}
 
 	public void setRatePerUnit(BigDecimal ratePerUnit) {
-		this.ratePerUnit = ratePerUnit;
+		if (ratePerUnit != null) {
+			this.ratePerUnit = ratePerUnit.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.ratePerUnit = ratePerUnit;
+		}
 	}
 
 	public BigDecimal getTotalBeforeTax() {
@@ -117,7 +138,11 @@ public class InvoiceProduct  implements Serializable  {
 	}
 
 	public void setTotalBeforeTax(BigDecimal totalBeforeTax) {
-		this.totalBeforeTax = totalBeforeTax;
+		if (totalBeforeTax != null) {
+			this.totalBeforeTax = totalBeforeTax.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.totalBeforeTax = totalBeforeTax;
+		}
 	}
 
 	public BigDecimal getTotalPrice() {
@@ -125,7 +150,11 @@ public class InvoiceProduct  implements Serializable  {
 	}
 
 	public void setTotalPrice(BigDecimal totalPrice) {
-		this.totalPrice = totalPrice;
+		if (totalPrice != null) {
+			this.totalPrice = totalPrice.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.totalPrice = totalPrice;
+		}
 	}
 
 	public BigDecimal getVatAmount() {
@@ -133,7 +162,11 @@ public class InvoiceProduct  implements Serializable  {
 	}
 
 	public void setVatAmount(BigDecimal vatAmount) {
-		this.vatAmount = vatAmount;
+		if (vatAmount != null) {
+			this.vatAmount = vatAmount.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.vatAmount = vatAmount;
+		}
 	}
 
 	public TaxMaster getVatType() {
@@ -142,6 +175,58 @@ public class InvoiceProduct  implements Serializable  {
 
 	public void setVatType(TaxMaster vatType) {
 		this.vatType = vatType;
+	}
+	
+	public BigDecimal getCgstAmount() {
+		return cgstAmount;
+	}
+
+	public void setCgstAmount(BigDecimal cgstAmount) {
+		if (cgstAmount != null) {
+			this.cgstAmount = cgstAmount.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.cgstAmount = cgstAmount;
+		}
+	}
+
+	public TaxMaster getCgstType() {
+		return cgstType;
+	}
+
+	public void setCgstType(TaxMaster cgstType) {
+		this.cgstType = cgstType;
+	}
+
+	public BigDecimal getSgstAmount() {
+		return sgstAmount;
+	}
+
+	public void setSgstAmount(BigDecimal sgstAmount) {
+		if (sgstAmount != null) {
+			this.sgstAmount = sgstAmount.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.sgstAmount = sgstAmount;
+		}
+	}
+
+	public TaxMaster getSgstType() {
+		return sgstType;
+	}
+
+	public void setSgstType(TaxMaster sgstType) {
+		this.sgstType = sgstType;
+	}
+
+	public BigDecimal getDiscount() {
+		return discount;
+	}
+
+	public void setDiscount(BigDecimal discount) {
+		if (discount != null) {
+			this.discount = discount.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.discount = discount;
+		}
 	}
 
 	public Integer getQty() {
@@ -213,8 +298,10 @@ public class InvoiceProduct  implements Serializable  {
 	public String toString() {
 		return "InvoiceProduct [invoiceProductId=" + invoiceProductId + ", invoiceId=" + invoiceId + ", product="
 				+ product + ", ratePerUnit=" + ratePerUnit + ", qty=" + qty + ", totalBeforeTax=" + totalBeforeTax
-				+ ", totalPrice=" + totalPrice + ", vatAmount=" + vatAmount + ", vatType=" + vatType + ", availableQty="
-				+ availableQty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
+				+ ", totalPrice=" + totalPrice + ", vatAmount=" + vatAmount + ", vatType=" + vatType + ", cgstAmount="
+				+ cgstAmount + ", cgstType=" + cgstType + ", sgstAmount=" + sgstAmount + ", sgstType=" + sgstType
+				+ ", discount=" + discount + ", availableQty=" + availableQty + ", updateBy=" + updateBy
+				+ ", updateTimestamp=" + updateTimestamp + "]";
 	}
 
 }

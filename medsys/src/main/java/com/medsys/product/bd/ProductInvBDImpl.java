@@ -28,8 +28,8 @@ public class ProductInvBDImpl implements ProductInvBD {
     }
  
     @Override
-    public ProductInv getProduct(Integer productId)  {
-        return productInvDAO.getProduct(productId);
+    public ProductInv getProduct(Integer productInvId)  {
+        return productInvDAO.getProduct(productInvId);
     }
     
     @Override
@@ -102,6 +102,11 @@ public class ProductInvBDImpl implements ProductInvBD {
 	@Override
 	public Response deleteProduct(ProductInv product) {
 		return productInvDAO.deleteProduct(product);
+	}
+
+	@Override
+	public int getCountOfProductsInDeficit() {
+		return productInvDAO.getCountOfProductsInDeficit();
 	}
 
 	

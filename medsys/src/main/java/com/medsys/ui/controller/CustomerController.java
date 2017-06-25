@@ -94,6 +94,7 @@ public class CustomerController {
 
 	@RequestMapping(value = UIActions.ADD_CUSTOMER, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response create(@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "gstin", required = false) String gstin,
 			@RequestParam(value = "email", required = false) String email,
 			@RequestParam(value = "mobileNo", required = false) String mobileNo,
 			@RequestParam(value = "address", required = false) String address,
@@ -105,6 +106,7 @@ public class CustomerController {
 		
 		Customer newCustomer = new Customer();
 		newCustomer.setName(name);
+		newCustomer.setGstin(gstin);
 		newCustomer.setEmail(email);
 		newCustomer.setMobileNo(mobileNo);
 		newCustomer.setAddress(address);
@@ -127,6 +129,7 @@ public class CustomerController {
 	@RequestMapping(value = UIActions.EDIT_CUSTOMER, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response update(@RequestParam(value = "id", required = false) String customerId,
 			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "gstin", required = false) String gstin,
 			@RequestParam(value = "email", required = false) String email,
 			@RequestParam(value = "mobileNo", required = false) String mobileNo,
 			@RequestParam(value = "address", required = false) String address,
@@ -138,6 +141,7 @@ public class CustomerController {
 			Customer toBeUpdatedCustomer = new Customer();
 			toBeUpdatedCustomer.setCustomerId(UUID.fromString(customerId));
 			toBeUpdatedCustomer.setName(name);
+			toBeUpdatedCustomer.setGstin(gstin);
 			toBeUpdatedCustomer.setEmail(email);
 			toBeUpdatedCustomer.setMobileNo(mobileNo);
 			toBeUpdatedCustomer.setAddress(address);

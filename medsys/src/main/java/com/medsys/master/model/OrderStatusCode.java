@@ -3,7 +3,6 @@ package com.medsys.master.model;
 public enum OrderStatusCode {
 
 	ACTIVE("A"), 
-	PRINT_READY("PR"), 
 	SET_RESTORED("SR"), 
 	INVOICE_GENERATED("IG"), 
 	DISCARDED("DI");

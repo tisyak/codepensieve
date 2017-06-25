@@ -54,7 +54,7 @@
 			    //Browser has blocked it
 			    alert('Please allow popups for this Site');
 			}
-			// Check periodically if download has started
+			/* // Check periodically if download has started
 			var frequency = 1000;
 			var timer = setInterval(function() {
 				$.get('${downloadProgressUrl}', {token: token}, 
@@ -66,7 +66,7 @@
 								clearInterval(timer);
 							}
 					});
-			}, frequency);
+			}, frequency); */
 			
 		});
 	}

@@ -39,5 +39,33 @@ public interface InvoiceDAO {
 	public BigDecimal calculateTotalPriceForInvoice(Integer invoiceId);
 
 	List<Invoice> searchForInvoice(Date fromDate, Date toDate);
+
+	BigDecimal calculateTotalCGSTForInvoice(Integer invoiceId);
+
+	BigDecimal calculateTotalSGSTForInvoice(Integer invoiceId);
+
+	public BigDecimal calculateTotalDiscountInInvoice(Integer invoiceId);
+
+	public BigDecimal getTotalSalesAmountInMonth();
+
+	public BigDecimal getTotalSalesAmountInYear();
+
+	public int getCountOfTotalInvoicesForYear();
+
+	public BigDecimal getTotalVATInYear();
+
+	public int getCountOfCustomerBilledForYear();
+
+	public int getCountOfCustomerBilledInMonth();
+
+	public int getCountOfTotalInvoicesInMonth();
+
+	BigDecimal getTotalSalesAmountInDateRange(Date startDate, Date endDate);
+
+	int getCountOfTotalInvoicesInDateRange(Date startDate, Date endDate);
+
+	BigDecimal getTotalVATInDateRange(Date startDate, Date endDate);
+
+	int getCountOfCustomerBilledInDateRange(Date startDate, Date endDate);
 	
 }

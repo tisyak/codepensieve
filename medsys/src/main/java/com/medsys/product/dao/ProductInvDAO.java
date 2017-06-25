@@ -32,6 +32,8 @@ public interface ProductInvDAO {
 
 	public Response deleteProduct(ProductInv productInv);
 
+	public int getCountOfProductsInDeficit();
+
 	
 
 }

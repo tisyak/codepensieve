@@ -235,9 +235,16 @@
     					});
     			
     			// Start download
-    			window.location = '${downloadUrl}'+'?token='+token+'&type='+type+'&orderId='+${orderId};
+    			var win = window.open('${downloadUrl}'+'?token='+token+'&type='+type+'&orderId='+${orderId} , '_blank');
+    			if (win) {
+    			    //Browser has allowed it to be opened
+    			    win.focus();
+    			} else {
+    			    //Browser has blocked it
+    			    alert('Please allow popups for this Site');
+    			}
     			// Check periodically if download has started
-    			var frequency = 1000;
+    			/* var frequency = 1000;
     			var timer = setInterval(function() {
     				$.get('${downloadProgressUrl}', {token: token}, 
     						function(response) {
@@ -248,7 +255,7 @@
     								clearInterval(timer);
     							}
     					});
-    			}, frequency);
+    			}, frequency); */
     			
     		});
     	}

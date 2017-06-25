@@ -70,6 +70,10 @@ public class Customer implements Serializable{
 	@Column(name = "pincode", length = 512)
 	private String pincode;
 	
+	@Size(max = 50, message = "{error.field.max}")
+	@Column(name = "gstin", length = 100)
+	private String gstin;
+	
 	 @OneToMany( mappedBy = "customerId", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
 	 List<CustomerContact> contacts;
 
@@ -83,6 +87,10 @@ public class Customer implements Serializable{
 	}
 
 	public String getName() {
+		
+		if(name!=null){
+			name = StringUtils.capitalize(name);
+		}
 		return name;
 	}
 
@@ -131,6 +139,14 @@ public class Customer implements Serializable{
 	}
 
 		
+	public String getGstin() {
+		return gstin;
+	}
+
+	public void setGstin(String gstin) {
+		this.gstin = gstin;
+	}
+
 	public List<CustomerContact> getContacts() {
 		return contacts;
 	}
@@ -184,10 +200,9 @@ public class Customer implements Serializable{
 
 	@Override
 	public String toString() {
-		return "Customer [customerId=" + customerId + ", name=" + name
-				+ ", email=" + email + ", mobileNo=" + mobileNo + ", address="
-				+ address + ", city=" + city + ", pincode=" + pincode
-				+ "]";
+		return "Customer [customerId=" + customerId + ", name=" + name + ", email=" + email + ", mobileNo=" + mobileNo
+				+ ", address=" + address + ", city=" + city + ", pincode=" + pincode + ", gstin=" + gstin
+				+ ", contacts=" + contacts + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 
 	

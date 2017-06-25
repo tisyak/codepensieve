@@ -18,6 +18,7 @@ import com.medsys.adminuser.bd.AdminUserBD;
 import com.medsys.adminuser.model.AdminUser;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
+import com.medsys.ui.util.UIConstants;
 
 @Controller
 public class ProfileController extends SuperController {
@@ -68,14 +69,14 @@ public class ProfileController extends SuperController {
 
 		if (result.hasErrors()) {
 			logger.info("Profile-save error: " + result.toString());
-			redirectAttrs.addFlashAttribute("org.springframework.validation.BindingResult.adminUser", result);
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(),  result.getAllErrors());
 			redirectAttrs.addFlashAttribute("adminUser", adminUser);
 			return UIActions.REDIRECT + UIActions.EDIT_PROFILE ;
 		} else {
 			logger.info("Profile/save-POST:  " + adminUser);
 			adminUserBD.updateUser(adminUser);
 			String message = "adminUser " + adminUser.getName() + " was successfully edited";
-			redirectAttrs.addFlashAttribute("message", message);
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
 		}
 
 		return UIActions.REDIRECT + UIActions.VIEW_PROFILE;

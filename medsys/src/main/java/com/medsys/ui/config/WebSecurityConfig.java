@@ -58,6 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.permitAll()
 				.antMatchers(UIActions.FORWARD_SLASH + UIActions.ERROR + "/**")
 				.permitAll()
+				.anyRequest().authenticated()
 				.and()
 				.formLogin()
 				.loginPage(UIActions.FORWARD_SLASH + UIActions.LOGIN)
