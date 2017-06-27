@@ -28,9 +28,6 @@ public enum MedsysUITiles {
 
 	CONFIRM_DELETE_ORDER("orders.DeleteOrder"),
 	
-	ADD_PRODUCTS_IN_ORDER("orders.AddProductsToOrder"),
-	
-	
 	/** INVOICE MANAGEMENT */
 
 	SEARCH_INVOICES("invoices.SearchInvoices"),
@@ -52,6 +49,16 @@ public enum MedsysUITiles {
 	
 	/** PRODUCT GROUP MANAGEMENT*/
 	MANAGE_PRODUCT_GROUP("product.ProductGroup"),
+	
+	/** SET MANAGEMENT */
+
+	SEARCH_SET("set.SearchSet"),
+
+	SET_LIST("set.SearchSet"),
+
+	ADD_SET("set.AddSet"),
+
+	EDIT_SET("set.EditSet"),
 	
 	/** Admin User Management */
 	ADMIN_USERS_LIST("master.AdminUserList"),

@@ -1,6 +1,7 @@
 package com.medsys.orders.dao;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -64,11 +65,10 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		return new Response(true, null);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Invoice getInvoice(Integer invoiceId) {
 		logger.debug("InvoiceDAOImpl.getInvoice() - [" + invoiceId + "]");
-		Query<Invoice> query = getCurrentSession().createQuery("from Invoice where invoiceId = " + invoiceId + "");
+		Query<Invoice> query = getCurrentSession().createQuery("from Invoice inv LEFT JOIN FETCH inv.products where inv.invoiceId = " + invoiceId + "",Invoice.class);
 		// query.setParameter("invoiceId", invoiceId.toString());
 
 		logger.debug(query.toString());
@@ -102,9 +102,11 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<Invoice> getAllInvoice() {
-		return getCurrentSession().createQuery("from Invoice order by invoiceDate desc").getResultList();
+		
+		
+		return getCurrentSession().createQuery(" from Invoice order by invoiceDate,invoiceNo desc",Invoice.class)
+				.getResultList();
 	}
 
 	@Override
@@ -129,7 +131,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	public List<Invoice> searchForInvoice(Invoice invoice) {
 		logger.debug("InvoiceDAOImpl.searchForInvoice() - [" + invoice.toString() + "]");
 		Query<Invoice> query = getCurrentSession().createQuery(
-				"from Invoice where lower(invoiceNo) like :invoiceNo OR lower(customer.name) like :custName "
+				" from Invoice where lower(invoiceNo) like :invoiceNo OR lower(customer.name) like :custName "
 						+ " OR invoiceDate = :invoiceDate " + " order by invoiceNo asc",
 				Invoice.class);
 
@@ -264,60 +266,6 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	}
 
 	@Override
-	public BigDecimal calculateTotalBeforeTaxForInvoice(Integer invoiceId) {
-		logger.debug("Calculating total amount before tax for all products in Invoice: " + invoiceId);
-		getCurrentSession().flush();
-		return (BigDecimal) getCurrentSession()
-				.createQuery("SELECT SUM(totalBeforeTax) from InvoiceProduct where invoiceId = " + invoiceId)
-				.getSingleResult();
-	}
-
-	@Override
-	public BigDecimal calculateTotalVATForInvoice(Integer invoiceId) {
-		logger.debug("Calculating total VAT tax for all products in Invoice: " + invoiceId);
-		getCurrentSession().flush();
-		return (BigDecimal) getCurrentSession()
-				.createQuery("SELECT SUM(vatAmount) from InvoiceProduct where invoiceId = " + invoiceId)
-				.getSingleResult();
-	}
-
-	@Override
-	public BigDecimal calculateTotalCGSTForInvoice(Integer invoiceId) {
-		logger.debug("Calculating total CGST tax for all products in Invoice: " + invoiceId);
-		getCurrentSession().flush();
-		return (BigDecimal) getCurrentSession()
-				.createQuery("SELECT SUM(cgstAmount) from InvoiceProduct where invoiceId = " + invoiceId)
-				.getSingleResult();
-	}
-
-	@Override
-	public BigDecimal calculateTotalSGSTForInvoice(Integer invoiceId) {
-		logger.debug("Calculating total SGST tax for all products in Invoice: " + invoiceId);
-		getCurrentSession().flush();
-		return (BigDecimal) getCurrentSession()
-				.createQuery("SELECT SUM(sgstAmount) from InvoiceProduct where invoiceId = " + invoiceId)
-				.getSingleResult();
-	}
-
-	@Override
-	public BigDecimal calculateTotalPriceForInvoice(Integer invoiceId) {
-		logger.debug("Calculating total price for all products in Invoice: " + invoiceId);
-		getCurrentSession().flush();
-		return (BigDecimal) getCurrentSession()
-				.createQuery("SELECT SUM(totalPrice) from InvoiceProduct where invoiceId = " + invoiceId)
-				.getSingleResult();
-	}
-
-	@Override
-	public BigDecimal calculateTotalDiscountInInvoice(Integer invoiceId) {
-		logger.debug("Calculating total Discount for all products in Invoice: " + invoiceId);
-		getCurrentSession().flush();
-		return (BigDecimal) getCurrentSession()
-				.createQuery("SELECT SUM(discount) from InvoiceProduct where invoiceId = " + invoiceId)
-				.getSingleResult();
-	}
-
-	@Override
 	public BigDecimal getTotalSalesAmountInYear() {
 		Date startDate = CalendarUtility.getFirstDateOfYear();
 		Date endDate = CalendarUtility.getLastDateOfYear();
@@ -427,6 +375,39 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		logger.debug(sumQuery.toString());
 
 		return sumQuery.getSingleResult().intValue();
+	}
+
+	@Override
+	public void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp) {
+		/*
+		 * UPDATE public.invoice SET total_amount_before_tax =
+		 * invPdt.total_amount_before_tax, total_cgst = invPdt.total_cgst,
+		 * total_sgst = invPdt.total_sgst, total_vat = invPdt.total_vat,
+		 * total_amount = invPdt.total_amount, total_discount =
+		 * invPdt.total_discount FROM ( SELECT SUM(total_before_tax)
+		 * total_amount_before_tax, SUM(cgst_amount) total_cgst,
+		 * SUM(sgst_amount) total_sgst, SUM(vat_amount) total_vat, SUM(total)
+		 * total_amount, SUM(discount) total_discount
+		 * 
+		 * FROM public.invoice_product
+		 * 
+		 * WHERE invoice_id = 20 GROUP BY invoice_id ) invPdt WHERE invoice_id =
+		 * 20
+		 */
+
+		@SuppressWarnings("rawtypes")
+		Query query = getCurrentSession().createNativeQuery("UPDATE public.invoice SET  "
+				+ " total_amount_before_tax = invPdt.total_amount_before_tax," + " total_cgst = invPdt.total_cgst,"
+				+ " total_sgst = invPdt.total_sgst, " + " total_vat = invPdt.total_vat, "
+				+ " total_amount = invPdt.total_amount, " + " total_discount = invPdt.total_discount "
+				+ " FROM  ( SELECT  SUM(total_before_tax) total_amount_before_tax,SUM(cgst_amount) total_cgst,"
+				+ "	SUM(sgst_amount) total_sgst,"
+				+ " SUM(vat_amount) total_vat,SUM(total) total_amount,SUM(discount) total_discount "
+				+ " FROM public.invoice_product  WHERE invoice_id = :invoiceId GROUP BY invoice_id ) invPdt WHERE invoice_id = :invoiceId");
+
+		query.setParameter("invoiceId",invoiceId);
+		query.executeUpdate();
+
 	}
 
 }

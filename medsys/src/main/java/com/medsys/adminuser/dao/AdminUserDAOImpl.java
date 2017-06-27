@@ -72,24 +72,23 @@ public class AdminUserDAOImpl implements AdminUserDAO {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public AdminUser getUserByUserName(String usersName) throws UsernameNotFoundException {
 		logger.debug("AdminUserDAOImpl.getUserByUserName() - [" + usersName + "]");
-		Query query = getCurrentSession().createQuery(
-				"from AdminUser where lower(username) = :usersName");
-		query.setString("usersName", usersName.toLowerCase());
+		Query<AdminUser> query = getCurrentSession().createQuery(
+				"from AdminUser where lower(username) = :usersName",AdminUser.class);
+		query.setParameter("usersName", usersName.toLowerCase());
 		AdminUser userObject = null;
 		logger.debug(query.toString());
-		if (query.list().size() == 0) {
+		if (query.getResultList().size() == 0) {
 			logger.debug("No user found.");
 			//throw new UsernameNotFoundException("AdminUser [" + usersName
 			//		+ "] not found");
 			return userObject;
 		} else {
 			
-			logger.debug("AdminUser List Size: " + query.list().size());
-			List<AdminUser> list = (List<AdminUser>) query.list();
+			logger.debug("AdminUser List Size: " + query.getResultList().size());
+			List<AdminUser> list = (List<AdminUser>) query.getResultList();
 			userObject = (AdminUser) list.get(0);
 			return userObject;
 		}
@@ -109,7 +108,7 @@ public class AdminUserDAOImpl implements AdminUserDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<AdminUser> getUsers() {
-		return getCurrentSession().createQuery("from AdminUser").list();
+		return getCurrentSession().createQuery("from AdminUser").getResultList();
 	}
 
 	@Override
@@ -129,13 +128,13 @@ public class AdminUserDAOImpl implements AdminUserDAO {
 	@Override
 	public boolean checkUsernameAvailability(String username) {
 		logger.debug("AdminUserDAOImpl.checkUsernameAvailability() - [" + username + "]");
-		Query query = getCurrentSession().createSQLQuery("select lower(user_name) from admin_users"
-				+ " where lower(user_name) = :user");
-		query.setString("user", username);
+		Query<String> query = getCurrentSession().createNativeQuery("select lower(user_name) from admin_users"
+				+ " where lower(user_name) = :user",String.class);
+		query.setParameter("user", username);
 		//query.list().size()
 		//int status = query.executeUpdate();
 		//logger.debug(" username checking status:"+ query.list().size());
-		if(query.list().size() > 0) {
+		if(query.getResultList().size() > 0) {
 			logger.debug(" username available in table");
 			return false;
 		} else {

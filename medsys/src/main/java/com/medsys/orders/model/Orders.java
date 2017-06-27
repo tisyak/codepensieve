@@ -1,12 +1,10 @@
 package com.medsys.orders.model;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -17,9 +15,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.annotations.Type;
-import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,8 +76,9 @@ public class Orders {
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "orderId")
-	java.util.Set<OrderProductSet> products;
+	@OneToMany(mappedBy = "orderId")
+	@javax.persistence.OrderBy("product ASC")
+	java.util.SortedSet<OrderProductSet> products;
 
 	public static void setLogger(Logger logger) {
 		Orders.logger = logger;
@@ -175,11 +172,11 @@ public class Orders {
 		this.updateTimestamp = updateTimestamp;
 	}
 
-	public java.util.Set<OrderProductSet> getProducts() {
+	public java.util.SortedSet<OrderProductSet> getProducts() {
 		return products;
 	}
 
-	public void setProducts(java.util.Set<OrderProductSet> products) {
+	public void setProducts(java.util.SortedSet<OrderProductSet> products) {
 		this.products = products;
 	}
 

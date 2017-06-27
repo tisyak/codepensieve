@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.product.dao.SetDAO;
+import com.medsys.product.model.ProductGroup;
 import com.medsys.product.model.ProductInv;
 import com.medsys.product.model.Set;
 import com.medsys.product.model.SetPdtTemplate;
@@ -62,7 +63,7 @@ public class SetBDImpl implements SetBD {
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId) {
 		logger.debug("Get All products in Set: " + setId);
 		List<SetPdtTemplate> setPdtTemplates =  setDAO.getAllProductsInSet(setId);
-		
+		/*
 		for(SetPdtTemplate pdtTemplate: setPdtTemplates){
 			try{
 				ProductInv productInv = productInvBD.getProductByCode(pdtTemplate.getProduct().getProductCode());
@@ -72,7 +73,7 @@ public class SetBDImpl implements SetBD {
 				pdtTemplate.setAvailableQty(0);
 			}
 			
-		}
+		}*/
 		
 		return setPdtTemplates;
 	}
@@ -109,15 +110,21 @@ public class SetBDImpl implements SetBD {
 	}
 
 	@Override
-	public Response updateProuctInSet(SetPdtTemplate product) {
+	public Response updateProductInSet(SetPdtTemplate product) {
 		logger.debug("UPDATE product: " + product);
-		return setDAO.updateProuctInSet(product);
+		return setDAO.updateProductInSet(product);
 	}
 
 	@Override
 	public Response deleteProductFromSet(SetPdtTemplate product) {
 		logger.debug("DELETE product: " + product);
 		return setDAO.deleteProductFromSet(product);
+	}
+
+	@Override
+	public List<ProductGroup> getAllProductGroupForSet(Integer setId) {
+		return setDAO.getAllProductGroupForSet(setId);
+		
 	}
 
 

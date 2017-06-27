@@ -9,31 +9,26 @@
     </encoder>
   </appender>
   
-  <!-- HTML Rolling Appender -->
+  <!-- HTML Rolling Appender 
   
   <appender name="H" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${catalina.base}/logs/medsys_log.html</file>
     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
         <layout class="ch.qos.logback.classic.html.HTMLLayout">
-           <!--  <pattern>%msg%n</pattern> -->
            <pattern>%20.25d{yyyy-MM-dd HH:mm:ss}%logger{25}%.-1level%msg</pattern>
         </layout>
     </encoder>
     
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- daily rollover -->
             <fileNamePattern>${catalina.base}/logs/medsys_log.%d{yyyy-MM-dd}.%i.html</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                 class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- or whenever the file size reaches 10MB -->
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
-            <!-- keep 30 days' worth of history -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
     
     
-  <!--   
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <fileNamePattern>${catalina.base}/logs/medsys.html.%i</fileNamePattern>
       <minIndex>1</minIndex>
@@ -41,8 +36,8 @@
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <MaxFileSize>1024KB</MaxFileSize>
-    </triggeringPolicy> -->
-  </appender>
+    </triggeringPolicy> 
+  </appender>-->
   
   <!-- Plain Text Rolling Appender -->
   
@@ -77,14 +72,14 @@
   <logger name="org.w3c.tidy" level="OFF"/>
   <logger name="ch.qos" level="WARN"/>
   <logger name="org.slf4j" level="OFF"/>
-  <logger name="org.springframework" level="DEBUG"/>
+  <logger name="org.springframework" level="ERROR"/>
   <logger name="org.apache" level="WARN"/>
   <logger name="org.jboss" level="WARN"/>
   <logger name="org.hibernate" level="DEBUG"/>
   <logger name="org.postgresql" level="WARN"/>
 
   <root level="DEBUG">
-    <appender-ref ref="S"/>
+    <!-- <appender-ref ref="S"/> -->
  	<appender-ref ref="R"/>
   	<!-- <appender-ref ref="H"/> -->
   </root>

@@ -1,5 +1,6 @@
 package com.medsys.master.model;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -33,7 +34,7 @@ public class TaxMaster extends MasterData{
 	
 	@NotNull
 	@Column(name = "tax_percentage")
-	private Integer tax_percentage; 
+	private BigDecimal tax_percentage; 
 	
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 250, message = "{error.field.max}")
@@ -64,11 +65,11 @@ public class TaxMaster extends MasterData{
 		this.taxType = taxType;
 	}
 
-	public Integer getTax_percentage() {
+	public BigDecimal getTax_percentage() {
 		return tax_percentage;
 	}
 
-	public void setTax_percentage(Integer tax_percentage) {
+	public void setTax_percentage(BigDecimal tax_percentage) {
 		this.tax_percentage = tax_percentage;
 	}
 

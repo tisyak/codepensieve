@@ -19,6 +19,7 @@ public interface ProductGroupBD {
 	
 	public List<ProductGroup> searchForProductGroup(ProductGroup productGroup);
 
+
 	
 
 }

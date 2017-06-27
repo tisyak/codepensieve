@@ -154,7 +154,9 @@ public class InvoiceProductController {
 		logger.debug("productId in request: " + productId);
 		InvoiceProduct invoiceProduct = invoiceBD.getProductInInvoice(id);
 		logger.debug("InvoiceProduct from DB: " + invoiceProduct);
-
+		
+		
+		
 		if (invoiceProduct.getInvoiceId().equals(invoiceId)
 				&& invoiceProduct.getProduct().getProductId().equals(productId)) {
 			InvoiceProduct toBeUpdatedInvoiceProduct = new InvoiceProduct();
@@ -163,12 +165,16 @@ public class InvoiceProductController {
 			toBeUpdatedInvoiceProduct.setProduct(invoiceProduct.getProduct());
 			toBeUpdatedInvoiceProduct.setQty(qty);
 			toBeUpdatedInvoiceProduct.setRatePerUnit(ratePerUnit);
-			TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
-			toBeUpdatedInvoiceProduct.setVatType(appliedVatType);
-			TaxMaster appliedCgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, cgstTypeId);
-			toBeUpdatedInvoiceProduct.setCgstType(appliedCgstType);
-			TaxMaster appliedSgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, sgstTypeId);
-			toBeUpdatedInvoiceProduct.setSgstType(appliedSgstType);
+			Invoice parentInv = invoiceBD.getInvoice(invoiceId);
+			if (!parentInv.isGstInvoice()) {
+				TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
+				toBeUpdatedInvoiceProduct.setVatType(appliedVatType);
+			} else {
+				TaxMaster appliedCgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, cgstTypeId);
+				toBeUpdatedInvoiceProduct.setCgstType(appliedCgstType);
+				TaxMaster appliedSgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, sgstTypeId);
+				toBeUpdatedInvoiceProduct.setSgstType(appliedSgstType);
+			}
 			toBeUpdatedInvoiceProduct.setDiscount(discount);
 			logger.debug("Adding the product to invoice: " + toBeUpdatedInvoiceProduct);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();

@@ -78,8 +78,8 @@
 		<thead>
 			<tr>
 				<th style="width: 20%">Invoice Number</th>
-				<th style="width: 20%">Invoice To</th>
-				<th style="width: 30%">Order Number</th>
+				<th style="width: 20%">Customer</th>
+				<th style="width: 30%">Patient</th>
 				<th style="width: 10%">Invoice Date</th>
 				<th style="width: 10%">Total Amount</th>
 				<th style="width: 10%">Actions</th>
@@ -93,7 +93,7 @@
 			<tr>
 				<td><span class="name"><%=invoice.getInvoiceNo()%></span></td>
 				<td class="hidden-phone"><%=invoice.getCustomer().getName()%></td>
-				<td class="hidden-phone"><%=invoice.getOrder().getOrderNumber()%></td>
+				<td class="hidden-phone"><%=invoice.getPatientName()%></td>
 				<td class="hidden-phone"><%=invoice.getInvoiceDate()%></td>
 				<td class="hidden-phone"><%=invoice.getTotalAmount()%></td>
 				<td class="hidden-phone">

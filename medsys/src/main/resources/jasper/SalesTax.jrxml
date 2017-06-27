@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2017-06-25T16:32:01 -->
+<!-- 2017-06-28T00:53:23 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="479"/>
@@ -421,7 +421,7 @@
 				<textFieldExpression><![CDATA[$F{totalSGSTTax}]]></textFieldExpression>
 			</textField>
 			<componentElement>
-				<reportElement x="0" y="270" width="556" height="100" forecolor="#FFFFFF" backcolor="#33CCFF" uuid="a3050caf-8abc-442e-8b3b-1693d106e4e6">
+				<reportElement positionType="Float" x="0" y="270" width="556" height="100" forecolor="#FFFFFF" backcolor="#33CCFF" uuid="a3050caf-8abc-442e-8b3b-1693d106e4e6">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 2_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 2_CH"/>
@@ -541,7 +541,7 @@
 				</jr:table>
 			</componentElement>
 			<componentElement>
-				<reportElement x="0" y="380" width="556" height="100" forecolor="#FFFFFF" backcolor="#33CCFF" uuid="bab83fb4-636d-4b4a-9f08-13f276bd0129">
+				<reportElement positionType="Float" x="0" y="380" width="556" height="100" forecolor="#FFFFFF" backcolor="#33CCFF" uuid="bab83fb4-636d-4b4a-9f08-13f276bd0129">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 2_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 2_CH"/>

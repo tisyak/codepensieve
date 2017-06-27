@@ -7,7 +7,6 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -111,7 +110,8 @@ public class Invoice {
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "invoiceId")
+	@OneToMany(mappedBy = "invoiceId")
+	@javax.persistence.OrderBy("product ASC")
 	java.util.Set<InvoiceProduct> products;
 
 	public Integer getInvoiceId() {

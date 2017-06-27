@@ -3,6 +3,7 @@ package com.medsys.product.dao;
 import java.util.List;
 
 import com.medsys.common.model.Response;
+import com.medsys.product.model.ProductGroup;
 import com.medsys.product.model.Set;
 import com.medsys.product.model.SetPdtTemplate;
  
@@ -26,11 +27,13 @@ public interface SetDAO {
 
 	public Response addProductToSet(SetPdtTemplate product);
 
-	public SetPdtTemplate getProductInSet(Integer productId);
+	public SetPdtTemplate getProductInSet(Integer setPdtId);
 
-	public Response updateProuctInSet(SetPdtTemplate product);
+	public Response updateProductInSet(SetPdtTemplate product);
 
 	public Response deleteProductFromSet(SetPdtTemplate product);
+
+	public List<ProductGroup> getAllProductGroupForSet(Integer setId);
 
 	
 	

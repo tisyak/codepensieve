@@ -86,11 +86,12 @@
 		class="table table-condensed table-striped table-bordered table-hover no-margin">
 		<thead>
 			<tr>
-				<th style="width: 20%">Order Number</th>
+				<th style="width: 10%">Order Number</th>
 				<th style="width: 20%">Order From</th>
 				<th style="width: 30%">Product Set</th>
 				<th style="width: 10%">Order Date</th>
 				<th style="width: 10%">Delivery Date</th>
+				<th style="width: 10%">Order Status</th>
 				<th style="width: 10%">Actions</th>
 			</tr>
 		</thead>
@@ -105,6 +106,7 @@
 				<td class="hidden-phone"><%=order.getSet().getSetName()%></td>
 				<td class="hidden-phone"><%=order.getOrderDate()%></td>
 				<td class="hidden-phone"><%=order.getDeliveryDate()%></td>
+				<td class="hidden-phone"><%=order.getOrderStatus().getOrderStatusDesc()%></td>
 				<td class="hidden-phone">
 					<div class="btn-group">
 						<button data-toggle="dropdown" class="btn btn-xs dropdown-toggle"
@@ -115,13 +117,14 @@
 
 						<ul class="dropdown-menu pull-right">
 							
-							<li><a href="${editOrder}?orderId=<%=order.getOrderId()%>">Edit</a></li>
+							<li><a href="${editOrder}?orderId=<%=order.getOrderId()%>">View / Edit</a></li>
 							
 							<%
 								if (order.getOrderStatus().getOrderStatusCode().equals(OrderStatusCode.ACTIVE.getCode())) {
 							%>
-							<li><a href="${deleteOrder}?orderId=<%=order.getOrderId()%>">Delete</a></li>
 							<li><a href="${orderRestoreSet}?orderId=<%=order.getOrderId()%>">Restore Set</a></li>
+							<li><a href="${deleteOrder}?orderId=<%=order.getOrderId()%>">Delete</a></li>
+							
 							<%
 								}
 							%>

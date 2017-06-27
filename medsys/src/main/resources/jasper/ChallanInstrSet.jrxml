@@ -118,15 +118,20 @@
 			<style backcolor="#F3F3F3"/>
 		</conditionalStyle>
 	</style>
-	<subDataset name="productDataSet" uuid="34c3451e-c0fd-4dfd-af18-e87f3d124d16">
-		<field name="product" class="com.medsys.product.model.ProductMaster">
-			<fieldDescription><![CDATA[product]]></fieldDescription>
+	<subDataset name="instrDataSet" uuid="34c3451e-c0fd-4dfd-af18-e87f3d124d16">
+		
+		<field name="instrId" class="java.lang.String">
+			<fieldDescription><![CDATA[instrId]]></fieldDescription>
+		</field>
+		<field name="instrDesc" class="java.lang.String">
+			<fieldDescription><![CDATA[instrDesc]]></fieldDescription>
 		</field>
 		<field name="qty" class="java.lang.Integer">
 			<fieldDescription><![CDATA[qty]]></fieldDescription>
 		</field>
+		
 	</subDataset>
-	<field name="products" class="java.util.Set"/>
+	<field name="set.instruments" class="java.util.Set"/>
 	<field name="orderId" class="java.lang.Integer"/>
 	<field name="orderNumber" class="java.lang.String"/>
 	<field name="customer.name" class="java.lang.String"/>
@@ -195,7 +200,7 @@
 				<textElement verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
-				<text><![CDATA[BILL OF SUPPLY]]></text>
+				<text><![CDATA[INSTRUMENT LOAN SET]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="400" y="143" width="140" height="20" uuid="3836ce65-eca3-4cad-a6de-b1818def0a2b"/>
@@ -243,8 +248,8 @@
 					<property name="com.jaspersoft.studio.table.style.detail" value="Table 2_TD"/>
 				</reportElement>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
-					<datasetRun subDataset="productDataSet" uuid="6cf1a54e-b05e-4520-9d52-7b5f938fd1e7">
-						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{products})]]></dataSourceExpression>
+					<datasetRun subDataset="instrDataSet" uuid="6cf1a54e-b05e-4520-9d52-7b5f938fd1e7">
+						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{set.instruments})]]></dataSourceExpression>
 					</datasetRun>
 					<jr:column width="34" uuid="b6fb1631-94ce-4964-bb26-1ed485dc4365">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
@@ -273,14 +278,14 @@
 								<textElement verticalAlignment="Middle">
 									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Product Code]]></text>
+								<text><![CDATA[Instrument Code]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 2_TD" height="25">
 							<textField>
 								<reportElement x="0" y="0" width="94" height="25" uuid="6fe490b1-4901-465b-a454-4300a17a1ef5"/>
 								<textElement verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$F{product}.getProductCode()]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{instrId}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
@@ -292,14 +297,14 @@
 								<textElement verticalAlignment="Middle">
 									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Product Desc]]></text>
+								<text><![CDATA[Instr Desc]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 2_TD" height="25">
 							<textField>
 								<reportElement x="0" y="0" width="354" height="25" uuid="6fe490b1-4901-465b-a454-4300a17a1ef5"/>
 								<textElement verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$F{product}.getProductDesc()]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{instrDesc}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>

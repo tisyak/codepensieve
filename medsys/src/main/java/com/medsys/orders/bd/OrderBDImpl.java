@@ -19,7 +19,6 @@ import com.medsys.orders.dao.OrderDAO;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.ProductInvBD;
-import com.medsys.product.model.ProductInv;
 import com.medsys.util.EpSystemError;
 
 @Service
@@ -84,7 +83,7 @@ public class OrderBDImpl implements OrderBD {
 	public List<OrderProductSet> getAllProductsInOrder(Integer orderId) {
 		logger.debug("Get All products in Order: " + orderId);
 		List<OrderProductSet> orderProducts = orderDAO.getAllProductsInOrder(orderId);
-		for (OrderProductSet product : orderProducts) {
+		/*for (OrderProductSet product : orderProducts) {
 			try {
 				ProductInv productInv = productInvBD.getProductByCode(product.getProduct().getProductCode());
 				product.setAvailableQty(productInv.getAvailableQty());
@@ -93,7 +92,7 @@ public class OrderBDImpl implements OrderBD {
 				product.setAvailableQty(0);
 			}
 
-		}
+		}*/
 
 		return orderProducts;
 
@@ -238,6 +237,11 @@ public class OrderBDImpl implements OrderBD {
 	@Override
 	public int getCountOfTotalOrdersForYear() {
 		return  orderDAO.getCountOfTotalOrdersForYear();
+	}
+
+	@Override
+	public Orders getOrderWithInstr(Integer orderId) {
+		return  orderDAO.getOrderWithInstr(orderId);
 	}
 
 	

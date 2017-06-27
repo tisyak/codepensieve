@@ -41,6 +41,8 @@ public interface OrderBD {
 
 	public int getCountOfTotalOrdersForYear();
 
+	public Orders getOrderWithInstr(Integer orderId);
+
 	
 
 	

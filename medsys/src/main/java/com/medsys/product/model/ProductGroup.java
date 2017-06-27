@@ -41,6 +41,9 @@ public class ProductGroup implements Serializable {
 	@Size(max = 250, message = "{error.field.max}")
 	@Column(name = "group_desc", length = 250)
 	private String groupDesc;
+	
+	@Column(name = "group_order", columnDefinition = "serial")
+	private Integer groupOrder;
 
 	/** The update by. */
 	@Column(name = "update_by")
@@ -74,6 +77,14 @@ public class ProductGroup implements Serializable {
 		this.groupDesc = groupDesc;
 	}
 
+	public Integer getGroupOrder() {
+		return groupOrder;
+	}
+
+	public void setGroupOrder(Integer groupOrder) {
+		this.groupOrder = groupOrder;
+	}
+
 	public String getUpdateBy() {
 		return updateBy;
 	}
@@ -91,9 +102,35 @@ public class ProductGroup implements Serializable {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((groupId == null) ? 0 : groupId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ProductGroup other = (ProductGroup) obj;
+		if (groupId == null) {
+			if (other.groupId != null)
+				return false;
+		} else if (!groupId.equals(other.groupId))
+			return false;
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return "ProductGroup [groupId=" + groupId + ", groupName=" + groupName + ", groupDesc=" + groupDesc
-				+ ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
+				+ ", groupOrder=" + groupOrder + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp
+				+ "]";
 	}
 
 }

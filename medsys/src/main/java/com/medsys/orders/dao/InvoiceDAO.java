@@ -1,6 +1,7 @@
 package com.medsys.orders.dao;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -31,20 +32,8 @@ public interface InvoiceDAO {
 	public Response updateProductInInvoice(InvoiceProduct invoiceProduct);
 
 	public Response deleteProductFromInvoice(InvoiceProduct invoiceProduct);
-	
-	public BigDecimal calculateTotalBeforeTaxForInvoice(Integer invoiceId);
-	
-	public BigDecimal calculateTotalVATForInvoice(Integer invoiceId);
-	
-	public BigDecimal calculateTotalPriceForInvoice(Integer invoiceId);
 
 	List<Invoice> searchForInvoice(Date fromDate, Date toDate);
-
-	BigDecimal calculateTotalCGSTForInvoice(Integer invoiceId);
-
-	BigDecimal calculateTotalSGSTForInvoice(Integer invoiceId);
-
-	public BigDecimal calculateTotalDiscountInInvoice(Integer invoiceId);
 
 	public BigDecimal getTotalSalesAmountInMonth();
 
@@ -67,5 +56,7 @@ public interface InvoiceDAO {
 	BigDecimal getTotalVATInDateRange(Date startDate, Date endDate);
 
 	int getCountOfCustomerBilledInDateRange(Date startDate, Date endDate);
+
+	public void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp);
 	
 }
