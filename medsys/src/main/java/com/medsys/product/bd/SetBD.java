@@ -3,6 +3,7 @@ package com.medsys.product.bd;
 import java.util.List;
 
 import com.medsys.common.model.Response;
+import com.medsys.product.model.ProductGroup;
 import com.medsys.product.model.Set;
 import com.medsys.product.model.SetPdtTemplate;
 
@@ -22,7 +23,7 @@ public interface SetBD {
 
 	public Response addProductToSet(SetPdtTemplate product);
 
-	public Response updateProuctInSet(SetPdtTemplate product);
+	public Response updateProductInSet(SetPdtTemplate product);
 
 	public Response deleteProductFromSet(SetPdtTemplate product);
 
@@ -31,6 +32,8 @@ public interface SetBD {
 	public List<SetPdtTemplate> getAllProductsInSet(Integer setId);
 
 	public List<SetPdtTemplate> getAllProductsInSetAndGroup(Integer setId, Integer groupId);
+
+	public List<ProductGroup> getAllProductGroupForSet(Integer setId);
 
 	
 

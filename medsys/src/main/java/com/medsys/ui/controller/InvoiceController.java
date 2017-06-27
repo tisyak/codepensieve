@@ -15,6 +15,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -38,10 +39,8 @@ import com.medsys.orders.bd.InvoiceBD;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.Orders;
-import com.medsys.product.bd.ProductGroupBD;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.ProductGroup;
-import com.medsys.product.model.Set;
 import com.medsys.ui.jasper.service.InvoiceReportDownloadService;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
@@ -70,9 +69,6 @@ public class InvoiceController extends SuperController {
 	private MasterDataBD masterDataBD;
 
 	@Autowired
-	private ProductGroupBD productGroupBD;
-
-	@Autowired
 	private InvoiceReportDownloadService invoiceReportDownloadService;
 
 	@RequestMapping(value = { UIActions.FORWARD_SLASH + UIActions.LIST_ALL_INVOICES }, method = RequestMethod.GET)
@@ -96,9 +92,7 @@ public class InvoiceController extends SuperController {
 	public String loadSearchInvoice(@ModelAttribute Invoice invoice, Model model) {
 
 		logger.info("IN: Invoice/loadSearchInvoice-GET");
-		if (invoice == null) {
-			invoice = new Invoice();
-		}
+		invoice = new Invoice();
 		model.addAttribute("invoice", invoice);
 		return MedsysUITiles.SEARCH_INVOICES.getTile();
 	}
@@ -126,7 +120,7 @@ public class InvoiceController extends SuperController {
 		return MedsysUITiles.SEARCH_INVOICES.getTile();
 	}
 
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_INVOICE, method = RequestMethod.GET)
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_INVOICE, method = {RequestMethod.GET,RequestMethod.POST})
 	public String loadAddInvoice(@ModelAttribute Invoice invoice, Model model) {
 
 		logger.info("IN: Invoice/loadAdd-GET");
@@ -208,6 +202,7 @@ public class InvoiceController extends SuperController {
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.EDIT_INVOICE, method = RequestMethod.GET)
+	@Transactional
 	public String loadEditInvoicePage(@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
 			Model model) {
 		logger.info("IN: Invoice/edit-GET:  invoice to query = " + invoiceId);
@@ -238,20 +233,9 @@ public class InvoiceController extends SuperController {
 		 * START Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
-
-		/** Set Listing for ADD Product Filter **/
-		List<Set> setMasterList = setBD.getAllSet();
-		String setList = "{";
-		for (Set set : setMasterList) {
-			setList += "'" + set.getSetId() + "':'" + set.getSetName() + "',";
-		}
-		setList = setList.substring(0, setList.length() - 1);
-		setList += "}";
-		// Figure out how to cache all these values
-		model.addAttribute("setList", setList);
-
+		
 		/** ProductGroup Listing for ADD Product Filter **/
-		List<ProductGroup> productGroupMasterList = productGroupBD.getAllProductGroup();
+		List<ProductGroup> productGroupMasterList = setBD.getAllProductGroupForSet(invoice.getOrder().getSet().getSetId());
 		String pdtGroupList = "{";
 		for (ProductGroup productGroup : productGroupMasterList) {
 			pdtGroupList += "'" + productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";

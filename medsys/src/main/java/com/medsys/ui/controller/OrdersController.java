@@ -79,9 +79,7 @@ public class OrdersController extends SuperController {
 	public String loadSearchOrders(@ModelAttribute Orders order, Model model) {
 
 		logger.info("IN: Order/loadSearchOrders-GET");
-		if (order == null) {
-			order = new Orders();
-		}
+		order = new Orders();
 		model.addAttribute("order", order);
 		return MedsysUITiles.SEARCH_ORDERS.getTile();
 	}
@@ -149,21 +147,6 @@ public class OrdersController extends SuperController {
 			redirectAttrs.addFlashAttribute("updatedOrderId", order.getOrderId());
 			return UIActions.REDIRECT + UIActions.EDIT_ORDER;
 		}
-	}
-
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_PRODUCT_ORDER, method = { RequestMethod.POST,
-			RequestMethod.GET })
-	public String loadAddProductsToOrder(@RequestParam(value = "updatedOrderId", required = false) Integer orderId,
-			Model model) {
-
-		if (orderId == null) {
-			logger.info("Checking in model for updatedOrderId = " + model.asMap().get("updatedOrderId"));
-			orderId = (Integer) model.asMap().get("updatedOrderId");
-		}
-
-		logger.info(" IN: Order/loadAddProductsToOrder-POST orderId : " + orderId);
-		model.addAttribute("order", ordersBD.getOrder(orderId));
-		return MedsysUITiles.ADD_PRODUCTS_IN_ORDER.getTile();
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.EDIT_ORDER, method = RequestMethod.GET)
@@ -256,8 +239,9 @@ public class OrdersController extends SuperController {
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_ORDER_REPORT)
 	public void download(@RequestParam String type, @RequestParam String token, @RequestParam Integer orderId,
+			@RequestParam String challanKind, 
 			HttpServletResponse response) {
 		logger.debug("Requesting download of type: " + type + " with token: " + token);
-		ordersReportDownloadService.download(type, token, orderId, response);
+		ordersReportDownloadService.download(type, token, orderId,challanKind, response);
 	}
 }

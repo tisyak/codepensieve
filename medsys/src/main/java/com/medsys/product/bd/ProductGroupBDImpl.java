@@ -51,5 +51,6 @@ public class ProductGroupBDImpl implements ProductGroupBD {
 	public List<ProductGroup> searchForProductGroup(ProductGroup productGroup) {
 		 return productGroupDAO.searchForProductGroup(productGroup);
 	}
+
    
 }

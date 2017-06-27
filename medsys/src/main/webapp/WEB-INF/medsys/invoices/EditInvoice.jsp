@@ -53,10 +53,10 @@
 	Invoice invoice = (Invoice) request.getAttribute("invoice");
 
 	pageContext.setAttribute("vatTypeList", request.getAttribute("vatTypeList"));
-	pageContext.setAttribute("setList", request.getAttribute("setList"));
 	pageContext.setAttribute("pdtGroupList", request.getAttribute("pdtGroupList"));
 
 	pageContext.setAttribute("invoiceId", invoice.getInvoiceId());
+	pageContext.setAttribute("setId", invoice.getOrder().getSet().getSetId());
 %>
 <script>
 		
@@ -65,7 +65,6 @@
 	//data[csrfParameter] = csrfToken;
 	
 	var vatTypeList = ${vatTypeList};
-	var setList = ${setList};
 	var pdtGroupList = ${pdtGroupList};
 	//headers[csrfHeader] = csrfToken; 
 	
@@ -87,45 +86,10 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['invoiceProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','VAT %','VAT Amount','Discount','Total', 'Actions'],
+		   	colNames:['invoiceProductId','Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','Taxable Value','Discount','VAT %','VAT Amount','Total', 'Actions'],
 		   	colModel:[
 		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
-		   		{name:'setId',index:'setId',  hidden: true,edittype:"select",editable: true, editrules: { edithidden: true }, 
-						editoptions: { 
-							value: ${setList},
-						  	dataEvents :[
-								{ type: 'change', fn: function(e) {
-									//alert("Calling filter products");
-									var thisval = $(e.target).val();
-									//alert($(e.target).attr("id"));
-									$.get('${getFilteredProductsUrl}?setId='+thisval, 
-										function(data)
-										{ 
-											//alert("data: " + data);
-											//var res = $.parseJSON(data);
-											//alert(res);
-											s = "";
-																 
-											$.each(data, function(i, item) {
-												 
-												 s += '<option value="' + data[i].productId  + '">' + data[i].productCode +
-												   '</option>';
-											})
-											
-											//s += "</select>";
-											//alert(s);
-											form = $(e.target).closest('form.FormGrid');
-                                            $("#product\\.productId", form[0]).html(s);
-											//alert($("select#product\\.productId.FormElement", form[0]).html());
-										}
-									); // end get
-									}//end func
-								} // end type
-							] // dataevents
-                
-                
-						}
-				},
+		   		
 		   		{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, 
 					editoptions: { 
 						value: ${pdtGroupList},
@@ -133,20 +97,20 @@
 								{ type: 'change', fn: function(e) {
 									//alert("Calling filter products");
 									var thisval = $(e.target).val();
-									form = $(e.target).closest('form.FormGrid');
-                                    var chosenSetId=$("#setId", form[0]).val();
+									//form = $(e.target).closest('form.FormGrid');
+                                    //var chosenSetId=$("#setId", form[0]).val();
 									//alert($(e.target).attr("id"));
-									$.get('${getFilteredProductsUrl}?groupId='+thisval+'&setId='+chosenSetId, 
+									$.get('${getFilteredProductsUrl}?groupId='+thisval+'&setId='+${setId}, 
 										function(data)
 										{ 
 											//alert("data: " + data);
-											//var res = $.parseJSON(data);
+											var res = $.parseJSON(data);
 											//alert(res);
 											s = "";
 																 
-											$.each(data, function(i, item) {
+											$.each(res, function(i, item) {
 												 
-												 s += '<option value="' + data[i].productId  + '">' + data[i].productCode +
+												 s += '<option value="' + res[i].productId  + '">' + res[i].productCode + ' - '+ res[i].productDesc + 
 												   '</option>';
 											})
 											
@@ -163,14 +127,14 @@
 					}},
 				{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
 		   			edittype:"select", editoptions: {
-											dataUrl: '${getFilteredProductsUrl}',
+											dataUrl: '${getFilteredProductsUrl}?setId='+${setId},
 											buildSelect: function(response){
-                                                                var data = $.parseJSON(response);
+                                                                var data = $.parseJSON(eval(response));
                                                                 s = "<select>";
 																 
 																$.each(data, function(i, item) {
 																	 
-																	 s += '<option value="' + data[i].productId + '">' + data[i].productCode +
+																	 s += '<option value="' + data[i].productId + '">' + data[i].productCode + ' - '+ data[i].productDesc + 
                                                                        '</option>';
 																})
                                                                 
@@ -183,13 +147,14 @@
 		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
 		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30},
 		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} },
+				{name:'totalBeforeTax',index:'totalBeforeTax',  editrules: { edithidden: true }, width:30,align:'right'},
+				{name:'discount',index:'discount', editable: true, editrules: { edithidden: true }, width:30,align:'right'},
 		   		{name:'vatType.taxId',index:'vatType.taxId', width:15,formatter: 'select',edittype:"select",editable: true, editoptions: { value: ${vatTypeList}}},
 				{name:'vatAmount',index:'vatAmount',width:20,editrules: { edithidden: true }, width:30, formatter:'currency',  
 				/*formatter: function (cellValue, option, rowObject) {
 								alert('value8: ' + rowObject.ratePerUnit + ' value9: ' + rowObject.qty + ' value10: ' + rowObject['vatType.taxId']);
 								return parseFloat(rowObject.ratePerUnit, 10) * parseFloat(rowObject.qty, 10) * parseFloat(rowObject['vatType.taxId'], 10);
 				},*/ formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
-				{name:'discount',index:'discount', editable: true, editrules: { edithidden: true }, width:30},
 		   		{name:'totalPrice',index:'totalPrice',editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
 				{
 					name: 'Actions', index: 'Actions', width: 25,  editable: false, formatter: 'actions',
@@ -217,6 +182,7 @@
 		   	autowidth: true,
 			rownumbers: true,
 		    pager: '#pager',
+		    toppager: true,
 		   	sortname: 'product.productCode',
 		    viewrecords: true,
 		    sortorder: "asc",
@@ -589,7 +555,7 @@
 		<form:errors path="patientInfo" cssClass="error" />
 		<div class="col-sm-5">
 		<div class="col-sm-1">
-		<form:checkbox path="gstInvoice" title="gstInvoice"  /> 
+		<form:checkbox path="gstInvoice" title="gstInvoice"  disabled="true"/> 
 				</div>
 				<label class="col-sm-3" for="gstInvoice">GST Invoice</label>
 		<form:errors path="gstInvoice" cssClass="error" />	
@@ -607,13 +573,13 @@
 	<div>
 
 		<c:url
-			value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_INVOICES%>"
-			var="listAllInvoiceAction" />
+			value="<%=UIActions.FORWARD_SLASH + UIActions.SEARCH_INVOICES%>"
+			var="searchInvoiceAction" />
 
 		<button type="submit" formmethod="post" class="btn btn-primary"
 			formaction="${action}">Save Invoice</button>
 		<button type="submit" formmethod="get" class="btn btn-default"
-			formaction="${listAllInvoiceAction}">Cancel</button>
+			formaction="${searchInvoiceAction}">Cancel</button>
 		<br /> <br />
 
 		<!-- <input type="button" value="Edit Products in Invoice"

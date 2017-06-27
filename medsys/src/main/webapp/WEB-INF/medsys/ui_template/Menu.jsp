@@ -68,14 +68,15 @@
 
 						<ul class="nav nav-pills nav-stacked">
 							<li><spring:url
-									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_SET%>"
-									var="manageSet" /> <a href="${manageSet}"><i
-									class="glyphicon  glyphicon-list"></i><span> Manage Set</span></a></li>
+									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_SEARCH_SETS%>"
+									var="searchSets" /> <a href="${searchSets}"><i
+									class="glyphicon  glyphicon-search"></i><span> Search
+										Sets</span></a></li>
 							<li><spring:url
-									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_IN_SET%>"
-									var="manageProductInSet" /> <a href="${manageProductInSet}"><i
-									class="glyphicon  glyphicon-list"></i><span> Manage
-										Products in a Set</span></a></li>
+									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_SET%>"
+									var="addSet" /> <a href="${addSet}"><i
+									class="glyphicon glyphicon-file"></i><span> Create
+										New Set </span></a></li>
 
 						</ul></li>
 					<li><spring:url

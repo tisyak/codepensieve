@@ -100,7 +100,7 @@ public class ProductMasterDAOImpl implements ProductMasterDAO {
 	public List<ProductMaster> searchForProduct(ProductMaster product) {
 		logger.debug("ProductMasterDAOImpl.searchForProduct() - [" + product.toString() + "]");
 		Query<ProductMaster> query = getCurrentSession()
-				.createQuery("from ProductMaster where lower(productCode) like :productCode  order by productCode asc");
+				.createQuery("from ProductMaster where lower(productCode) like :productCode  order by productCode asc",ProductMaster.class);
 
 		if (product.getProductCode() != null) {
 			query.setParameter("productCode", "%" + product.getProductCode().toLowerCase() + "%");

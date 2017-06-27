@@ -65,14 +65,13 @@ public class UIActions {
     public static final String ADD_SET="set/add";
     public static final String EDIT_SET="set/edit";
     public static final String SAVE_SET="set/save";
-    public static final String LOAD_DELETE_SET="set/loadDelete";
-    public static final String DELETE_SET="set/delete";
+    public static final String GET_SET_REPORT="set/download";
     
     public static final String LIST_ALL_PRODUCT_SET_TEMPLATE="setPdtTemplate/list";
     public static final String LOAD_SEARCH_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadSearch";
     public static final String SEARCH_PRODUCT_SET_TEMPLATE="setPdtTemplate/search";
     public static final String SEARCH_PRODUCTS_BY_SET_GRP_URL="productMaster/searchBySetGrp";
-    public static final String LOAD_ADD_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadAdd";
+    public static final String GET_PRODUCT_SET_TEMPLATE="setPdtTemplate/get";
     public static final String ADD_PRODUCT_SET_TEMPLATE="setPdtTemplate/add";
     public static final String EDIT_PRODUCT_SET_TEMPLATE="setPdtTemplate/edit";
     public static final String SAVE_PRODUCT_SET_TEMPLATE="setPdtTemplate/save";
@@ -98,10 +97,6 @@ public class UIActions {
     public static final String DELETE_PRODUCT_INVENTORY="productinv/delete";
     public static final String GET_PRODUCT_INVENTORY_REPORT="productinv/download";
     
-    
-    public static final String MANAGE_SET="set/loadManage";
-    public static final String MANAGE_PRODUCT_IN_SET="set/loadManageProducts";
-    
     public static final String LIST_ALL_ORDERS="orders/list";
     public static final String LOAD_SEARCH_ORDERS="orders/loadSearch";
     public static final String SEARCH_ORDERS="orders/search";
@@ -117,7 +112,6 @@ public class UIActions {
     public static final String LIST_ALL_PRODUCT_ORDERS="orderproduct/list";
     public static final String LOAD_SEARCH_PRODUCT_ORDERS="orderproduct/loadSearch";
     public static final String SEARCH_PRODUCT_ORDERS="orderproduct/search";
-    public static final String LOAD_ADD_PRODUCT_ORDER="orderproduct/loadAdd";
     public static final String ADD_PRODUCT_ORDER="orderproduct/add";
     public static final String GET_PRODUCT_ORDER="orderproduct/get";
     public static final String EDIT_PRODUCT_ORDER="orderproduct/edit";

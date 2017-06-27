@@ -1,5 +1,6 @@
 package com.medsys.product.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -18,25 +19,30 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "m_product")
-public class ProductMaster {
-	
+public class ProductMaster implements Serializable, Comparable<ProductMaster> {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	static Logger logger = LoggerFactory.getLogger(ProductMaster.class);
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "product_id", columnDefinition = "serial")
-	private Integer productId; 
-	
+	private Integer productId;
+
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 20, message = "{error.field.max}")
 	@Column(name = "product_code", length = 20)
 	private String productCode;
-	
+
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 250, message = "{error.field.max}")
 	@Column(name = "product_desc", length = 250)
 	private String productDesc;
-			
+
 	/** The update by. */
 	@Column(name = "update_by")
 	private String updateBy;
@@ -44,9 +50,9 @@ public class ProductMaster {
 	/** The update timestamp. */
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
-	
+
 	@ManyToOne
-	@JoinColumn(name="group_id",referencedColumnName="group_id")
+	@JoinColumn(name = "group_id", referencedColumnName = "group_id")
 	private ProductGroup group;
 
 	public Integer getProductId() {
@@ -96,6 +102,33 @@ public class ProductMaster {
 	public void setGroup(ProductGroup group) {
 		this.group = group;
 	}
+	
+	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((productCode == null) ? 0 : productCode.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ProductMaster other = (ProductMaster) obj;
+		if (productCode == null) {
+			if (other.productCode != null)
+				return false;
+		} else if (!productCode.equals(other.productCode))
+			return false;
+		return true;
+	}
 
 	@Override
 	public String toString() {
@@ -103,6 +136,11 @@ public class ProductMaster {
 				+ ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + ", group=" + group + "]";
 	}
 
-	
+	@Override
+	public int compareTo(ProductMaster aThat) {
+
+		return this.productCode.compareTo(aThat.productCode);
+		
+	}
 
 }

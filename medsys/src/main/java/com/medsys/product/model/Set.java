@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
@@ -43,6 +44,11 @@ public class Set {
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
 
+
+	@OneToMany(mappedBy = "setId")
+	@javax.persistence.OrderBy("instrDesc ASC")
+	java.util.SortedSet<SetInstrument> instruments;
+	
 	public Integer getSetId() {
 		return setId;
 	}
@@ -65,6 +71,14 @@ public class Set {
 
 	public void setSetDesc(String setDesc) {
 		this.setDesc = setDesc;
+	}
+
+	public java.util.SortedSet<SetInstrument> getInstruments() {
+		return instruments;
+	}
+
+	public void setInstruments(java.util.SortedSet<SetInstrument> instruments) {
+		this.instruments = instruments;
 	}
 
 	public String getUpdateBy() {

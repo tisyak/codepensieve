@@ -45,12 +45,10 @@ public class Customer implements Serializable{
 	@Column(name = "name", length = 100)
 	private String name;
 			
-	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 100, message = "{error.field.max}")
 	@Column(name = "email", length = 100)
 	private String email;
 	
-	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 10, message = "{error.field.max}")
 	@Column(name = "mobile_no", length = 10)
 	private String mobileNo;
@@ -74,7 +72,7 @@ public class Customer implements Serializable{
 	@Column(name = "gstin", length = 100)
 	private String gstin;
 	
-	 @OneToMany( mappedBy = "customerId", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
+	 @OneToMany( fetch=FetchType.EAGER, mappedBy = "customerId",cascade = CascadeType.REFRESH)
 	 List<CustomerContact> contacts;
 
 	

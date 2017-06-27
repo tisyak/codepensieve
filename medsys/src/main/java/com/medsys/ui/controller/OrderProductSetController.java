@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
+import com.medsys.master.model.OrderStatusCode;
 import com.medsys.orders.bd.OrderBD;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.product.bd.ProductMasterBD;
@@ -55,7 +56,8 @@ public class OrderProductSetController {
 			@RequestParam(value = "sidx", required = false) String sidx,
 			@RequestParam(value = "sord", required = false) String sord,
 			@RequestParam(value = "setId", required = false) Integer setId,
-			@RequestParam(value = "orderId", required = false) Integer orderId) {
+			@RequestParam(value = "orderId", required = false) Integer orderId,
+			@RequestParam(value = "orderStatusCode", required = false) String orderStatusCode) {
 
 		// Pageable pageRequest = new PageRequest(page-1, rows);
 		logger.debug("list all products / search in order : setId: " + setId + " ,orderID: " + orderId);
@@ -69,8 +71,14 @@ public class OrderProductSetController {
 
 		logger.debug("Products in order: " + orderProducts);
 
-		if (orderProducts == null || orderProducts.size() == 0) {
+		logger.debug("size: " + orderProducts.size() + "orderStatusCode: " + orderStatusCode);
+		logger.debug(
+				"(orderProducts == null || orderProducts.size() == 0) && OrderStatusCode.ACTIVE.getCode().equals(orderStatusCode) "
+						+ ((orderProducts == null || orderProducts.size() == 0)
+								&& OrderStatusCode.ACTIVE.getCode().equals(orderStatusCode)));
 
+		if ((orderProducts == null || orderProducts.size() == 0)
+				&& OrderStatusCode.ACTIVE.getCode().equals(orderStatusCode)) {
 			List<SetPdtTemplate> setProducts = setBD.getAllProductsInSet(setId);
 
 			JqgridResponse<SetPdtTemplate> response = new JqgridResponse<SetPdtTemplate>();
@@ -96,7 +104,9 @@ public class OrderProductSetController {
 			response.setTotal(Integer.valueOf(1).toString());
 			response.setPage(Integer.valueOf(1).toString());
 
-			logger.debug("Products already exist in order. Loading response from Order Product List: " + response);
+			logger.debug(
+					"Products already exist in order OR order status is NOT ACTIVE. Loading response from Order Product List: "
+							+ response);
 
 			return response;
 		}
@@ -147,8 +157,7 @@ public class OrderProductSetController {
 	@RequestMapping(value = UIActions.ADD_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response create(@RequestParam(value = "orderId", required = true) Integer orderId,
 			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam(value = "qty", required = true) Integer qty,
-			HttpServletResponse httpServletResponse) {
+			@RequestParam(value = "qty", required = true) Integer qty, HttpServletResponse httpServletResponse) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
 		OrderProductSet newOrderProductSet = new OrderProductSet(orderId, null, product, qty);
@@ -158,7 +167,7 @@ public class OrderProductSetController {
 		newOrderProductSet.setUpdateBy(auth.getName());
 		newOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		Response response = orderBD.addProductToOrder(newOrderProductSet);
-		if(!response.isStatus()){
+		if (!response.isStatus()) {
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return response;
@@ -167,8 +176,7 @@ public class OrderProductSetController {
 	@RequestMapping(value = UIActions.EDIT_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response update(@RequestParam String id,
 			@RequestParam(value = "orderId", required = true) Integer orderId,
-			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam Integer qty,
+			@RequestParam(value = "product.productCode", required = true) String productCode, @RequestParam Integer qty,
 			HttpServletResponse httpServletResponse) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
@@ -185,7 +193,7 @@ public class OrderProductSetController {
 		toBeUpdatedOrderProductSet.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		logger.debug("Updating the product in order: " + toBeUpdatedOrderProductSet);
 		Response response = orderBD.updateProductInOrder(toBeUpdatedOrderProductSet);
-		if(!response.isStatus()){
+		if (!response.isStatus()) {
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return response;
@@ -193,13 +201,12 @@ public class OrderProductSetController {
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_ORDER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer id,
-			HttpServletResponse httpServletResponse) {
+	public @ResponseBody Response delete(@RequestParam Integer id, HttpServletResponse httpServletResponse) {
 
 		OrderProductSet orderProductSet = orderBD.getProductInOrder(id);
 		logger.debug("Deleting the product in order: " + orderProductSet);
 		Response response = orderBD.deleteProductFromOrder(orderProductSet);
-		if(!response.isStatus()){
+		if (!response.isStatus()) {
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return response;

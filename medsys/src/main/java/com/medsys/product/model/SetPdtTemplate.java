@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,8 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
+import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +32,11 @@ public class SetPdtTemplate implements Serializable {
 	@Column(name = "set_pdt_id", columnDefinition = "serial")
 	private Integer setPdtId;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	@JoinColumn(name = "set_id", referencedColumnName = "set_id")
 	private Set parentSet;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne
 	@JoinColumn(name = "product_id", referencedColumnName = "product_id")
 	@OrderBy("productCode")
 	private ProductMaster product;
@@ -45,7 +44,7 @@ public class SetPdtTemplate implements Serializable {
 	@Column(name = "qty")
 	private Integer qty;
 
-	@Transient
+	@Formula("(select pdtInv.available_qty from product_inv pdtInv where pdtInv.product_id= product_id)")
 	private Integer availableQty;
 
 	/** The update by. */
@@ -55,6 +54,19 @@ public class SetPdtTemplate implements Serializable {
 	/** The update timestamp. */
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
+	
+
+	public SetPdtTemplate() {
+	}
+
+	public SetPdtTemplate(Set set,Integer setPdtId,ProductMaster product, Integer qty) {
+		this.parentSet = set;
+		this.setPdtId =  setPdtId;
+		this.product = product;
+		this.qty = qty;
+
+	}
+
 
 	public Integer getSetPdtId() {
 		return setPdtId;

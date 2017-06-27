@@ -17,7 +17,8 @@ public interface ProductGroupDAO {
  
     public List<ProductGroup> getAllProductGroup();
 
-	public List<ProductGroup> searchForProductGroup(ProductGroup productGroup);	
+	public List<ProductGroup> searchForProductGroup(ProductGroup productGroup);
+
 	
 	
 }

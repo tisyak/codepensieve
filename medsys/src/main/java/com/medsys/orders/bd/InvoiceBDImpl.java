@@ -8,7 +8,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,6 @@ import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.InvoiceProduct;
 import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.ProductInvBD;
-import com.medsys.product.model.ProductInv;
 import com.medsys.util.EpSystemError;
 
 @Service
@@ -90,17 +88,6 @@ public class InvoiceBDImpl implements InvoiceBD {
 	public List<InvoiceProduct> getAllProductsInInvoice(Integer invoiceId) {
 		logger.info("Get All products in Invoice: " + invoiceId);
 		List<InvoiceProduct> invoiceProducts = invoiceDAO.getAllProductsInInvoice(invoiceId);
-		for (InvoiceProduct product : invoiceProducts) {
-			try {
-				ProductInv productInv = productInvBD.getProductByCode(product.getProduct().getProductCode());
-				product.setAvailableQty(productInv.getAvailableQty());
-			} catch (EmptyResultDataAccessException e) {
-				logger.debug("Product " + product.getProduct().getProductCode() + " not found in Inventory");
-				product.setAvailableQty(0);
-			}
-
-		}
-
 		return invoiceProducts;
 
 	}
@@ -178,11 +165,11 @@ public class InvoiceBDImpl implements InvoiceBD {
 		BigDecimal totalAmountBeforeTax = invoiceProduct.getRatePerUnit()
 				.multiply(new BigDecimal(invoiceProduct.getQty()));
 		invoiceProduct.setTotalBeforeTax(totalAmountBeforeTax);
-
-		BigDecimal totalAmountAfterTax = totalAmountBeforeTax;
-		logger.debug("totalAmountAfterTax: " + totalAmountAfterTax);
+		logger.debug("discount " + invoiceProduct.getDiscount());
+		totalAmountBeforeTax = totalAmountBeforeTax.subtract(invoiceProduct.getDiscount());;
+		logger.debug("totalAmountBeforeTax after discount: " + totalAmountBeforeTax);
 		Invoice invoice = this.getInvoice(invoiceProduct.getInvoiceId());
-
+		BigDecimal totalAmountAfterTax = null;
 		if (!invoice.isGstInvoice()) {
 			/* VAT multiplier */
 			BigDecimal vatPercentage = new BigDecimal(invoiceProduct.getVatType().getTax_percentage());
@@ -191,7 +178,7 @@ public class InvoiceBDImpl implements InvoiceBD {
 			BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier);
 			logger.debug("effectiveVat " + effectiveVat);
 			invoiceProduct.setVatAmount(effectiveVat);
-			totalAmountAfterTax = totalAmountAfterTax.add(effectiveVat);
+			totalAmountAfterTax = totalAmountBeforeTax.add(effectiveVat);
 			logger.debug("totalAmountAfter VAT Tax " + totalAmountAfterTax);
 			/* End Of VAT multiplier */
 		} else {
@@ -202,7 +189,7 @@ public class InvoiceBDImpl implements InvoiceBD {
 			BigDecimal effectiveCgst = totalAmountBeforeTax.multiply(cgstPercentageMultiplier);
 			logger.debug("effectiveCgst " + effectiveCgst);
 			invoiceProduct.setCgstAmount(effectiveCgst);
-			totalAmountAfterTax = totalAmountAfterTax.add(effectiveCgst);
+			totalAmountAfterTax = totalAmountBeforeTax.add(effectiveCgst);
 			logger.debug("totalAmountAfter CGST Tax " + totalAmountAfterTax);
 
 			BigDecimal sgstPercentage = new BigDecimal(invoiceProduct.getSgstType().getTax_percentage());
@@ -215,8 +202,8 @@ public class InvoiceBDImpl implements InvoiceBD {
 			logger.debug("totalAmountAfter SGST Tax " + totalAmountAfterTax);
 			/* End Of GST multiplier */
 		}
-		logger.debug("discount " + invoiceProduct.getDiscount());
-		BigDecimal totalPrice = totalAmountAfterTax.subtract(invoiceProduct.getDiscount());
+		
+		BigDecimal totalPrice = totalAmountAfterTax;
 		logger.debug("totalPrice after discount " + totalPrice);
 		invoiceProduct.setTotalPrice(totalPrice);
 
@@ -224,30 +211,10 @@ public class InvoiceBDImpl implements InvoiceBD {
 	}
 
 	private void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp) {
+		
+		logger.debug("updateEffectiveTotalsInInvoice: " + invoiceId);
 
-		Invoice invoice = invoiceDAO.getInvoice(invoiceId);
-
-		BigDecimal totalBeforeTax = invoiceDAO.calculateTotalBeforeTaxForInvoice(invoiceId);
-		if (!invoice.isGstInvoice()) {
-			BigDecimal totalVATAmount = invoiceDAO.calculateTotalVATForInvoice(invoiceId);
-			invoice.setTotalVat(totalVATAmount);
-		} else {
-			BigDecimal totalCGSTAmount = invoiceDAO.calculateTotalCGSTForInvoice(invoiceId);
-			invoice.setTotalCgst(totalCGSTAmount);
-			BigDecimal totalSGSTAmount = invoiceDAO.calculateTotalSGSTForInvoice(invoiceId);
-			invoice.setTotalSgst(totalSGSTAmount);
-		}
-		BigDecimal totalDiscount = invoiceDAO.calculateTotalDiscountInInvoice(invoiceId);
-		BigDecimal totalPrice = invoiceDAO.calculateTotalPriceForInvoice(invoiceId);
-
-		invoice.setTotalAmountBeforeTax(totalBeforeTax);
-		invoice.setTotalDiscount(totalDiscount);
-		invoice.setTotalAmount(totalPrice);
-		invoice.setUpdateBy(updateBy);
-		invoice.setUpdateTimestamp(updateTimestamp);
-
-		logger.debug("Updating invoice with changed TotalVAT and TotalPrice: " + invoice);
-		invoiceDAO.updateInvoice(invoice);
+		invoiceDAO.updateEffectiveTotalsInInvoice(invoiceId, updateBy, updateTimestamp);
 
 	}
 

@@ -13,9 +13,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +24,7 @@ import com.medsys.product.model.ProductMaster;
 
 @Entity
 @Table(name = "invoice_product")
-public class InvoiceProduct  implements Serializable  {
+public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct>  {
 
 	/**
 	 * 
@@ -85,7 +85,7 @@ public class InvoiceProduct  implements Serializable  {
 	@Column(name = "discount",precision = 15, scale=0)
 	private BigDecimal discount;
 	
-	@Transient
+	@Formula("(select pdtInv.available_qty from product_inv pdtInv where pdtInv.product_id= product_id)")
 	private Integer availableQty; 
 	
 	
@@ -302,6 +302,11 @@ public class InvoiceProduct  implements Serializable  {
 				+ cgstAmount + ", cgstType=" + cgstType + ", sgstAmount=" + sgstAmount + ", sgstType=" + sgstType
 				+ ", discount=" + discount + ", availableQty=" + availableQty + ", updateBy=" + updateBy
 				+ ", updateTimestamp=" + updateTimestamp + "]";
+	}
+
+	@Override
+	public int compareTo(InvoiceProduct aThat) {
+		return this.product.getProductCode().compareTo(aThat.product.getProductCode());
 	}
 
 }

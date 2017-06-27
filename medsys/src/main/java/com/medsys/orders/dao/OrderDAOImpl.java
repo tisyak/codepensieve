@@ -61,11 +61,10 @@ public class OrderDAOImpl implements OrderDAO {
 		return new Response(true, null);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Orders getOrder(Integer orderId) {
 		logger.debug("OrderDAOImpl.getOrder() - [" + orderId + "]");
-		Query<Orders> query = getCurrentSession().createQuery("from Orders where orderId = " + orderId + "");
+		Query<Orders> query = getCurrentSession().createQuery("from Orders ord LEFT JOIN FETCH ord.products where ord.orderId = " + orderId,Orders.class);
 		// query.setParameter("orderId", orderId.toString());
 
 		logger.debug(query.toString());
@@ -148,18 +147,21 @@ public class OrderDAOImpl implements OrderDAO {
 				Orders.class);
 
 		if (order.getOrderNumber() != null) {
+			logger.debug("setting orderNumber in search ");
 			query.setParameter("orderNo", "%" + order.getOrderNumber().toLowerCase() + "%");
 		} else {
 			query.setParameter("orderNo", order.getOrderNumber());
 		}
 
 		if (order.getOrderDate() != null) {
+			logger.debug("setting orderDate in search ");
 			query.setParameter("orderDate", order.getOrderDate(), TemporalType.DATE);
 		} else {
 			query.setParameter("orderDate", null);
 		}
 
 		if (order.getCustomer() != null && order.getCustomer().getName() != null) {
+			logger.debug("setting custName in search ");
 			query.setParameter("custName", "%" + order.getCustomer().getName().toLowerCase() + "%");
 		} else {
 			query.setParameter("custName", null);
@@ -181,8 +183,7 @@ public class OrderDAOImpl implements OrderDAO {
 
 	@Override
 	public List<Orders> searchForOrdersInDateRange(Date startDate, Date endDate) {
-		logger.debug(
-				"OrderDAOImpl.searchForOrdersInDateRange() for the Year - [" + startDate + " - " + endDate + "]");
+		logger.debug("OrderDAOImpl.searchForOrdersInDateRange() for the Year - [" + startDate + " - " + endDate + "]");
 
 		Query<Orders> searchQuery = getCurrentSession()
 				.createQuery("from Orders WHERE orderDate BETWEEN :stDate AND :edDate ", Orders.class);
@@ -304,6 +305,26 @@ public class OrderDAOImpl implements OrderDAO {
 
 		return countQuery.getSingleResult().intValue();
 
+	}
+
+	@Override
+	public Orders getOrderWithInstr(Integer orderId) {
+		logger.debug("OrderDAOImpl.getOrder() - [" + orderId + "]");
+		Query<Orders> query = getCurrentSession().createQuery("from Orders ord JOIN FETCH  ord.set.instruments where ord.orderId = " + orderId,Orders.class);
+		// query.setParameter("orderId", orderId.toString());
+
+		logger.debug(query.toString());
+		if (query.getResultList().size() == 0) {
+			logger.debug("No order found.");
+			throw new EmptyResultDataAccessException("Order [" + orderId + "] not found", 1);
+		} else {
+
+			logger.debug("Orders List Size: " + query.getResultList().size());
+			List<Orders> list = (List<Orders>) query.getResultList();
+			Orders order = (Orders) list.get(0);
+
+			return order;
+		}
 	}
 
 }

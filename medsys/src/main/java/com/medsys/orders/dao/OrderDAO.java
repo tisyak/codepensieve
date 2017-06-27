@@ -41,4 +41,6 @@ public interface OrderDAO {
 
 	int getCountOfTotalOrdersInDateRange(Date startDate, Date endDate);
 
+	public Orders getOrderWithInstr(Integer orderId);
+
 }

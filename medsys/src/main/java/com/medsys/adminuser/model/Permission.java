@@ -32,14 +32,7 @@ public class Permission implements GrantedAuthority {
     @Size(max = 50, message = "{permission.permissionname.role.max}")
     @Column(name = "permission", length = 50)
     private String permissionname;
-     
-   /* @OneToMany(fetch = FetchType.EAGER)  
-    @JoinTable(name = "role_permissions",   
-        joinColumns        = {@JoinColumn(name = "perm_id", referencedColumnName = "permission_id")},  
-        inverseJoinColumns = {@JoinColumn(name = "role_id")}  
-    )  
-    private Set<Role> permRoles;*/
- 
+   
     
     public String getPermissionname() {
         return permissionname;

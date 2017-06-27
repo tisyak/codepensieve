@@ -12,6 +12,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import com.medsys.common.model.Response;
+import com.medsys.product.model.ProductGroup;
 import com.medsys.product.model.Set;
 import com.medsys.product.model.SetPdtTemplate;
 import com.medsys.util.EpSystemError;
@@ -147,17 +148,17 @@ public class SetDAOImpl implements SetDAO {
 	}
 
 	@Override
-	public SetPdtTemplate getProductInSet(Integer productId) {
-		logger.debug("Getting product having productId: " + productId);
+	public SetPdtTemplate getProductInSet(Integer setPdtId) {
+		logger.debug("Getting product having productId: " + setPdtId);
 
 		Query<SetPdtTemplate> query = getCurrentSession()
-				.createQuery("from SetPdtTemplate where productId = " + productId.toString() + "",SetPdtTemplate.class);
+				.createQuery("from SetPdtTemplate where setPdtId = " + setPdtId.toString() + "",SetPdtTemplate.class);
 		// query.setParameter("setId", setId.toString());
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
 			logger.debug("Product not found in set.");
-			throw new EmptyResultDataAccessException("SetPdtTemplate [" + productId + "] not found", 1);
+			throw new EmptyResultDataAccessException("SetPdtTemplate [" + setPdtId + "] not found", 1);
 		} else {
 
 			logger.debug("SetPdtTemplate List Size: " + query.getResultList().size());
@@ -168,7 +169,7 @@ public class SetDAOImpl implements SetDAO {
 	}
 
 	@Override
-	public Response updateProuctInSet(SetPdtTemplate product) {
+	public Response updateProductInSet(SetPdtTemplate product) {
 		SetPdtTemplate productToUpdate = getProductInSet(product.getSetPdtId());
 		getCurrentSession().update(productToUpdate);
 		// TODO: change return appropriately
@@ -186,6 +187,16 @@ public class SetDAOImpl implements SetDAO {
 
 		return new Response(false, EpSystemError.NO_RECORD_FOUND);
 
+	}
+
+	@Override
+	public List<ProductGroup> getAllProductGroupForSet(Integer setId) {
+		logger.debug("Fetching all products in Set: " + setId);
+
+		List<ProductGroup> pdtList = getCurrentSession()
+				.createQuery("select distinct spt.product.group from SetPdtTemplate spt WHERE set_id = " + setId + " order by spt.product.group.groupName", ProductGroup.class).getResultList();
+		logger.debug("pdtList: " + pdtList);
+		return pdtList;
 	}
 
 }

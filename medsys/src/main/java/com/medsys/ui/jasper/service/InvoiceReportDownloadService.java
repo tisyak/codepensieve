@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.orders.bd.InvoiceBD;
 import com.medsys.orders.model.Invoice;
@@ -46,6 +47,7 @@ public class InvoiceReportDownloadService {
 	@Autowired
 	private InvoiceBD invoiceBD;
 
+	@Transactional
 	public void download(String type, String token, Integer invoiceId, String billVersion, HttpServletResponse response) {
 
 		try {

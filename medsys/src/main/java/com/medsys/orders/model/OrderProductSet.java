@@ -11,9 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Formula;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ import com.medsys.product.model.ProductMaster;
 
 @Entity
 @Table(name = "order_product_set")
-public class OrderProductSet implements Serializable {
+public class OrderProductSet implements Serializable,Comparable<OrderProductSet> {
 	
 	/**
 	 * 
@@ -47,7 +47,7 @@ public class OrderProductSet implements Serializable {
 	@Column(name = "qty")
 	private Integer qty; 
 	
-	@Transient
+	@Formula("(select pdtInv.available_qty from product_inv pdtInv where pdtInv.product_id= product_id)")
 	private Integer availableQty; 
 	
 	/** The update by. */
@@ -171,7 +171,10 @@ public class OrderProductSet implements Serializable {
 		return "OrderProductSet [orderProductSetId=" + orderProductSetId + ", order=" + orderId + ", product="
 				+ product + ", qty=" + qty + ", availableQty=" + availableQty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
-	
-	
+
+	@Override
+	public int compareTo(OrderProductSet aThat) {
+		return this.product.getProductCode().compareTo(aThat.product.getProductCode());
+	}
 
 }

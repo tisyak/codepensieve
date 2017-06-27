@@ -53,19 +53,18 @@ public class PermissionDAOImpl implements PermissionDAO {
         }
     }
  
-    @SuppressWarnings("unchecked")
     @Override
     public Permission getPermission(String usersPermission) throws EmptyResultDataAccessException {
         logger.debug("PermissionDAOImpl.getPermission() - [" + usersPermission + "]");
-        Query query = getCurrentSession().createQuery("from Permission where permissionname = :usersPermission ");
-        query.setString("usersPermission", usersPermission);
+        Query <Permission>query = getCurrentSession().createQuery("from Permission where permissionname = :usersPermission ",Permission.class);
+        query.setParameter("usersPermission", usersPermission);
          
         logger.debug(query.toString());
-        if (query.list().size() == 0 ) {
+        if (query.getResultList().size() == 0 ) {
             throw new EmptyResultDataAccessException("Permission [" + usersPermission + "] not found",1);
         } else {
-            logger.debug("Permission List Size: " + query.list().size());
-            List<Permission> list = (List<Permission>)query.list();
+            logger.debug("Permission List Size: " + query.getResultList().size());
+            List<Permission> list = (List<Permission>)query.getResultList();
             Permission permObject = (Permission) list.get(0);
  
             return permObject;
@@ -91,6 +90,6 @@ public class PermissionDAOImpl implements PermissionDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Permission> getPermissions() {
-        return getCurrentSession().createQuery("from Permission").list();
+        return getCurrentSession().createQuery("from Permission").getResultList();
     }
 }
