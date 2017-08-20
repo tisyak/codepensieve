@@ -112,11 +112,7 @@
 				title="patientInfo" />
 		</div>
 		<form:errors path="patientInfo" cssClass="error" />
-		<div class="col-sm-1">
-		<form:checkbox path="gstInvoice" title="gstInvoice"  /> 
-				</div>
-				<label class="col-sm-2" for="gstInvoice">GST Invoice</label>
-		<form:errors path="gstInvoice" cssClass="error" />	
+		
 		<div class="col-sm-1">
 		<form:checkbox path="billToPatient" title="billToPatient"  /> 
 				</div>
@@ -136,7 +132,7 @@
 		<button type="submit" formmethod="post" class="btn btn-primary"
 			formaction="${action}">Save and Add Products to Invoice </button>
 		<button type="submit" formmethod="get" class="btn btn-default"
-			formaction="${listAllInvoiceAction}">Cancel</button>
+			formaction="${listAllInvoiceAction}">Cancel / Back</button>
 	
 	</div>
 </form:form>

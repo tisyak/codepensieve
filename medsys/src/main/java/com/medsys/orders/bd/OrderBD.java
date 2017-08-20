@@ -25,6 +25,8 @@ public interface OrderBD {
 	
 	public List<Orders> searchForOrdersInDateRange(Date startDate, Date endDate);
 	
+	public List<Orders> searchForOrdersBeforeGivenDate(Date givenDate);
+	
 	public List<OrderProductSet> getAllProductsInOrder(Integer orderId);
 
 	public Response addProductToOrder(OrderProductSet newOrderProductSet);

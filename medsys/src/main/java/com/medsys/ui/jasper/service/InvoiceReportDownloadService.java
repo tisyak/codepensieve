@@ -48,7 +48,8 @@ public class InvoiceReportDownloadService {
 	private InvoiceBD invoiceBD;
 
 	@Transactional
-	public void download(String type, String token, Integer invoiceId, String billVersion, HttpServletResponse response) {
+	public void download(String type, String token, Integer invoiceId, String billVersion,
+			HttpServletResponse response) {
 
 		try {
 			// 1. Add report parameters
@@ -60,12 +61,8 @@ public class InvoiceReportDownloadService {
 			logger.debug("Setting billVersion as " + billVersion);
 			invoice.setBillVersion(billVersion);
 			// 2. Retrieve template
-			InputStream reportStream = this.getClass().getResourceAsStream(INVOICE_TEMPLATE);
+			InputStream reportStream = this.getClass().getResourceAsStream(INVOICE_GST_TEMPLATE);
 			logger.debug("Obtaining the .jrxml inputstream.");
-			
-			if (invoice.isGstInvoice()) {
-				reportStream = this.getClass().getResourceAsStream(INVOICE_GST_TEMPLATE);
-			}
 
 			// 3. Convert template to JasperDesign
 			JasperDesign jd = JRXmlLoader.load(reportStream);
@@ -119,14 +116,14 @@ public class InvoiceReportDownloadService {
 			throw new RuntimeException(e);
 		}
 	}
-	
 
 	/**
 	 * Returns a data source that's wrapped within {@link JRDataSource}
+	 * 
 	 * @return
 	 */
 	private JRDataSource getInvoiceData(Invoice invoice) {
-		
+
 		List<Invoice> lstInvoice = new ArrayList<Invoice>();
 		lstInvoice.add(invoice);
 		// Return wrapped collection

@@ -16,24 +16,24 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "m_po_status")
-public class POStatusMaster extends MasterData  {
+public class PurchaseOrderStatusMaster extends MasterData  {
 	
-	static Logger logger = LoggerFactory.getLogger(POStatusMaster.class);
+	static Logger logger = LoggerFactory.getLogger(PurchaseOrderStatusMaster.class);
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "po_status_id", columnDefinition = "serial")
-	private Integer poStatusId; 
+	private Integer purchaseOrderStatusId; 
 	
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 20, message = "{error.field.max}")
 	@Column(name = "po_status_code", length = 5)
-	private String poStatusCode;
+	private String purchaseOrderStatusCode;
 	
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 250, message = "{error.field.max}")
 	@Column(name = "po_status_desc", length = 250)
-	private String poStatusDesc;
+	private String purchaseOrderStatusDesc;
 			
 	/** The update by. */
 	@Column(name = "update_by")
@@ -43,28 +43,28 @@ public class POStatusMaster extends MasterData  {
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
 
-	public Integer getPOStatusId() {
-		return poStatusId;
+	public Integer getPurchaseOrderStatusId() {
+		return purchaseOrderStatusId;
 	}
 
-	public void setPOStatusId(Integer poStatusId) {
-		this.poStatusId = poStatusId;
+	public void setPurchaseOrderStatusId(Integer purchaseOrderStatusId) {
+		this.purchaseOrderStatusId = purchaseOrderStatusId;
 	}
 
-	public String getPOStatusCode() {
-		return poStatusCode;
+	public String getPurchaseOrderStatusCode() {
+		return purchaseOrderStatusCode;
 	}
 
-	public void setPOStatusCode(String poStatusCode) {
-		this.poStatusCode = poStatusCode;
+	public void setPurchaseOrderStatusCode(String purchaseOrderStatusCode) {
+		this.purchaseOrderStatusCode = purchaseOrderStatusCode;
 	}
 
-	public String getPOStatusDesc() {
-		return poStatusDesc;
+	public String getPurchaseOrderStatusDesc() {
+		return purchaseOrderStatusDesc;
 	}
 
-	public void setPOStatusDesc(String poStatusDesc) {
-		this.poStatusDesc = poStatusDesc;
+	public void setPurchaseOrderStatusDesc(String purchaseOrderStatusDesc) {
+		this.purchaseOrderStatusDesc = purchaseOrderStatusDesc;
 	}
 
 	public String getUpdateBy() {
@@ -87,7 +87,7 @@ public class POStatusMaster extends MasterData  {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((poStatusCode == null) ? 0 : poStatusCode.hashCode());
+		result = prime * result + ((purchaseOrderStatusCode == null) ? 0 : purchaseOrderStatusCode.hashCode());
 		return result;
 	}
 
@@ -99,30 +99,30 @@ public class POStatusMaster extends MasterData  {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		POStatusMaster other = (POStatusMaster) obj;
-		if (poStatusCode == null) {
-			if (other.poStatusCode != null)
+		PurchaseOrderStatusMaster other = (PurchaseOrderStatusMaster) obj;
+		if (purchaseOrderStatusCode == null) {
+			if (other.purchaseOrderStatusCode != null)
 				return false;
-		} else if (!poStatusCode.equals(other.poStatusCode))
+		} else if (!purchaseOrderStatusCode.equals(other.purchaseOrderStatusCode))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "POStatusMaster [poStatusId=" + poStatusId + ", poStatusCode=" + poStatusCode
-				+ ", poStatusDesc=" + poStatusDesc + ", updateBy=" + updateBy + ", updateTimestamp="
+		return "PurchaseOrderStatusMaster [purchaseOrderStatusId=" + purchaseOrderStatusId + ", purchaseOrderStatusCode=" + purchaseOrderStatusCode
+				+ ", purchaseOrderStatusDesc=" + purchaseOrderStatusDesc + ", updateBy=" + updateBy + ", updateTimestamp="
 				+ updateTimestamp + "]";
 	}
 
 	@Override
 	public Integer getUniqueId() {
-		return this.getPOStatusId();
+		return this.getPurchaseOrderStatusId();
 	}
 
 	@Override
 	public String getKeyColumnName() {
-		return "poStatusCode";
+		return "purchaseOrderStatusCode";
 	}
 
 }

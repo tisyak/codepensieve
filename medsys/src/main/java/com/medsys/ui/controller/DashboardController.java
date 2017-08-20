@@ -72,7 +72,7 @@ public class DashboardController extends SuperController {
 			orderCountForYear = orderBD.getCountOfTotalOrdersForYear();
 			salesInYear = invoiceBD.getTotalSalesAmountInYear();
 			invoiceCountForYear = invoiceBD.getCountOfTotalInvoicesForYear();
-			VATForYear = invoiceBD.getTotalVATInYear();
+			VATForYear = invoiceBD.getTotalGSTInYear();
 			countOfCustomersBilledThisYear = invoiceBD.getCountOfCustomerBilledForYear();
 		} catch (Exception e) {
 			logger.debug("Exception in summary: " + e.getMessage());

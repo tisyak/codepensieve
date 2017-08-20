@@ -39,7 +39,8 @@
 <c:url value="/${UIActions.EDIT_PRODUCT_INVENTORY}" var="saveUrl" />
 <c:url value="/productinv/update" var="editUrl" />
 <c:url value="/${UIActions.DELETE_PRODUCT_INVENTORY}" var="deleteUrl" />
-
+<c:url value="/${UIActions.SEARCH_PRODUCT_GRP_BY_SET_URL}"
+	var="getFilteredProductGroupsUrl" />
 <c:url value="/${UIActions.SEARCH_PRODUCTS_BY_SET_GRP_URL}" var="getFilteredProductsUrl" />
 
 
@@ -53,6 +54,7 @@
 
 	pageContext.setAttribute("setList", request.getAttribute("setList"));
 	pageContext.setAttribute("pdtGroupList", request.getAttribute("pdtGroupList"));
+	pageContext.setAttribute("pdtList", request.getAttribute("pdtList"));
 
 %>
 <script>
@@ -63,6 +65,7 @@
 	
 	var setList = ${setList};
 	var pdtGroupList = ${pdtGroupList};
+	var pdtList = ${pdtList};
 	//headers[csrfHeader] = csrfToken; 
 	
 	//alert("data for ajax submit: " + data);
@@ -81,44 +84,44 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['productInvProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Org Qty','Engd Qty','Sold Qty','Dscrd Qty','Avlbl Qty','Quantity to be added','Quantity to be discarded','Price','MRP', 'Actions'],
+		   	colNames:['productInvProductId','Set', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Org Qty','Engd Qty','Sold Qty','Dscrd Qty','Avlbl Qty','ADD Qty','Remove Qty','Price','MRP', 'Actions'],
 		   	colModel:[
 		   		{name:'productInvId',index:'id',  hidden:true},
 		   		{name:'setId',index:'setId',  hidden: true,edittype:"select",editable: true, editrules: { edithidden: true }, 
 						editoptions: { 
-							value: ${setList},
-						  	dataEvents :[
-								{ type: 'change', fn: function(e) {
-									//alert("Calling filter products");
-									var thisval = $(e.target).val();
-									//alert($(e.target).attr("id"));
-									$.get('${getFilteredProductsUrl}?setId='+thisval, 
-										function(data)
-										{ 
-											//alert("data: " + data);
-											//var res = $.parseJSON(data);
-											//alert(res);
-											s = "";
-																 
-											$.each(data, function(i, item) {
-												 
-												 s += '<option value="' + data[i].productId  + '">' + data[i].productCode +
-												   '</option>';
-											})
-											
-											//s += "</select>";
-											//alert(s);
-											form = $(e.target).closest('form.FormGrid');
-                                            $("#product\\.productId", form[0]).html(s);
-											//alert($("select#product\\.productId.FormElement", form[0]).html());
-										}
-									); // end get
-									}//end func
-								} // end type
-							] // dataevents
-                
-                
-						}
+						value: ${setList},
+					  	dataEvents :[
+							{ type: 'change', fn: function(e) {
+								//alert("Calling filter products");
+								var thisval = $(e.target).val();
+								//alert($(e.target).attr("id"));
+								$.get('${getFilteredProductGroupsUrl}?setId='+thisval, 
+									function(data)
+									{ 
+										//alert("data: " + data);
+										var res = $.parseJSON(data);
+										//alert(res);
+										s = "";
+															 
+										$.each(res, function(i, item) {
+											 
+											 s += '<option value="' + res[i].groupId  + '">' + res[i].groupName +
+											   '</option>';
+										})
+										
+										//s += "</select>";
+										//alert(s);
+										form = $(e.target).closest('form.FormGrid');
+                                        $("#groupId", form[0]).html(s);
+										//alert($("select#product\\.productId.FormElement", form[0]).html());
+									}
+								); // end get
+								}//end func
+							} // end type
+						] // dataevents
+            
+            
+					}
 				},
 		   		{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, 
 					editoptions: { 
@@ -134,13 +137,13 @@
 										function(data)
 										{ 
 											//alert("data: " + data);
-											//var res = $.parseJSON(data);
+											var res = $.parseJSON(data);
 											//alert(res);
 											s = "";
 																 
-											$.each(data, function(i, item) {
+											$.each(res, function(i, item) {
 												 
-												 s += '<option value="' + data[i].productId  + '">' + data[i].productCode +
+												 s += '<option value="' + res[i].productId  + '">' + res[i].productCode +
 												   '</option>';
 											})
 											
@@ -155,33 +158,17 @@
 								} // end type
 							] // dataevents
 					}},
-				{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
-		   			edittype:"select", editoptions: {
-											dataUrl: '${getFilteredProductsUrl}',
-											buildSelect: function(response){
-                                                                var data = $.parseJSON(response);
-                                                                s = "<select>";
-																 
-																$.each(data, function(i, item) {
-																	 
-																	 s += '<option value="' + data[i].productId + '">' + data[i].productCode +
-                                                                       '</option>';
-																})
-                                                                
-                                                                return s + "</select>";
-                                                            }
-											}	
-		   		},
+				{name:'product.productId',index:'product.productId', width:20, hidden:true, width:50, editable: true, editrules: { edithidden: true }},
 				{name:'product.productCode',index:'product.productCode', width: 30 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
 		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
-		   		{name:'orgQty',index:'orgQty', width:20, editable:true, editrules:{required:true}, editoptions:{size:5} },
+		   		{name:'orgQty',index:'orgQty', width:20 },
 		   		{name:'engagedQty',index:'engagedQty', width:20, editable:false, editrules:{required:true}, editoptions:{size:5} },
 		   		{name:'soldQty',index:'soldQty', width:20, editable:false, editrules:{required:true}, editoptions:{size:5} },
 		   		{name:'discardedQty',index:'discardedQty', width:20, editable:false, editrules:{required:true}, editoptions:{size:5} },
 		   		{name:'availableQty',index:'availableQty', width:20, editable:false, editrules:{required:true}, editoptions:{size:5} },
-				{name:'qtyTobeAdded',index:'qtyTobeAdded',  hidden:true,width:20, editable:true, editrules:{edithidden: true}, editoptions:{size:5} },
-				{name:'qtyTobeDiscarded',index:'qtyTobeDiscarded', hidden:true, width:20, editable:true, editrules:{edithidden: true}, editoptions:{size:5} },
+				{name:'qtyTobeAdded',index:'qtyTobeAdded',  width:20, editable:true, editrules:{edithidden: true}, editoptions:{size:5} },
+				{name:'qtyTobeDiscarded',index:'qtyTobeDiscarded', width:20, editable:true, editrules:{edithidden: true}, editoptions:{size:5} },
 		   		{name:'price',index:'price', editable: true, editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
 				{name:'mrp',index:'mrp',editable: true,editrules: { edithidden: true }, width:30, formatter:'currency', formatoptions: {decimalSeparator:".", thousandsSeparator: "", decimalPlaces: 2, prefix: "Rs.", suffix:"", defaultValue: '0.00'},align:'right'},
 				{
@@ -191,21 +178,12 @@
 							//Currently,setting this to false
                             keys: false,
 							// When the editformbutton parameter is set to true the form editing dialogue appear instead of in-line edit.
-                            editformbutton:true,
+                            editformbutton:false,
 							//if true will show edit icon, else will hide
 							editbutton : true, 
-							editOptions:{ beforeShowForm: function(form) { 
-												//During edit hide the Set and Group Columns 
-												//and disable the Product Code
-												$("#tr_groupId", form).hide(); 
-												$("#tr_setId", form).hide(); 
-												$("#tr_orgQty", form).hide(); 
-												$("#product\\.productId", form).prop("disabled", true); 
-											},
-											url: '${saveUrl}',
-											closeAfterEdit: true
-							},
-							
+							url: '${saveUrl}',
+							//triggering reloadGrid after save
+							afterSave: function () { $("#grid").setGridParam({datatype:'json',postData: data}).trigger('reloadGrid');},
 							//if true will show delete icon, else will hide
 							delbutton : true 
                     }
@@ -251,16 +229,16 @@
 			
 		});
 		$("#grid").jqGrid('navGrid','#pager',
-				{edit:false, add:true, del:false, search:true, cloneToTop: true },
+				{edit:false, add:false, del:false, search:true, cloneToTop: true },
 				{}, 
 				// options for the Add Dialog
                 {
-					beforeShowForm: function(form) { 
+					/*beforeShowForm: function(form) { 
 												//During edit hide the Set and Group Columns 
 												//and disable the Product Code
 												$("#tr_qtyTobeAdded", form).hide(); 
 												$("#tr_qtyTobeDiscarded", form).hide(); 
-												$("#product\\.productId", form).prop("disabled", false); 
+												
 											},
                     closeAfterAdd: true,
 					url:'${addUrl}', 

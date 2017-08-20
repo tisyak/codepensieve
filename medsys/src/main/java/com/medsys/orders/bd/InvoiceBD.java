@@ -45,6 +45,8 @@ public interface InvoiceBD {
 	public int getCountOfTotalInvoicesForYear();
 
 	public BigDecimal getTotalVATInYear();
+	
+	public BigDecimal getTotalGSTInYear();
 
 	public int getCountOfCustomerBilledForYear();
 

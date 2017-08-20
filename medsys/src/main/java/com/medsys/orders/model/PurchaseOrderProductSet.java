@@ -21,22 +21,22 @@ import com.medsys.product.model.ProductMaster;
 
 @Entity
 @Table(name = "po_product_set")
-public class POProductSet implements Serializable,Comparable<POProductSet> {
+public class PurchaseOrderProductSet implements Serializable,Comparable<PurchaseOrderProductSet> {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4745389593451287026L;
 	
-	static Logger logger = LoggerFactory.getLogger(POProductSet.class);
+	static Logger logger = LoggerFactory.getLogger(PurchaseOrderProductSet.class);
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "product_set_id", columnDefinition = "serial")
-	private Integer poProductSetId; 
+	private Integer productSetId; 
 
 	@Column(name = "po_id")
-	private Integer poId;
+	private Integer purchaseOrderId;
 	
 	@ManyToOne
 	@JoinColumn(name="product_id",referencedColumnName="product_id")
@@ -56,31 +56,31 @@ public class POProductSet implements Serializable,Comparable<POProductSet> {
 	
 	
 
-	public POProductSet() {
+	public PurchaseOrderProductSet() {
 	}
 
-	public POProductSet(Integer poId,Integer productSetId,ProductMaster product, Integer qty) {
-		this.poId = poId;
-		this.poProductSetId =  productSetId;
+	public PurchaseOrderProductSet(Integer purchaseOrderId,Integer productSetId,ProductMaster product, Integer qty) {
+		this.purchaseOrderId = purchaseOrderId;
+		this.productSetId =  productSetId;
 		this.product = product;
 		this.qty = qty;
 
 	}
 
-	public Integer getPOProductSetId() {
-		return poProductSetId;
+	public Integer getProductSetId() {
+		return productSetId;
 	}
 
-	public void setPOProductSetId(Integer poProductSetId) {
-		this.poProductSetId = poProductSetId;
+	public void setProductSetId(Integer productSetId) {
+		this.productSetId = productSetId;
 	}
 
-	public Integer getPOId() {
-		return poId;
+	public Integer getPurchaseOrderId() {
+		return purchaseOrderId;
 	}
 
-	public void setPOId(Integer poId) {
-		this.poId = poId;
+	public void setPurchaseOrderId(Integer purchaseOrderId) {
+		this.purchaseOrderId = purchaseOrderId;
 	}
 
 	public ProductMaster getProduct() {
@@ -121,9 +121,9 @@ public class POProductSet implements Serializable,Comparable<POProductSet> {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((poId == null) ? 0 : poId.hashCode());
+		result = prime * result + ((purchaseOrderId == null) ? 0 : purchaseOrderId.hashCode());
 		result = prime * result + ((product == null) ? 0 : product.hashCode());
-		result = prime * result + ((poProductSetId == null) ? 0 : poProductSetId.hashCode());
+		result = prime * result + ((productSetId == null) ? 0 : productSetId.hashCode());
 		return result;
 	}
 
@@ -135,33 +135,33 @@ public class POProductSet implements Serializable,Comparable<POProductSet> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		POProductSet other = (POProductSet) obj;
-		if (poId == null) {
-			if (other.poId != null)
+		PurchaseOrderProductSet other = (PurchaseOrderProductSet) obj;
+		if (purchaseOrderId == null) {
+			if (other.purchaseOrderId != null)
 				return false;
-		} else if (!poId.equals(other.poId))
+		} else if (!purchaseOrderId.equals(other.purchaseOrderId))
 			return false;
 		if (product == null) {
 			if (other.product != null)
 				return false;
 		} else if (!product.equals(other.product))
 			return false;
-		if (poProductSetId == null) {
-			if (other.poProductSetId != null)
+		if (productSetId == null) {
+			if (other.productSetId != null)
 				return false;
-		} else if (!poProductSetId.equals(other.poProductSetId))
+		} else if (!productSetId.equals(other.productSetId))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "POProductSet [poProductSetId=" + poProductSetId + ", po=" + poId + ", product="
+		return "POProductSet [productSetId=" + productSetId + ", purchaseOrder=" + purchaseOrderId + ", product="
 				+ product + ", qty=" + qty + ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + "]";
 	}
 
 	@Override
-	public int compareTo(POProductSet aThat) {
+	public int compareTo(PurchaseOrderProductSet aThat) {
 		return this.product.getProductCode().compareTo(aThat.product.getProductCode());
 	}
 	

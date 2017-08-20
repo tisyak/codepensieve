@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.master.bd.MasterDataBD;
+import com.medsys.master.model.OrderStatusCode;
+import com.medsys.master.model.OrderStatusMaster;
 import com.medsys.master.model.SeedMaster;
 import com.medsys.master.model.SeedMasterKey;
 import com.medsys.orders.bd.OrderNoGenerator;
@@ -64,7 +66,8 @@ public class OrderDAOImpl implements OrderDAO {
 	@Override
 	public Orders getOrder(Integer orderId) {
 		logger.debug("OrderDAOImpl.getOrder() - [" + orderId + "]");
-		Query<Orders> query = getCurrentSession().createQuery("from Orders ord LEFT JOIN FETCH ord.products where ord.orderId = " + orderId,Orders.class);
+		Query<Orders> query = getCurrentSession().createQuery(
+				"from Orders ord LEFT JOIN FETCH ord.products where ord.orderId = " + orderId, Orders.class);
 		// query.setParameter("orderId", orderId.toString());
 
 		logger.debug(query.toString());
@@ -84,17 +87,39 @@ public class OrderDAOImpl implements OrderDAO {
 	@Override
 	public Response deleteOrder(Integer orderId) {
 		try {
-			Orders order = getOrder(orderId);
+			Orders order = getOrderEligibleForDelete(orderId);
 			if (order != null) {
-				getCurrentSession().delete(order);
-				logger.info("Delete of order with orderId: " + orderId + " successful");
-				return new Response(true, null);
+				order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class,
+					OrderStatusCode.DISCARDED.getCode()));
+				Response response = updateOrderStatus(order);
+				logger.info("Order status update to discarded for order with orderId: " + orderId + " successful");
+				return response;
 			} else {
-				throw new EmptyResultDataAccessException("Order [" + orderId + "] not found", 1);
+				return new Response(false, EpSystemError.NO_RECORD_FOUND);
 			}
 		} catch (HibernateException he) {
-			logger.error("Delete of order with orderId: " + orderId + " failed.");
+			logger.error("Delete of order with orderId: " + orderId + " failed."+ he.getMessage());
 			return new Response(false, EpSystemError.DB_EXCEPTION);
+		}
+	}
+
+	private Orders getOrderEligibleForDelete(Integer orderId) {
+		logger.debug("OrderDAOImpl.getOrderEligibleForDelete() - [" + orderId + "]");
+
+		Query<Orders> query = getCurrentSession().createQuery(
+				" from Orders ord where not exists (select 1 from OrderProductSet ordPdt where ordPdt.orderId = :orderId) and ord.orderId = :orderId )",
+				Orders.class);
+		query.setParameter("orderId", orderId);
+		logger.debug(query.toString());
+		if (query.getResultList().size() == 0) {
+			logger.debug("No order found without associated products found.");
+			return null;
+		} else {
+
+			logger.debug("Retreiving order for delete.");
+			Orders order = query.getSingleResult();
+
+			return order;
 		}
 	}
 
@@ -190,6 +215,29 @@ public class OrderDAOImpl implements OrderDAO {
 
 		searchQuery.setParameter("stDate", startDate, TemporalType.DATE);
 		searchQuery.setParameter("edDate", endDate, TemporalType.DATE);
+
+		logger.debug(searchQuery.toString());
+
+		if (searchQuery.getResultList().size() == 0) {
+			logger.debug("No orders found matching current search criteria.");
+			return null;
+
+		} else {
+
+			logger.debug("Date Search Orders List Size: " + searchQuery.getResultList().size());
+			List<Orders> list = (List<Orders>) searchQuery.getResultList();
+			return list;
+		}
+	}
+
+	@Override
+	public List<Orders> searchForOrdersBeforeGivenDate(Date givenDate) {
+		logger.debug("OrderDAOImpl.searchForOrdersInDateRange() for the Year - [" + givenDate + "]");
+
+		Query<Orders> searchQuery = getCurrentSession().createQuery("from Orders WHERE orderDate >= :givenDate",
+				Orders.class);
+
+		searchQuery.setParameter("givenDate", givenDate, TemporalType.DATE);
 
 		logger.debug(searchQuery.toString());
 
@@ -310,7 +358,8 @@ public class OrderDAOImpl implements OrderDAO {
 	@Override
 	public Orders getOrderWithInstr(Integer orderId) {
 		logger.debug("OrderDAOImpl.getOrder() - [" + orderId + "]");
-		Query<Orders> query = getCurrentSession().createQuery("from Orders ord JOIN FETCH  ord.set.instruments where ord.orderId = " + orderId,Orders.class);
+		Query<Orders> query = getCurrentSession().createQuery(
+				"from Orders ord JOIN FETCH  ord.set.instruments where ord.orderId = " + orderId, Orders.class);
 		// query.setParameter("orderId", orderId.toString());
 
 		logger.debug(query.toString());

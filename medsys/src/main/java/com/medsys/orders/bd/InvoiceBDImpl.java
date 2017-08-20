@@ -1,7 +1,6 @@
 package com.medsys.orders.bd;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -30,10 +29,10 @@ public class InvoiceBDImpl implements InvoiceBD {
 
 	@Autowired
 	private InvoiceDAO invoiceDAO;
-	
+
 	@Autowired
 	private OrderBD orderBD;
-	
+
 	@Autowired
 	private MasterDataBD masterDataBD;
 
@@ -44,9 +43,10 @@ public class InvoiceBDImpl implements InvoiceBD {
 	public Response addInvoice(Invoice invoice) {
 		logger.debug("InvoiceBD: Adding invoice.");
 		Response response = invoiceDAO.addInvoice(invoice);
-		if(response.isStatus()){
+		if (response.isStatus()) {
 			Orders order = invoice.getOrder();
-			order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class, OrderStatusCode.INVOICE_GENERATED.getCode()));
+			order.setOrderStatus((OrderStatusMaster) masterDataBD.getbyCode(OrderStatusMaster.class,
+					OrderStatusCode.INVOICE_GENERATED.getCode()));
 			response = orderBD.updateOrderStatus(order);
 		}
 		return response;
@@ -105,10 +105,12 @@ public class InvoiceBDImpl implements InvoiceBD {
 
 			Response response = invoiceDAO.addProductToInvoice(newInvoiceProduct);
 
-			if (response.isStatus()) {
-				updateEffectiveTotalsInInvoice(newInvoiceProduct.getInvoiceId(), newInvoiceProduct.getUpdateBy(),
-						newInvoiceProduct.getUpdateTimestamp());
-			}
+			/*
+			 * if (response.isStatus()) {
+			 * updateEffectiveTotalsInInvoice(newInvoiceProduct.getInvoiceId(),
+			 * newInvoiceProduct.getUpdateBy(),
+			 * newInvoiceProduct.getUpdateTimestamp()); }
+			 */
 
 			return response;
 		} catch (SysException e) {
@@ -153,10 +155,11 @@ public class InvoiceBDImpl implements InvoiceBD {
 
 		Response response = invoiceDAO.updateProductInInvoice(invoiceProduct);
 
-		if (response.isStatus()) {
-			updateEffectiveTotalsInInvoice(invoiceProduct.getInvoiceId(), invoiceProduct.getUpdateBy(),
-					invoiceProduct.getUpdateTimestamp());
-		}
+		/*
+		 * if (response.isStatus()) {
+		 * updateEffectiveTotalsInInvoice(invoiceProduct.getInvoiceId(),
+		 * invoiceProduct.getUpdateBy(), invoiceProduct.getUpdateTimestamp()); }
+		 */
 		return response;
 
 	}
@@ -164,45 +167,32 @@ public class InvoiceBDImpl implements InvoiceBD {
 	private InvoiceProduct calculateEffectiveTaxAndPrice(InvoiceProduct invoiceProduct) {
 		BigDecimal totalAmountBeforeTax = invoiceProduct.getRatePerUnit()
 				.multiply(new BigDecimal(invoiceProduct.getQty()));
-		invoiceProduct.setTotalBeforeTax(totalAmountBeforeTax);
 		logger.debug("discount " + invoiceProduct.getDiscount());
-		totalAmountBeforeTax = totalAmountBeforeTax.subtract(invoiceProduct.getDiscount());;
+		totalAmountBeforeTax = totalAmountBeforeTax.subtract(invoiceProduct.getDiscount());
+		invoiceProduct.setTotalBeforeTax(totalAmountBeforeTax);
 		logger.debug("totalAmountBeforeTax after discount: " + totalAmountBeforeTax);
-		Invoice invoice = this.getInvoice(invoiceProduct.getInvoiceId());
 		BigDecimal totalAmountAfterTax = null;
-		if (!invoice.isGstInvoice()) {
-			/* VAT multiplier */
-			BigDecimal vatPercentage = invoiceProduct.getVatType().getTax_percentage();
-			BigDecimal vatPercentageMultiplier = vatPercentage.divide(new BigDecimal(100));
-			logger.debug("vatPercentageMultiplier: " + vatPercentageMultiplier);
-			BigDecimal effectiveVat = totalAmountBeforeTax.multiply(vatPercentageMultiplier);
-			logger.debug("effectiveVat " + effectiveVat);
-			invoiceProduct.setVatAmount(effectiveVat);
-			totalAmountAfterTax = totalAmountBeforeTax.add(effectiveVat);
-			logger.debug("totalAmountAfter VAT Tax " + totalAmountAfterTax);
-			/* End Of VAT multiplier */
-		} else {
-			/* GST multiplier */
-			BigDecimal cgstPercentage = invoiceProduct.getCgstType().getTax_percentage();
-			BigDecimal cgstPercentageMultiplier = cgstPercentage.divide(new BigDecimal(100));
-			logger.debug("cgstPercentageMultiplier: " + cgstPercentageMultiplier);
-			BigDecimal effectiveCgst = totalAmountBeforeTax.multiply(cgstPercentageMultiplier);
-			logger.debug("effectiveCgst " + effectiveCgst);
-			invoiceProduct.setCgstAmount(effectiveCgst);
-			totalAmountAfterTax = totalAmountBeforeTax.add(effectiveCgst);
-			logger.debug("totalAmountAfter CGST Tax " + totalAmountAfterTax);
 
-			BigDecimal sgstPercentage = invoiceProduct.getSgstType().getTax_percentage();
-			BigDecimal sgstPercentageMultiplier = sgstPercentage.divide(new BigDecimal(100));
-			logger.debug("sgstPercentageMultiplier: " + sgstPercentageMultiplier);
-			BigDecimal effectiveSgst = totalAmountBeforeTax.multiply(sgstPercentageMultiplier);
-			logger.debug("effectiveSgst " + effectiveSgst);
-			invoiceProduct.setSgstAmount(effectiveSgst);
-			totalAmountAfterTax = totalAmountAfterTax.add(effectiveSgst);
-			logger.debug("totalAmountAfter SGST Tax " + totalAmountAfterTax);
-			/* End Of GST multiplier */
-		}
-		
+		/* GST multiplier */
+		BigDecimal cgstPercentage = invoiceProduct.getCgstType().getTax_percentage();
+		BigDecimal cgstPercentageMultiplier = cgstPercentage.divide(new BigDecimal(100));
+		logger.debug("cgstPercentageMultiplier: " + cgstPercentageMultiplier);
+		BigDecimal effectiveCgst = totalAmountBeforeTax.multiply(cgstPercentageMultiplier);
+		logger.debug("effectiveCgst " + effectiveCgst);
+		invoiceProduct.setCgstAmount(effectiveCgst);
+		totalAmountAfterTax = totalAmountBeforeTax.add(effectiveCgst);
+		logger.debug("totalAmountAfter CGST Tax " + totalAmountAfterTax);
+
+		BigDecimal sgstPercentage = invoiceProduct.getSgstType().getTax_percentage();
+		BigDecimal sgstPercentageMultiplier = sgstPercentage.divide(new BigDecimal(100));
+		logger.debug("sgstPercentageMultiplier: " + sgstPercentageMultiplier);
+		BigDecimal effectiveSgst = totalAmountBeforeTax.multiply(sgstPercentageMultiplier);
+		logger.debug("effectiveSgst " + effectiveSgst);
+		invoiceProduct.setSgstAmount(effectiveSgst);
+		totalAmountAfterTax = totalAmountAfterTax.add(effectiveSgst);
+		logger.debug("totalAmountAfter SGST Tax " + totalAmountAfterTax);
+		/* End Of GST multiplier */
+
 		BigDecimal totalPrice = totalAmountAfterTax;
 		logger.debug("totalPrice after discount " + totalPrice);
 		invoiceProduct.setTotalPrice(totalPrice);
@@ -210,13 +200,17 @@ public class InvoiceBDImpl implements InvoiceBD {
 		return invoiceProduct;
 	}
 
-	private void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp) {
-		
-		logger.debug("updateEffectiveTotalsInInvoice: " + invoiceId);
-
-		invoiceDAO.updateEffectiveTotalsInInvoice(invoiceId, updateBy, updateTimestamp);
-
-	}
+	/*
+	 * private void updateEffectiveTotalsInInvoice(Integer invoiceId, String
+	 * updateBy, Timestamp updateTimestamp) {
+	 * 
+	 * logger.debug("updateEffectiveTotalsInInvoice: " + invoiceId);
+	 * 
+	 * invoiceDAO.updateEffectiveTotalsInInvoice(invoiceId, updateBy,
+	 * updateTimestamp);
+	 * 
+	 * }
+	 */
 
 	@Override
 	@Transactional
@@ -225,15 +219,18 @@ public class InvoiceBDImpl implements InvoiceBD {
 		// Managing product inventory before deleting product to the invoice
 		try {
 			productInvBD.cancelProductSale(invoiceProduct.getProduct().getProductCode(), invoiceProduct.getQty());
-			Response response =  invoiceDAO.deleteProductFromInvoice(invoiceProduct);
-			
-			if (response.isStatus()) {
-				updateEffectiveTotalsInInvoice(invoiceProduct.getInvoiceId(), invoiceProduct.getUpdateBy(),
-						invoiceProduct.getUpdateTimestamp());
-			}
-			
+
+			Response response = invoiceDAO.deleteProductFromInvoice(invoiceProduct);
+
+			/*
+			 * if (response.isStatus()) {
+			 * updateEffectiveTotalsInInvoice(invoiceProduct.getInvoiceId(),
+			 * invoiceProduct.getUpdateBy(),
+			 * invoiceProduct.getUpdateTimestamp()); }
+			 */
+
 			return response;
-			
+
 		} catch (SysException e) {
 			return new Response(false, e.getErrorCode());
 		}
@@ -267,6 +264,11 @@ public class InvoiceBDImpl implements InvoiceBD {
 	@Override
 	public BigDecimal getTotalVATInYear() {
 		return invoiceDAO.getTotalVATInYear();
+	}
+
+	@Override
+	public BigDecimal getTotalGSTInYear() {
+		return invoiceDAO.getTotalGSTInYear();
 	}
 
 	@Override

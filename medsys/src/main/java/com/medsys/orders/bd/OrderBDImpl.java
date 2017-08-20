@@ -77,6 +77,12 @@ public class OrderBDImpl implements OrderBD {
 	public List<Orders> searchForOrdersInDateRange(Date startDate, Date endDate) {
 		return orderDAO.searchForOrdersInDateRange(startDate,endDate);
 	}
+	
+
+	@Override
+	public List<Orders> searchForOrdersBeforeGivenDate(Date givenDate) {
+		return orderDAO.searchForOrdersBeforeGivenDate(givenDate);
+	}
 
 
 	@Override

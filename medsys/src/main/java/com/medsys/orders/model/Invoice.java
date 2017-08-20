@@ -19,6 +19,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,33 +76,33 @@ public class Invoice {
 	@JoinColumn(name = "invoice_status_id", referencedColumnName = "invoice_status_id")
 	private InvoiceStatusMaster invoiceStatus;
 
-	@Column(name = "total_amount_before_tax", precision = 15, scale = 0)
-	private BigDecimal totalAmountBeforeTax;
-
-	@Column(name = "total_amount", precision = 15, scale = 0)
-	private BigDecimal totalAmount;
-
-	@Column(name = "total_vat", precision = 15, scale = 0)
+	@Formula("(select SUM(invPdt.vat_amount) from invoice_product invPdt where invPdt.invoice_id= invoice_id)")
 	private BigDecimal totalVat;
 
-	@Column(name = "total_cgst", precision = 15, scale = 0)
+	@Formula("(select SUM(invPdt.cgst_amount) from invoice_product invPdt where invPdt.invoice_id= invoice_id)")
 	private BigDecimal totalCgst;
 
-	@Column(name = "total_sgst", precision = 15, scale = 0)
+	@Formula("(select SUM(invPdt.sgst_amount) from invoice_product invPdt where invPdt.invoice_id= invoice_id)")
 	private BigDecimal totalSgst;
 
-	@Column(name = "total_discount", precision = 15, scale = 0)
-	private BigDecimal totalDiscount;
+	@Transient
+	private BigDecimal totalGst;
+	
+	@Formula("(select SUM(invPdt.total_before_tax) from invoice_product invPdt where invPdt.invoice_id= invoice_id)")
+	private BigDecimal totalBeforeTax;
+
+	@Formula("(select SUM(invPdt.total) from invoice_product invPdt where invPdt.invoice_id= invoice_id)")
+	private BigDecimal totalAmount;
 
 	/** The update by. */
 	@Column(name = "update_by")
 	private String updateBy;
 
-	@Column(name = "gst_invoice")
-	private boolean gstInvoice;
-
 	@Column(name = "bill_to_patient")
 	private boolean billToPatient;
+	
+	@Column(name = "print_mrp")
+	private boolean printMRP;
 
 	@Transient
 	private String billVersion;
@@ -173,6 +174,19 @@ public class Invoice {
 	public void setBillToPatient(boolean billToPatient) {
 		this.billToPatient = billToPatient;
 	}
+	
+
+	public boolean isPrintMRP() {
+		return printMRP;
+	}
+	
+	public boolean getPrintMRP() {
+		return printMRP;
+	}
+
+	public void setPrintMRP(boolean printMRP) {
+		this.printMRP = printMRP;
+	}
 
 	public String getBillVersion() {
 		return billVersion;
@@ -214,18 +228,6 @@ public class Invoice {
 		this.invoiceStatus = invoiceStatus;
 	}
 
-	public BigDecimal getTotalAmount() {
-		return totalAmount;
-	}
-
-	public void setTotalAmount(BigDecimal totalAmount) {
-		if (totalAmount != null) {
-			this.totalAmount = totalAmount.setScale(0, RoundingMode.HALF_UP);
-		} else {
-			this.totalAmount = totalAmount;
-		}
-	}
-
 	public BigDecimal getTotalVat() {
 		return totalVat;
 	}
@@ -262,28 +264,32 @@ public class Invoice {
 		}
 	}
 
-	public BigDecimal getTotalDiscount() {
-		return totalDiscount;
+	public BigDecimal getTotalAmount() {
+		return totalAmount;
 	}
 
-	public void setTotalDiscount(BigDecimal totalDiscount) {
-		if (totalDiscount != null) {
-			this.totalDiscount = totalDiscount.setScale(0, RoundingMode.HALF_UP);
+	public void setTotalAmount(BigDecimal totalAmount) {
+		if (totalAmount != null) {
+			this.totalAmount = totalAmount.setScale(0, RoundingMode.HALF_UP);
 		} else {
-			this.totalDiscount = totalDiscount;
+			this.totalAmount = totalAmount;
 		}
 	}
 
-	public BigDecimal getTotalAmountBeforeTax() {
-		return totalAmountBeforeTax;
+	public BigDecimal getTotalGst() {
+		BigDecimal tempTotalGst = totalCgst;
+
+		if (tempTotalGst != null) {
+			tempTotalGst = totalCgst.add(totalSgst);
+		} else {
+			tempTotalGst = totalSgst;
+		}
+
+		return tempTotalGst;
 	}
 
-	public void setTotalAmountBeforeTax(BigDecimal totalAmountBeforeTax) {
-		if (totalAmountBeforeTax != null) {
-			this.totalAmountBeforeTax = totalAmountBeforeTax.setScale(0, RoundingMode.HALF_UP);
-		} else {
-			this.totalAmountBeforeTax = totalAmountBeforeTax;
-		}
+	public BigDecimal getTotalBeforeTax() {
+		return totalBeforeTax;
 	}
 
 	public String getUpdateBy() {
@@ -310,17 +316,6 @@ public class Invoice {
 		this.products = products;
 	}
 
-	public boolean isGstInvoice() {
-		return gstInvoice;
-	}
-
-	public boolean getGstInvoice() {
-		return gstInvoice;
-	}
-
-	public void setGstInvoice(boolean gstInvoice) {
-		this.gstInvoice = gstInvoice;
-	}
 
 	@Override
 	public int hashCode() {
@@ -358,10 +353,11 @@ public class Invoice {
 		return "Invoice [invoiceId=" + invoiceId + ", invoiceNo=" + invoiceNo + ", order=" + order + ", customer="
 				+ customer + ", patientName=" + patientName + ", patientInfo=" + patientInfo + ", refSource="
 				+ refSource + ", invoiceDate=" + invoiceDate + ", paymentTerms=" + paymentTerms + ", invoiceStatus="
-				+ invoiceStatus + ", totalAmountBeforeTax=" + totalAmountBeforeTax + ", totalAmount=" + totalAmount
-				+ ", totalVat=" + totalVat + ", totalCgst=" + totalCgst + ", totalSgst=" + totalSgst
-				+ ", totalDiscount=" + totalDiscount + ", updateBy=" + updateBy + ", gstInvoice=" + gstInvoice
-				+ ", updateTimestamp=" + updateTimestamp + "]";
+				+ invoiceStatus + ", totalVat=" + totalVat + ", totalCgst=" + totalCgst + ", totalSgst=" + totalSgst
+				+ ", totalGst=" + totalGst + ", totalBeforeTax=" + totalBeforeTax + ", totalAmount=" + totalAmount
+				+ ", updateBy=" + updateBy + ", billToPatient=" + billToPatient
+				+ ", printMRP=" + printMRP + ", billVersion=" + billVersion + ", updateTimestamp=" + updateTimestamp
+				+ "]";
 	}
 
 }

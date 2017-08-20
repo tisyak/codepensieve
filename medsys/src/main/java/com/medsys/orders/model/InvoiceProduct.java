@@ -45,6 +45,9 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 	@JoinColumn(name = "product_id", referencedColumnName = "product_id")
 	private ProductMaster product;
 
+	@Formula("(select pdtInv.mrp from product_inv pdtInv where pdtInv.product_id= product_id)")
+	private BigDecimal mrp;
+	
 	@NotNull
 	@Column(name = "rate_per_unit",precision = 15, scale = 0)
 	private BigDecimal ratePerUnit;
@@ -52,14 +55,13 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 	@NotNull
 	@Column(name = "qty")
 	private Integer qty;
-
+	
+	@Column(name = "discount",precision = 15, scale=0)
+	private BigDecimal discount;
+	
 	@NotNull
 	@Column(name = "total_before_tax",precision = 15, scale=0)
 	private BigDecimal totalBeforeTax;
-	
-	@NotNull
-	@Column(name = "total",precision = 15, scale=0)
-	private BigDecimal totalPrice;
 
 	@Column(name = "vat_amount",precision = 15, scale=0)
 	private BigDecimal vatAmount;
@@ -82,8 +84,11 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 	@JoinColumn(name = "sgst_type", referencedColumnName = "tax_id")
 	private TaxMaster sgstType;
 	
-	@Column(name = "discount",precision = 15, scale=0)
-	private BigDecimal discount;
+
+	@NotNull
+	@Column(name = "total",precision = 15, scale=0)
+	private BigDecimal totalPrice;
+
 	
 	@Formula("(select pdtInv.available_qty from product_inv pdtInv where pdtInv.product_id= product_id)")
 	private Integer availableQty; 
@@ -119,6 +124,18 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 
 	public void setProduct(ProductMaster product) {
 		this.product = product;
+	}
+
+	public BigDecimal getMrp() {
+		return mrp;
+	}
+
+	public void setMrp(BigDecimal mrp) {
+		if (mrp != null) {
+			this.mrp = mrp.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.mrp = mrp;
+		}
 	}
 
 	public BigDecimal getRatePerUnit() {
@@ -297,10 +314,10 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 	@Override
 	public String toString() {
 		return "InvoiceProduct [invoiceProductId=" + invoiceProductId + ", invoiceId=" + invoiceId + ", product="
-				+ product + ", ratePerUnit=" + ratePerUnit + ", qty=" + qty + ", totalBeforeTax=" + totalBeforeTax
-				+ ", totalPrice=" + totalPrice + ", vatAmount=" + vatAmount + ", vatType=" + vatType + ", cgstAmount="
-				+ cgstAmount + ", cgstType=" + cgstType + ", sgstAmount=" + sgstAmount + ", sgstType=" + sgstType
-				+ ", discount=" + discount + ", availableQty=" + availableQty + ", updateBy=" + updateBy
+				+ product + ", mrp=" + mrp + ", ratePerUnit=" + ratePerUnit + ", qty=" + qty + ", discount=" + discount
+				+ ", totalBeforeTax=" + totalBeforeTax + ", vatAmount=" + vatAmount + ", vatType=" + vatType
+				+ ", cgstAmount=" + cgstAmount + ", cgstType=" + cgstType + ", sgstAmount=" + sgstAmount + ", sgstType="
+				+ sgstType + ", totalPrice=" + totalPrice + ", availableQty=" + availableQty + ", updateBy=" + updateBy
 				+ ", updateTimestamp=" + updateTimestamp + "]";
 	}
 

@@ -27,6 +27,7 @@ public enum UIConstants {
     MATH_PRECISION_CONTEXT("15"),
     SCALE("0"),
     EMPTY_QTY("0"),
+    ONE_HUNDRED("100"),
        
     /***************************** ENCODED URL MANIPULTATION CONSTANTS ***********************************. */
     /**

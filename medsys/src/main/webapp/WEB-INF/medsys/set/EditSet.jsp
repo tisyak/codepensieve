@@ -23,18 +23,19 @@
 <!-- End of JQGrid Header Files -->
 
 <script src="<c:url value="/resources/js/moment.min.js"/>"></script>
-<!-- JQGrid Action URLs -->	
-<c:url value="/${UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE}" var="recordsUrl"/>
+<!-- JQGrid Action URLs -->
+<c:url value="/${UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE}"
+	var="recordsUrl" />
 <c:url value="/${UIActions.ADD_PRODUCT_SET_TEMPLATE}" var="addUrl" />
-<c:url value="/${UIActions.EDIT_PRODUCT_SET_TEMPLATE}" var="saveUrl"/>
-<c:url value="/setPdtTemplate/update" var="editUrl"/>
-<c:url value="/setPdtTemplate/delete" var="deleteUrl"/>
+<c:url value="/${UIActions.EDIT_PRODUCT_SET_TEMPLATE}" var="saveUrl" />
+<c:url value="/setPdtTemplate/update" var="editUrl" />
+<c:url value="/setPdtTemplate/delete" var="deleteUrl" />
 
-<c:url value="/${UIActions.GET_SET_REPORT}" var="downloadUrl"/>
-<c:url value="/${UIActions.GET_TOKEN}" var="downloadTokenUrl"/>
-<c:url value="/${UIActions.GET_PROGRESS}" var="downloadProgressUrl"/>
+<c:url value="/${UIActions.GET_SET_REPORT}" var="downloadUrl" />
+<c:url value="/${UIActions.GET_TOKEN}" var="downloadTokenUrl" />
+<c:url value="/${UIActions.GET_PROGRESS}" var="downloadProgressUrl" />
 
-<!--End of JQGrid Action URLs -->	
+<!--End of JQGrid Action URLs -->
 <%
 	Set set = (Set) request.getAttribute("set");
 
@@ -156,9 +157,9 @@
 		);
 		
 		$("#grid").navButtonAdd('#pager',
-				{ 	caption:"Pdf", 
+				{ 	caption:"Bl.Order Pdf", 
 					buttonicon:"ui-icon-arrowreturn-1-s", 
-					onClickButton: downloadPdf,
+					onClickButton: downloadBlankOrderPdf,
 					position: "last", 
 					title:"", 
 					cursor: "pointer"
@@ -166,22 +167,63 @@
 			);
 		
 		$("#grid").navButtonAdd('#pager',
-				{ 	caption:"Excel", 
+				{ 	caption:"Bl.Order Instr Pdf", 
 					buttonicon:"ui-icon-arrowreturn-1-s", 
-					onClickButton: downloadXls,
+					onClickButton: downloadBlankOrderInstrPdf,
 					position: "last", 
 					title:"", 
 					cursor: "pointer"
 				} 
 			);
-
+		
+		$("#grid").navButtonAdd('#pager',
+				{ 	caption:"Pricelist Pdf", 
+					buttonicon:"ui-icon-arrowreturn-1-s", 
+					onClickButton: downloadPricelistPdf,
+					position: "last", 
+					title:"", 
+					cursor: "pointer"
+				} 
+			);
+		
 	});
         
-        function downloadXls() {download('xls');}
+        $(function() {
+    		 $("#pricelistPercentageDialog").dialog({
+    			 
+	    			 autoOpen: false, 
+	    			 modal: true,
+	                 buttons: {
+	                    OK: function() {
+	                       $( this ).dialog( "close" );
+	                    }
+	                 },
+	                 beforeClose: function( event, ui ) {
+	                    if ( $.trim($("#pricelistPercentage").val()).length <= 0 ) {
+	                       event.preventDefault();
+	                       $( "[for = pricelistPercentage]" ).addClass( "invalid" );
+	                    }
+	                 },
+	                 width: 600,
+    			 
+    		 
+    		        close: function(event, ui) { 
+    		        	download('pdf','pricelist',$("#pricelistPercentage").val());
+    		        }
+    		    });
+			});
+		
+		function downloadXls() {download('xls');}
     	
-    	function downloadPdf() {download('pdf');}
+    	function downloadBlankOrderPdf() {download('pdf','products',0);}
+    	function downloadBlankOrderInstrPdf() {download('pdf','instr',0);}
+    	function downloadPricelistPdf() {
+			 $( "#pricelistPercentageDialog" ).dialog( "open" );
+    		
+    		
+    	}
     	
-    	function download(type) {
+    	function download(type,challanKind,extraParam) {
     		// Retrieve download token
     		// When token is received, proceed with download
     		$.get('${downloadTokenUrl}', function(response) {
@@ -199,7 +241,8 @@
     					});
     			
     			// Start download
-    			var win = window.open('${downloadUrl}'+'?token='+token+'&type='+type+'&setId='+${setId} , '_blank');
+    			var win = window.open('${downloadUrl}'+'?token='+token+'&type='+type+'&setId='+${setId}
+    						+'&challanKind='+challanKind+'&extraParam='+extraParam  , '_blank');
     			if (win) {
     			    //Browser has allowed it to be opened
     			    win.focus();
@@ -207,20 +250,7 @@
     			    //Browser has blocked it
     			    alert('Please allow popups for this Site');
     			}
-    			// Check periodically if download has started
-    			/* var frequency = 1000;
-    			var timer = setInterval(function() {
-    				$.get('${downloadProgressUrl}', {token: token}, 
-    						function(response) {
-    							// If token is not returned, download has started
-    							// Close progress dialog if started
-    							if (response.message[0] != token) {
-    								$('#msgbox').dialog('close');
-    								clearInterval(timer);
-    							}
-    					});
-    			}, frequency); */
-    			
+    		
     		});
     	}
 </script>
@@ -228,8 +258,8 @@
 
 <spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.SAVE_SET%>"
 	var="action" />
-<form:form class="form-horizontal" method="POST" action="${action}" modelAttribute="set"
-	autocomplete="off">
+<form:form class="form-horizontal" method="POST" action="${action}"
+	modelAttribute="set" autocomplete="off">
 
 	<form:hidden path="setId" cssClass="form-control" title="setId"
 		autocomplete="off" />
@@ -251,32 +281,33 @@
 		<form:errors path="setDesc" cssClass="error" />
 
 	</div>
-	
+
 	<div>
-	
-	<c:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_SETS%>"
-		var="listAllSetAction" />
 
-	<button type="submit"  formmethod="post" class="btn btn-primary"
-		formaction="${action}">Save Set</button>
-	<button type="submit"  formmethod="get" class="btn btn-default"
-		formaction="${listAllSetAction}">Cancel</button>
-		 <br />  <br />
+		<c:url value="<%=UIActions.FORWARD_SLASH + UIActions.LIST_ALL_SETS%>"
+			var="listAllSetAction" />
 
-   <br />  <br />
-	<!-- JQGrid HTML -->
-	<div id='jqgrid'>
-		<div id='pager'></div>
-		<table id='grid'></table>
-		
+		<button type="submit" formmethod="post" class="btn btn-primary"
+			formaction="${action}">Save Set</button>
+		<button type="submit" formmethod="get" class="btn btn-default"
+			formaction="${listAllSetAction}">Cancel / Back</button>
+		<br /> <br /> <br /> <br />
+		<!-- JQGrid HTML -->
+		<div id='jqgrid'>
+			<div id='pager'></div>
+			<table id='grid'></table>
+
+		</div>
+
+		<div id='msgbox' title='' style='display: none'></div>
+		<div id="pricelistPercentageDialog">
+			<label for="pricelistPercentage">Percentage For
+				Pricelist</label> <input type="text" id="pricelistPercentage" />
+		</div>
+		<!-- End of JQGrid HTML -->
 	</div>
 
-	<div id='msgbox' title='' style='display: none'></div>
 
-	<!-- End of JQGrid HTML -->
-	</div>
-	
-	
-		
-		
+
+
 </form:form>

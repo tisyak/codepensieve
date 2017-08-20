@@ -100,5 +100,5 @@
 		var="listAllOrdersAction" />
 
 	<button type="submit" formmethod="get" class="btn btn-default"
-		formaction="${listAllOrdersAction}">Cancel</button>
+		formaction="${listAllOrdersAction}">Cancel / Back</button>
 </form:form>

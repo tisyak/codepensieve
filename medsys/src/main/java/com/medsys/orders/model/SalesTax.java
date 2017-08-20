@@ -1,6 +1,7 @@
 package com.medsys.orders.model;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 import org.slf4j.Logger;
@@ -45,7 +46,11 @@ public class SalesTax {
 	}
 
 	public void setTotalVATTax(BigDecimal totalVATTax) {
-		this.totalVATTax = totalVATTax;
+		if (totalVATTax != null) {
+			this.totalVATTax = totalVATTax.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.totalVATTax = totalVATTax;
+		}
 	}
 
 	public BigDecimal getTotalCGSTTax() {
@@ -53,7 +58,11 @@ public class SalesTax {
 	}
 
 	public void setTotalCGSTTax(BigDecimal totalCGSTTax) {
-		this.totalCGSTTax = totalCGSTTax;
+		if (totalCGSTTax != null) {
+			this.totalCGSTTax = totalCGSTTax.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.totalCGSTTax = totalCGSTTax;
+		}
 	}
 
 	public BigDecimal getTotalSGSTTax() {
@@ -61,7 +70,11 @@ public class SalesTax {
 	}
 
 	public void setTotalSGSTTax(BigDecimal totalSGSTTax) {
-		this.totalSGSTTax = totalSGSTTax;
+		if (totalSGSTTax != null) {
+			this.totalSGSTTax = totalSGSTTax.setScale(0, RoundingMode.HALF_UP);
+		} else {
+			this.totalSGSTTax = totalSGSTTax;
+		}
 	}
 
 	public java.util.Set<Invoice> getInvoicesHavingVAT() {

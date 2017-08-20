@@ -44,6 +44,8 @@ public enum MedsysUITiles {
 	
 	SALES_TAX_REPORT("invoices.SalesTax"),
 	
+	PRODUCT_DEFICIT_REPORT("product.ProductDeficit"),
+	
 	/** PRODUCT INVENTORY MANAGEMENT*/
 	MANAGE_PRODUCT_INV("product.ProductInv"),
 	
@@ -60,6 +62,8 @@ public enum MedsysUITiles {
 
 	EDIT_SET("set.EditSet"),
 	
+	QUOTATION("set.Quotation"),
+	
 	/** Admin User Management */
 	ADMIN_USERS_LIST("master.AdminUserList"),
 	
@@ -68,6 +72,19 @@ public enum MedsysUITiles {
 	
 	/** COMPANY MANAGEMENT*/
 	MANAGE_COMPANY("company.Company"),
+	
+	
+	/** PURCHASE_ORDER MANAGEMENT */
+
+	SEARCH_PURCHASE_ORDER("purchaseorder.SearchPO"),
+
+	PURCHASE_ORDER_LIST("purchaseorder.SearchPO"),
+
+	ADD_PURCHASE_ORDER("purchaseorder.AddPO"),
+
+	EDIT_PURCHASE_ORDER("purchaseorder.EditPO"),
+	
+
 	
 
 	/** PROFILE MANAGEMENT */

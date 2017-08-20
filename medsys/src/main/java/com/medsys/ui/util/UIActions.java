@@ -66,17 +66,19 @@ public class UIActions {
     public static final String EDIT_SET="set/edit";
     public static final String SAVE_SET="set/save";
     public static final String GET_SET_REPORT="set/download";
+    public static final String DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/delete";
     
     public static final String LIST_ALL_PRODUCT_SET_TEMPLATE="setPdtTemplate/list";
     public static final String LOAD_SEARCH_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadSearch";
     public static final String SEARCH_PRODUCT_SET_TEMPLATE="setPdtTemplate/search";
+    public static final String SEARCH_PRODUCT_GRP_BY_SET_URL="set/searchPdtGrpBySet";
     public static final String SEARCH_PRODUCTS_BY_SET_GRP_URL="productMaster/searchBySetGrp";
     public static final String GET_PRODUCT_SET_TEMPLATE="setPdtTemplate/get";
     public static final String ADD_PRODUCT_SET_TEMPLATE="setPdtTemplate/add";
     public static final String EDIT_PRODUCT_SET_TEMPLATE="setPdtTemplate/edit";
     public static final String SAVE_PRODUCT_SET_TEMPLATE="setPdtTemplate/save";
     public static final String LOAD_DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadDelete";
-    public static final String DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/delete";
+    public static final String LOAD_REQUEST_FOR_QUOTATION="set/deleteRequestForQuotation";
     
     public static final String MANAGE_PRODUCT_GROUP="productGroup/loadManage";
     public static final String LIST_ALL_PRODUCT_GROUP="productGroup/list";
@@ -137,6 +139,24 @@ public class UIActions {
     public static final String EDIT_PRODUCT_INVOICE="invoiceproduct/edit";
     public static final String LOAD_DELETE_PRODUCT_INVOICE="invoiceproduct/loadDelete";
     public static final String DELETE_PRODUCT_INVOICE="invoiceproduct/delete";
+    
+    public static final String LIST_ALL_PURCHASE_ORDER="purchaseorder/list";
+    public static final String LOAD_SEARCH_PURCHASE_ORDER="purchaseorder/loadSearch";
+    public static final String SEARCH_PURCHASE_ORDER="purchaseorder/search";
+    public static final String LOAD_ADD_PURCHASE_ORDER="purchaseorder/loadAdd";
+    public static final String ADD_PURCHASE_ORDER="purchaseorder/add";
+    public static final String EDIT_PURCHASE_ORDER="purchaseorder/edit";
+    public static final String SAVE_PURCHASE_ORDER="purchaseorder/save";
+    public static final String GET_PURCHASE_ORDER_EXCEL="purchaseorder/downloadExcel";
+    
+    public static final String LIST_ALL_PRODUCT_PURCHASE_ORDER="purchaseorderproduct/list";
+    public static final String LOAD_SEARCH_PRODUCT_PURCHASE_ORDER="purchaseorderproduct/loadSearch";
+    public static final String SEARCH_PRODUCT_PURCHASE_ORDER="purchaseorderproduct/search";
+    public static final String ADD_PRODUCT_PURCHASE_ORDER="purchaseorderproduct/add";
+    public static final String GET_PRODUCT_PURCHASE_ORDER="purchaseorderproduct/get";
+    public static final String EDIT_PRODUCT_PURCHASE_ORDER="purchaseorderproduct/edit";
+    public static final String LOAD_DELETE_PRODUCT_PURCHASE_ORDER="purchaseorderproduct/loadDelete";
+    public static final String DELETE_PRODUCT_PURCHASE_ORDER="purchaseorderproduct/delete";
    
     public static final String LOAD_REQUEST_FOR_SALES_TAX_REPORT = "reports/loadSalesTax";
     public static final String VIEW_SALES_TAX = "reports/salesTax";

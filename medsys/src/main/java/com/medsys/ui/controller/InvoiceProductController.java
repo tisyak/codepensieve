@@ -26,7 +26,6 @@ import com.medsys.common.model.Response;
 import com.medsys.master.bd.MasterDataBD;
 import com.medsys.master.model.TaxMaster;
 import com.medsys.orders.bd.InvoiceBD;
-import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.InvoiceProduct;
 import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.model.ProductMaster;
@@ -115,16 +114,11 @@ public class InvoiceProductController {
 		newInvoiceProduct.setQty(qty);
 		newInvoiceProduct.setRatePerUnit(ratePerUnit);
 
-		Invoice parentInv = invoiceBD.getInvoice(invoiceId);
-		if (!parentInv.isGstInvoice()) {
-			TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
-			newInvoiceProduct.setVatType(appliedVatType);
-		} else {
-			TaxMaster appliedCgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, cgstTypeId);
-			newInvoiceProduct.setCgstType(appliedCgstType);
-			TaxMaster appliedSgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, sgstTypeId);
-			newInvoiceProduct.setSgstType(appliedSgstType);
-		}
+		TaxMaster appliedCgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, cgstTypeId);
+		newInvoiceProduct.setCgstType(appliedCgstType);
+		TaxMaster appliedSgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, sgstTypeId);
+		newInvoiceProduct.setSgstType(appliedSgstType);
+
 		newInvoiceProduct.setDiscount(discount);
 
 		logger.debug("Adding the product to invoice: " + newInvoiceProduct);
@@ -154,9 +148,7 @@ public class InvoiceProductController {
 		logger.debug("productId in request: " + productId);
 		InvoiceProduct invoiceProduct = invoiceBD.getProductInInvoice(id);
 		logger.debug("InvoiceProduct from DB: " + invoiceProduct);
-		
-		
-		
+
 		if (invoiceProduct.getInvoiceId().equals(invoiceId)
 				&& invoiceProduct.getProduct().getProductId().equals(productId)) {
 			InvoiceProduct toBeUpdatedInvoiceProduct = new InvoiceProduct();
@@ -165,22 +157,18 @@ public class InvoiceProductController {
 			toBeUpdatedInvoiceProduct.setProduct(invoiceProduct.getProduct());
 			toBeUpdatedInvoiceProduct.setQty(qty);
 			toBeUpdatedInvoiceProduct.setRatePerUnit(ratePerUnit);
-			Invoice parentInv = invoiceBD.getInvoice(invoiceId);
-			if (!parentInv.isGstInvoice()) {
-				TaxMaster appliedVatType = (TaxMaster) masterDataBD.get(TaxMaster.class, vatTypeId);
-				toBeUpdatedInvoiceProduct.setVatType(appliedVatType);
-			} else {
-				TaxMaster appliedCgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, cgstTypeId);
-				toBeUpdatedInvoiceProduct.setCgstType(appliedCgstType);
-				TaxMaster appliedSgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, sgstTypeId);
-				toBeUpdatedInvoiceProduct.setSgstType(appliedSgstType);
-			}
+
+			TaxMaster appliedCgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, cgstTypeId);
+			toBeUpdatedInvoiceProduct.setCgstType(appliedCgstType);
+			TaxMaster appliedSgstType = (TaxMaster) masterDataBD.get(TaxMaster.class, sgstTypeId);
+			toBeUpdatedInvoiceProduct.setSgstType(appliedSgstType);
 			toBeUpdatedInvoiceProduct.setDiscount(discount);
-			logger.debug("Adding the product to invoice: " + toBeUpdatedInvoiceProduct);
+			logger.debug("Updating the product to invoice: " + toBeUpdatedInvoiceProduct);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 			toBeUpdatedInvoiceProduct.setUpdateBy(auth.getName());
 			toBeUpdatedInvoiceProduct.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 			Response response = invoiceBD.updateProductInInvoice(toBeUpdatedInvoiceProduct);
+			logger.debug("Checking the update status: " + response);
 			if (!response.isStatus()) {
 				httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			}
@@ -194,10 +182,9 @@ public class InvoiceProductController {
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer invoiceProductSetId,
-			HttpServletResponse httpServletResponse) {
+	public @ResponseBody Response delete(@RequestParam Integer id, HttpServletResponse httpServletResponse) {
 
-		InvoiceProduct invoiceProductSet = invoiceBD.getProductInInvoice(invoiceProductSetId);
+		InvoiceProduct invoiceProductSet = invoiceBD.getProductInInvoice(id);
 		logger.debug("Deleting the product in invoice: " + invoiceProductSet);
 		Response response = invoiceBD.deleteProductFromInvoice(invoiceProductSet);
 		if (!response.isStatus()) {

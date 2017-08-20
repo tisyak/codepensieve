@@ -1,7 +1,6 @@
 package com.medsys.orders.dao;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -41,8 +40,6 @@ public interface InvoiceDAO {
 
 	public int getCountOfTotalInvoicesForYear();
 
-	public BigDecimal getTotalVATInYear();
-
 	public int getCountOfCustomerBilledForYear();
 
 	public int getCountOfCustomerBilledInMonth();
@@ -52,11 +49,17 @@ public interface InvoiceDAO {
 	BigDecimal getTotalSalesAmountInDateRange(Date startDate, Date endDate);
 
 	int getCountOfTotalInvoicesInDateRange(Date startDate, Date endDate);
+	
+	public BigDecimal getTotalVATInYear();
 
 	BigDecimal getTotalVATInDateRange(Date startDate, Date endDate);
 
 	int getCountOfCustomerBilledInDateRange(Date startDate, Date endDate);
 
-	public void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp);
+	public BigDecimal getTotalGSTInYear();
+	
+	BigDecimal getTotalGSTInDateRange(Date startDate, Date endDate);
+
+	//public void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp);
 	
 }

@@ -41,6 +41,7 @@ import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.ProductGroup;
+import com.medsys.product.model.ProductMaster;
 import com.medsys.ui.jasper.service.InvoiceReportDownloadService;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
@@ -137,8 +138,7 @@ public class InvoiceController extends SuperController {
 
 	private List<Orders> getOrdersForLastThreeMonths() {
 		Date startDate = CalendarUtility.getStartDateForLastThreeMonths();
-		Date endDate = CalendarUtility.getEndDateAndTimeOfToday();
-		return orderBD.searchForOrdersInDateRange(startDate, endDate);
+		return orderBD.searchForOrdersBeforeGivenDate(startDate);
 
 	}
 
@@ -244,6 +244,22 @@ public class InvoiceController extends SuperController {
 		pdtGroupList += "}";
 		// Figure out how to cache all these values
 		model.addAttribute("pdtGroupList", pdtGroupList);
+		
+		if (productGroupMasterList != null && productGroupMasterList.size() > 0) {
+			List<ProductMaster> productMasterList = setBD.getAllProductsInSetAndGroup(invoice.getOrder().getSet().getSetId(),
+					productGroupMasterList.get(0).getGroupId());
+			String pdtList = "{";
+			for (ProductMaster product : productMasterList) {
+				pdtList += "'" + product.getProductId() + "':'" + product.getProductCode() + " - "
+						+ product.getProductDesc() + "',";
+			}
+			pdtList = pdtList.substring(0, pdtList.length() - 1);
+			pdtList += "}";
+			// Figure out how to cache all these values
+			model.addAttribute("pdtList", pdtList);
+		} else {
+			logger.error("NO SETs found hence, products search aborted!");
+		}
 
 		/** VAT Listing for ADD Product Filter **/
 		List<MasterData> taxMasterList = masterDataBD.getAll(TaxMaster.class);
@@ -280,11 +296,11 @@ public class InvoiceController extends SuperController {
 		 * END Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
-		if (invoice.isGstInvoice()) {
+		/*if (invoice.isGstInvoice()) {*/
 			return MedsysUITiles.EDIT_GST_INVOICE.getTile();
-		} else {
+		/*} else {
 			return MedsysUITiles.EDIT_INVOICE.getTile();
-		}
+		}*/
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.SAVE_INVOICE, method = RequestMethod.POST)

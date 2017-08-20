@@ -1,20 +1,21 @@
 package com.medsys.product.bd;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.product.dao.SetDAO;
 import com.medsys.product.model.ProductGroup;
-import com.medsys.product.model.ProductInv;
+import com.medsys.product.model.ProductMaster;
 import com.medsys.product.model.Set;
 import com.medsys.product.model.SetPdtTemplate;
+import com.medsys.ui.util.UIConstants;
  
 @Service
 @Transactional
@@ -23,9 +24,6 @@ public class SetBDImpl implements SetBD {
      
     @Autowired
     private SetDAO setDAO;
-    
-    @Autowired
-    private ProductInvBD productInvBD;
  
     @Override
     public void addSet(Set set) {
@@ -37,6 +35,47 @@ public class SetBDImpl implements SetBD {
     public Set getSet(Integer setId)  {
         return setDAO.getSet(setId);
     }
+    
+    @Override
+	public Set getSetWithInstr(Integer setId) {
+		return  setDAO.getSetWithInstr(setId);
+	}
+    
+    @Override
+	public Set getSetWithProducts(Integer setId) {
+		return  setDAO.getSetWithProducts(setId);
+	}
+    
+    @Override
+	public Set getSetWithAlteredPricelist(Integer setId, Integer pricelistPercent) {
+		Set set =  setDAO.getSetWithProducts(setId);
+		for(SetPdtTemplate setPdtTemplate : set.getPdtTemplates()){
+			setPdtTemplate.setPricePerUnit(setPdtTemplate.getPricePerUnit()
+					.multiply(new BigDecimal(pricelistPercent))
+					.divide(new BigDecimal(UIConstants.ONE_HUNDRED.getValue())));
+		}
+				
+		return set;
+	}
+    
+    @Override
+   	public List<Set>  getQuotation(Integer pricelistPercent) {
+    	List<Set> lstSet =  setDAO.getAllSetsWithProducts();
+    	logger.debug("No.of sets: " + lstSet.size());
+    	int i=0;
+    	for(Set set: lstSet){    		
+    		logger.debug("Iterating for set: " + set.getSetName());
+    		logger.debug("No.of products in set: " + set.getPdtTemplates());
+	   		for(SetPdtTemplate setPdtTemplate : set.getPdtTemplates()){
+	   			setPdtTemplate.setPricePerUnit(setPdtTemplate.getPricePerUnit()
+	   					.multiply(new BigDecimal(pricelistPercent))
+	   					.divide(new BigDecimal(UIConstants.ONE_HUNDRED.getValue())));
+	   			i++;
+	   		}
+    	}
+    	logger.debug("No.of iterations run: " + i);		
+   		return lstSet;
+   	}
  
     @Override
     public void updateSet(Set set)  {
@@ -79,22 +118,10 @@ public class SetBDImpl implements SetBD {
 	}
 
 	@Override
-	public List<SetPdtTemplate> getAllProductsInSetAndGroup(Integer setId,Integer groupId) {
+	public List<ProductMaster> getAllProductsInSetAndGroup(Integer setId,Integer groupId) {
 		logger.debug("Get All products in Set: " + setId + " and Group: " + groupId);
-		List<SetPdtTemplate> setPdtTemplates =  setDAO.getAllProductsInSetAndGroup(setId,groupId);
-		
-		for(SetPdtTemplate pdtTemplate: setPdtTemplates){
-			try{
-				ProductInv productInv = productInvBD.getProductByCode(pdtTemplate.getProduct().getProductCode());
-				pdtTemplate.setAvailableQty(productInv.getAvailableQty());
-			}catch(EmptyResultDataAccessException e){ 
-				logger.debug("Product "+ pdtTemplate.getProduct().getProductCode() +" not found in Inventory");
-				pdtTemplate.setAvailableQty(0);
-			}
-			
-		}
-		
-		return setPdtTemplates;
+		List<ProductMaster> pdtList =  setDAO.getAllProductsInSetAndGroup(setId,groupId);
+		return pdtList;
 	}
 
 	@Override

@@ -36,6 +36,7 @@ import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.UIConstants;
 import com.medsys.util.EpMessage;
+import com.medsys.util.EpSystemError;
 
 @Controller
 @Secured(Roles.MASTER_ADMIN)
@@ -207,14 +208,24 @@ public class OrdersController extends SuperController {
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.DELETE_ORDER, method = RequestMethod.POST)
-	public String deleteOrdersPage(Integer orderId, Model model) {
+	public String deleteOrdersPage(Integer orderId, Model model, RedirectAttributes redirectAttrs) {
 
 		logger.info("IN: Order/delete-POST | orderId = " + orderId);
 
-		ordersBD.deleteOrder(orderId);
-		String message = "Order with orderId: " + orderId + " was successfully deleted";
-		model.addAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
-		return UIActions.REDIRECT + UIActions.LIST_ALL_ORDERS;
+		Response response = ordersBD.deleteOrder(orderId);
+		if (response.isStatus()) {
+			String message = "Order with orderId: " + orderId + " was successfully deleted";
+			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
+		} else {
+			if (response.getError().getErrorCode().equals(EpSystemError.NO_RECORD_FOUND.getErrorCode())) {
+				String message = "No such Order or Order has products attached. Hence delete of order failed.";
+				redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_SYSTEM_ERROR.getValue(), message);
+			} else {
+				String message = "Order with orderId: " + orderId + " failed. Kindly try again";
+				redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_SYSTEM_ERROR.getValue(), message);
+			}
+		}
+		return UIActions.REDIRECT + UIActions.LOAD_SEARCH_ORDERS;
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.ORDER_RESTORE_SET, method = RequestMethod.GET)
@@ -233,15 +244,14 @@ public class OrdersController extends SuperController {
 					+ ".Comments: " + response.getRemarks();
 			redirectAttrs.addFlashAttribute(UIConstants.MSG_FOR_SYSTEM_ERROR.getValue(), message);
 		}
-		
+
 		return UIActions.REDIRECT + UIActions.LIST_ALL_ORDERS;
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_ORDER_REPORT)
 	public void download(@RequestParam String type, @RequestParam String token, @RequestParam Integer orderId,
-			@RequestParam String challanKind, 
-			HttpServletResponse response) {
+			@RequestParam String challanKind, HttpServletResponse response) {
 		logger.debug("Requesting download of type: " + type + " with token: " + token);
-		ordersReportDownloadService.download(type, token, orderId,challanKind, response);
+		ordersReportDownloadService.download(type, token, orderId, challanKind, response);
 	}
 }

@@ -40,5 +40,5 @@
 		var="listAllSetAction" />
 
 	<button type="submit" formmethod="get" class="btn btn-default"
-		formaction="${listAllSetAction}">Cancel</button>
+		formaction="${listAllSetAction}">Cancel / Back</button>
 </form:form>

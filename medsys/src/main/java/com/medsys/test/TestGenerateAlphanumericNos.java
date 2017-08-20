@@ -16,7 +16,7 @@ public class TestGenerateAlphanumericNos {
 		try {
 			//writer = new PrintWriter("F:\\theGenerateAlphanumericNos.txt", "UTF-8");
 			
-			String invNumber = "INV-2017-AAA-000";
+			String invNumber = "INV-2016-ZZZ-998";
 			
 			while (i <= num_of_ids) {
 

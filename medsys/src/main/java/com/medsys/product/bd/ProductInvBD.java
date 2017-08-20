@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.medsys.common.model.Response;
 import com.medsys.exception.SysException;
+import com.medsys.product.model.ProductDeficit;
 import com.medsys.product.model.ProductInv;
 
 public interface ProductInvBD {
@@ -33,6 +34,8 @@ public interface ProductInvBD {
 	public Response deleteProduct(ProductInv product);
 
 	public int getCountOfProductsInDeficit();
+
+	public List<ProductDeficit> getProductDeficit();
 
 	
 

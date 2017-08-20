@@ -54,6 +54,7 @@
 
 	pageContext.setAttribute("vatTypeList", request.getAttribute("vatTypeList"));
 	pageContext.setAttribute("pdtGroupList", request.getAttribute("pdtGroupList"));
+	pageContext.setAttribute("pdtList", request.getAttribute("pdtList"));
 
 	pageContext.setAttribute("invoiceId", invoice.getInvoiceId());
 	pageContext.setAttribute("setId", invoice.getOrder().getSet().getSetId());
@@ -127,20 +128,8 @@
 					}},
 				{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
 		   			edittype:"select", editoptions: {
-											dataUrl: '${getFilteredProductsUrl}?setId='+${setId},
-											buildSelect: function(response){
-                                                                var data = $.parseJSON(eval(response));
-                                                                s = "<select>";
-																 
-																$.each(data, function(i, item) {
-																	 
-																	 s += '<option value="' + data[i].productId + '">' + data[i].productCode + ' - '+ data[i].productDesc + 
-                                                                       '</option>';
-																})
-                                                                
-                                                                return s + "</select>";
-                                                            }
-											}	
+		   				
+		   									value: ${pdtList}
 		   		},
 				{name:'product.productCode',index:'product.productCode', width: 40 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
@@ -555,11 +544,7 @@
 		<form:errors path="patientInfo" cssClass="error" />
 		<div class="col-sm-5">
 		<div class="col-sm-1">
-		<form:checkbox path="gstInvoice" title="gstInvoice"  disabled="true"/> 
-		<form:hidden path="gstInvoice" title="gstInvoice" />
-				</div>
-				<label class="col-sm-3" for="gstInvoice">GST Invoice</label>
-		<form:errors path="gstInvoice" cssClass="error" />	
+		
 		<div class="col-sm-1">
 		<form:checkbox path="billToPatient" title="billToPatient"  /> 
 				</div>
@@ -580,7 +565,7 @@
 		<button type="submit" formmethod="post" class="btn btn-primary"
 			formaction="${action}">Save Invoice</button>
 		<button type="submit" formmethod="get" class="btn btn-default"
-			formaction="${searchInvoiceAction}">Cancel</button>
+			formaction="${searchInvoiceAction}">Cancel / Back</button>
 		<br /> <br />
 
 		<!-- <input type="button" value="Edit Products in Invoice"

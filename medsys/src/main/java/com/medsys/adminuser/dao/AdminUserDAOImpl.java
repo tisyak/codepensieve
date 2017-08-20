@@ -88,8 +88,7 @@ public class AdminUserDAOImpl implements AdminUserDAO {
 		} else {
 			
 			logger.debug("AdminUser List Size: " + query.getResultList().size());
-			List<AdminUser> list = (List<AdminUser>) query.getResultList();
-			userObject = (AdminUser) list.get(0);
+			userObject = query.getSingleResult();
 			return userObject;
 		}
 	}

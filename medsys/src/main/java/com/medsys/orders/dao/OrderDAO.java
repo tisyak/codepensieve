@@ -43,4 +43,6 @@ public interface OrderDAO {
 
 	public Orders getOrderWithInstr(Integer orderId);
 
+	public List<Orders> searchForOrdersBeforeGivenDate(Date givenDate);
+
 }

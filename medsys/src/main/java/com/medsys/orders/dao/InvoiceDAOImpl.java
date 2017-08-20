@@ -1,7 +1,6 @@
 package com.medsys.orders.dao;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -119,7 +118,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		invoiceToUpdate.setPatientName(invoice.getPatientName());
 		invoiceToUpdate.setPatientInfo(invoice.getPatientInfo());
 		invoiceToUpdate.setBillToPatient(invoice.getBillToPatient());
-		invoiceToUpdate.setGstInvoice(invoice.getGstInvoice());
+		invoiceToUpdate.setPrintMRP(invoice.getPrintMRP());
 		invoiceToUpdate.setRefSource(invoice.getRefSource());
 		invoiceToUpdate.setUpdateBy(invoice.getUpdateBy());
 		invoiceToUpdate.setUpdateTimestamp(invoice.getUpdateTimestamp());
@@ -244,13 +243,15 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		invoiceProductToUpdate.setRatePerUnit(invoiceProduct.getRatePerUnit());
 		invoiceProductToUpdate.setVatType(invoiceProduct.getVatType());
 		invoiceProductToUpdate.setTotalBeforeTax(invoiceProduct.getTotalBeforeTax());
-		invoiceProductToUpdate.setTotalPrice(invoiceProduct.getTotalPrice());
+		invoiceProductToUpdate.setDiscount(invoiceProduct.getDiscount());
 		invoiceProductToUpdate.setVatAmount(invoiceProduct.getVatAmount());
 		invoiceProductToUpdate.setCgstAmount(invoiceProduct.getCgstAmount());
 		invoiceProductToUpdate.setSgstAmount(invoiceProduct.getSgstAmount());
+		invoiceProductToUpdate.setTotalPrice(invoiceProduct.getTotalPrice());
 		invoiceProductToUpdate.setUpdateBy(invoiceProduct.getUpdateBy());
 		invoiceProductToUpdate.setUpdateTimestamp(invoiceProduct.getUpdateTimestamp());
 		getCurrentSession().update(invoiceProductToUpdate);
+		getCurrentSession().flush();
 		return new Response(true, null);
 	}
 
@@ -260,6 +261,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		InvoiceProduct existingInvoiceProduct = getProductInInvoice(invoiceProduct.getInvoiceProductId());
 		if (existingInvoiceProduct != null) {
 			getCurrentSession().delete(existingInvoiceProduct);
+			getCurrentSession().flush();
 			return new Response(true, null);
 		}
 		return new Response(false, EpSystemError.NO_RECORD_FOUND);
@@ -348,6 +350,28 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	}
 
 	@Override
+	public BigDecimal getTotalGSTInYear() {
+		Date startDate = CalendarUtility.getFirstDateOfYear();
+		Date endDate = CalendarUtility.getLastDateOfYear();
+		return getTotalGSTInDateRange(startDate, endDate);
+	}
+
+	@Override
+	public BigDecimal getTotalGSTInDateRange(Date startDate, Date endDate) {
+		logger.debug("getTotalGSTInDateRange for - [" + startDate + " - " + endDate + "]");
+
+		Query<BigDecimal> sumQuery = getCurrentSession().createQuery(
+				"select sum(totalSgst)+sum(totalCgst) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ", BigDecimal.class);
+
+		sumQuery.setParameter("stDate", startDate, TemporalType.DATE);
+		sumQuery.setParameter("edDate", endDate, TemporalType.DATE);
+
+		logger.debug(sumQuery.toString());
+
+		return sumQuery.getSingleResult();
+	}
+	
+	@Override
 	public int getCountOfCustomerBilledForYear() {
 		Date startDate = CalendarUtility.getFirstDateOfYear();
 		Date endDate = CalendarUtility.getLastDateOfYear();
@@ -377,9 +401,9 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		return sumQuery.getSingleResult().intValue();
 	}
 
-	@Override
+	/*@Override
 	public void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp) {
-		/*
+		*
 		 * UPDATE public.invoice SET total_amount_before_tax =
 		 * invPdt.total_amount_before_tax, total_cgst = invPdt.total_cgst,
 		 * total_sgst = invPdt.total_sgst, total_vat = invPdt.total_vat,
@@ -393,9 +417,9 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		 * 
 		 * WHERE invoice_id = 20 GROUP BY invoice_id ) invPdt WHERE invoice_id =
 		 * 20
-		 */
+		 *
 
-		@SuppressWarnings("rawtypes")
+		
 		Query query = getCurrentSession().createNativeQuery("UPDATE public.invoice SET  "
 				+ " total_amount_before_tax = invPdt.total_amount_before_tax," + " total_cgst = invPdt.total_cgst,"
 				+ " total_sgst = invPdt.total_sgst, " + " total_vat = invPdt.total_vat, "
@@ -408,6 +432,6 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		query.setParameter("invoiceId",invoiceId);
 		query.executeUpdate();
 
-	}
+	}*/
 
 }

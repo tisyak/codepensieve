@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
-import com.medsys.product.bd.ProductGroupBD;
 import com.medsys.product.bd.ProductInvBD;
 import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.bd.SetBD;
@@ -49,9 +48,6 @@ public class ProductInventoryController {
 
 	@Autowired
 	private SetBD setBD;
-
-	@Autowired
-	private ProductGroupBD productGroupBD;
 
 	@Autowired
 	private ProductMasterBD productMasterBD;
@@ -123,16 +119,38 @@ public class ProductInventoryController {
 		model.addAttribute("setList", setList);
 
 		/** ProductGroup Listing for ADD Product Filter **/
-		List<ProductGroup> productGroupMasterList = productGroupBD.getAllProductGroup();
-		String pdtGroupList = "{";
-		for (ProductGroup productGroup : productGroupMasterList) {
-			pdtGroupList += "'" + productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
+		List<ProductGroup> productGroupMasterList = null;
+		if (setMasterList.size() > 0) {
+			productGroupMasterList = setBD.getAllProductGroupForSet(setMasterList.get(0).getSetId());
+			String pdtGroupList = "{";
+			for (ProductGroup productGroup : productGroupMasterList) {
+				pdtGroupList += "'" + productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
+			}
+			pdtGroupList = pdtGroupList.substring(0, pdtGroupList.length() - 1);
+			pdtGroupList += "}";
+			// Figure out how to cache all these values
+			model.addAttribute("pdtGroupList", pdtGroupList);
+		} else {
+			logger.error("NO SETs found hence, product group search aborted!");
 		}
-		pdtGroupList = pdtGroupList.substring(0, pdtGroupList.length() - 1);
-		pdtGroupList += "}";
-		// Figure out how to cache all these values
-		model.addAttribute("pdtGroupList", pdtGroupList);
-
+		
+		if (productGroupMasterList != null && productGroupMasterList.size() > 0) {
+			List<ProductMaster> productMasterList = setBD.getAllProductsInSetAndGroup(setMasterList.get(0).getSetId(),
+					productGroupMasterList.get(0).getGroupId());
+			String pdtList = "{";
+			for (ProductMaster product : productMasterList) {
+				pdtList += "'" + product.getProductId() + "':'" + product.getProductCode() + " - "
+						+ product.getProductDesc() + "("+product.getProductId()+")"+"',";
+			}
+			pdtList = pdtList.substring(0, pdtList.length() - 1);
+			pdtList += "}";
+			logger.debug("pdtList: "+ pdtList);
+			// Figure out how to cache all these values
+			model.addAttribute("pdtList", pdtList);
+		} else {
+			logger.error("NO SETs found hence, products search aborted!");
+		}
+		
 		/**
 		 * END Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options

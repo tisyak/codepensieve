@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.medsys.common.model.Response;
 import com.medsys.product.model.ProductGroup;
+import com.medsys.product.model.ProductMaster;
 import com.medsys.product.model.Set;
 import com.medsys.product.model.SetPdtTemplate;
 import com.medsys.util.EpSystemError;
@@ -35,12 +36,12 @@ public class SetDAOImpl implements SetDAO {
 		getCurrentSession().save(set);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Set getSet(Integer setId) {
 		logger.debug("SetDAOImpl.getSet() - [" + setId + "]");
-		Query<Set> query = getCurrentSession().createQuery("from Set where setId = " + setId + "");
-		// query.setParameter("setId", setId.toString());
+		Query<Set> query = getCurrentSession().createQuery("from Set where setId = :setId",Set.class);
+		
+		query.setParameter("setId", setId);
 
 		logger.debug(query.toString());
 		if (query.getResultList().size() == 0) {
@@ -48,14 +49,72 @@ public class SetDAOImpl implements SetDAO {
 			throw new EmptyResultDataAccessException("Set [" + setId + "] not found", 1);
 		} else {
 
-			logger.debug("Set List Size: " + query.getResultList().size());
-			List<Set> list = (List<Set>) query.getResultList();
-			Set set = (Set) list.get(0);
+			logger.debug("Set List Size: " + query.getSingleResult());
+			Set set = query.getSingleResult();
+
+			return set;
+		}
+	}
+	
+	@Override
+	public Set getSetWithInstr(Integer setId) {
+		logger.debug("SetDAOImpl.getSetWithInstr() - [" + setId + "]");
+		Query<Set> query = getCurrentSession().createQuery("from Set st LEFT JOIN FETCH st.instruments  where st.setId = :setId",Set.class);
+		
+		query.setParameter("setId", setId);
+
+		logger.debug(query.toString());
+		if (query.getResultList().size() == 0) {
+			logger.debug("No set found.");
+			throw new EmptyResultDataAccessException("Set [" + setId + "] not found", 1);
+		} else {
+
+			logger.debug("Set List Size: " + query.getSingleResult());
+			Set set = query.getSingleResult();
 
 			return set;
 		}
 	}
 
+	@Override
+	public Set getSetWithProducts(Integer setId) {
+		logger.debug("SetDAOImpl.getSetWithProducts() - [" + setId + "]");
+		Query<Set> query = getCurrentSession().createQuery("from Set st LEFT JOIN FETCH st.pdtTemplates  where st.setId = :setId",Set.class);
+		
+		query.setParameter("setId", setId);
+
+		logger.debug(query.toString());
+		if (query.getResultList().size() == 0) {
+			logger.debug("No set found.");
+			throw new EmptyResultDataAccessException("Set [" + setId + "] not found", 1);
+		} else {
+
+			logger.debug("Set List Size: " + query.getSingleResult());
+			Set set = query.getSingleResult();
+
+			return set;
+		}
+	}
+	
+	@Override
+	public List<Set> getAllSetsWithProducts() {
+		logger.debug("SetDAOImpl.getAllSetsWithProducts()");
+		Query<Set> query = getCurrentSession().createQuery("select distinct(st) from Set st LEFT JOIN FETCH st.pdtTemplates",Set.class);
+
+		logger.debug(query.toString());
+		if (query.getResultList().size() == 0) {
+			logger.debug("No sets found.");
+			throw new EmptyResultDataAccessException("No sets in system", 1);
+		} else {
+
+			logger.debug("Set List Size: " + query.getResultList().size());
+			List<Set> lstSet = query.getResultList();
+
+			return lstSet;
+		}
+	}
+	
+	
 	@Override
 	public void deleteSet(Integer setId) {
 		Set set = getSet(setId);
@@ -109,22 +168,22 @@ public class SetDAOImpl implements SetDAO {
 		logger.debug("Fetching all products in Set: " + setId);
 
 		List<SetPdtTemplate> pdtList = getCurrentSession()
-				.createQuery(" from SetPdtTemplate WHERE  parentSet.setId = " + setId, SetPdtTemplate.class).getResultList();
+				.createQuery(" from SetPdtTemplate WHERE  setId = " + setId, SetPdtTemplate.class).getResultList();
 		logger.debug("pdtList: " + pdtList);
 		return pdtList;
 	}
 
 	@Override
-	public List<SetPdtTemplate> getAllProductsInSetAndGroup(Integer setId, Integer groupId) {
+	public List<ProductMaster> getAllProductsInSetAndGroup(Integer setId, Integer groupId) {
 		logger.debug("Fetching all products in Set: " + setId + " and Group: " + groupId);
-		String queryForFilteredPdts = " from SetPdtTemplate ";
+		String queryForFilteredPdts = "select spt.product from SetPdtTemplate spt ";
 
 		if ((setId != null && !setId.equals(0)) || (groupId != null && !groupId.equals(0))) {
 			queryForFilteredPdts += " WHERE ";
 		}
 
 		if (setId != null && !setId.equals(0)) {
-			queryForFilteredPdts += " parentSet.setId = " + setId;
+			queryForFilteredPdts += " spt.setId = " + setId;
 		}
 
 		if (groupId != null && !groupId.equals(0)) {
@@ -132,9 +191,12 @@ public class SetDAOImpl implements SetDAO {
 			if (setId != null && !setId.equals(0)) {
 				queryForFilteredPdts += " AND ";
 			}
-			queryForFilteredPdts += " product.group.groupId = " + groupId;
+			queryForFilteredPdts += " spt.product.group.groupId = " + groupId;
 		}
-		List<SetPdtTemplate> pdtList = getCurrentSession().createQuery(queryForFilteredPdts,SetPdtTemplate.class).getResultList();
+		
+		queryForFilteredPdts += " order by spt.product.productCode ";
+		
+		List<ProductMaster> pdtList = getCurrentSession().createQuery(queryForFilteredPdts,ProductMaster.class).getResultList();
 		logger.debug("pdtList: " + pdtList);
 		return pdtList;
 	}

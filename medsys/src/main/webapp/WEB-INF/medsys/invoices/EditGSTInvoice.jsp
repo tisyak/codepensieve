@@ -55,6 +55,7 @@
 	pageContext.setAttribute("cgstTypeList", request.getAttribute("cgstTypeList"));
 	pageContext.setAttribute("sgstTypeList", request.getAttribute("sgstTypeList"));
 	pageContext.setAttribute("pdtGroupList", request.getAttribute("pdtGroupList"));
+	pageContext.setAttribute("pdtList", request.getAttribute("pdtList"));
 
 	pageContext.setAttribute("invoiceId", invoice.getInvoiceId());
 	pageContext.setAttribute("setId", invoice.getOrder().getSet().getSetId());
@@ -87,7 +88,7 @@
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['invoiceProductId', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','Taxable Value','Discount','CGST %','CGST Amount','SGST %','SGST Amount','Total', 'Actions'],
+		   	colNames:['invoiceProductId', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','Discount','Taxable Value','CGST %','CGST Amount','SGST %','SGST Amount','Total', 'Actions'],
 		   	colModel:[
 		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
 		   			{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, 
@@ -127,31 +128,16 @@
 					}},
 				{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
 		   			edittype:"select", editoptions: {
-											dataUrl: '${getFilteredProductsUrl}?setId='+${setId},
-											dataType: "json",
-											buildSelect: function(response){
-                                                                var data = $.parseJSON(eval(response));
-																//alert(data);
-                                                                s = "<select>";
-																// s = "";
-																$.each(data, function(i, item) {
-																	 
-																	 s += '<option value="' + data[i].productId + '">' + data[i].productCode + ' - '+ data[i].productDesc + 
-                                                                       '</option>';
-																})
-                                                                s += "</select>";
-																//alert(s);
-                                                                return s;
-                                                            }
-											}	
-		   		},
+		   				
+							value: ${pdtList}
+				},},
 				{name:'product.productCode',index:'product.productCode', width: 40 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
 		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
 		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30,align:'right'},
 		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} ,align:'center'},
-				{name:'totalBeforeTax',index:'totalBeforeTax', editrules: { edithidden: true }, width:30,align:'right'},
 				{name:'discount',index:'discount', editable: true, editrules: { edithidden: true }, width:30,align:'right'},
+		   		{name:'totalBeforeTax',index:'totalBeforeTax', editrules: { edithidden: true }, width:30,align:'right'},
 		   		{name:'cgstType.taxId',index:'cgstType.taxId', width:15,formatter: 'select',edittype:"select",editable: true, editoptions: { value: ${cgstTypeList}},align:'right'},
 		   		{name:'cgstAmount',index:'cgstAmount',width:20,editrules: { edithidden: true }, width:30, align:'right'},
 		   		{name:'sgstType.taxId',index:'sgstType.taxId', width:15,formatter: 'select',edittype:"select",editable: true, editoptions: { value: ${sgstTypeList}},align:'right'},
@@ -178,7 +164,11 @@
 							//triggering reloadGrid after save
 							afterSave: function () { $("#grid").setGridParam({datatype:'json',postData: data}).trigger('reloadGrid');},
 							//if true will show delete icon, else will hide
-							delbutton : true 
+							delbutton : true ,
+							delOptions:{
+								url: '${deleteUrl}'
+								
+							}
                     }
 				}
 		   	],
@@ -355,70 +345,6 @@
 	});
 
 
-	
-	
-	
-	
-	function deleteRow(obj, args) {
-		// Get the currently selected row
-	    var row = $('#grid').jqGrid('getGridParam','selrow');
-	    // A pop-up dialog will appear to confirm the selected action
-		if( row != null ) 
-			$('#grid').jqGrid( 'delGridRow', row,
-	          	{	url:'${deleteUrl}', 
-					recreateForm: true,
-				    beforeShowForm: function(form) {
-				    	//Change title
-				        $(".delmsg").replaceWith('<span style="white-space: pre;">' +
-				        		'Delete selected record?' + '</span>');
-		            	//hide arrows
-				        $('#pData').hide();  
-				        $('#nData').hide();
-				    },
-	          		reloadAfterSubmit:true,
-	          		closeAfterDelete: true,
-	          		serializeDelData: function (postdata) {
-		          	      var rowdata = $('#grid').getRowData(postdata.id);
-		          	      // append postdata with any information 
-		          	      return {id: postdata.id, oper: postdata.oper, username: rowdata.productId};
-		          	},
-	          		afterSubmit : function(response, postdata) 
-					{ 
-			            var result = eval('(' + response.responseText + ')');
-						var errors = "";
-						
-			            if (result.success == false) {
-							for (var i = 0; i < result.message.length; i++) {
-								errors +=  result.message[i] + "<br/>";
-							}
-			            }  else {
-			            	$('#msgbox').text('Entry has been deleted successfully');
-							$('#msgbox').dialog( 
-									{	title: 'Success',
-										modal: true,
-										buttons: {"Ok": function()  {
-											$(this).dialog("close");} 
-										}
-									});
-		                }
-				    	// only used for adding new records
-				    	var newId = null;
-			        	
-						return [result.success, errors, newId];
-					}
-	          	});
-		else {
-			$('#msgbox').text('You must select a record first!');
-			$('#msgbox').dialog( 
-					{	title: 'Error',
-						modal: true,
-						buttons: {"Ok": function()  {
-							$(this).dialog("close");} 
-						}
-					});
-		}
-	}
-	
 /*	function startEdit() {
             var grid = $("#grid");
             var ids = grid.jqGrid('getDataIDs');
@@ -599,18 +525,18 @@
 		</div>
 		<form:errors path="patientInfo" cssClass="error" />
 		<div class="col-sm-5">
-		<div class="col-sm-1">
-		<form:checkbox path="gstInvoice" title="gstInvoice" disabled="true"  /> 
-		<form:hidden path="gstInvoice" title="gstInvoice" />
-				</div>
-				<label class="col-sm-3" for="gstInvoice">GST Invoice</label>
-		<form:errors path="gstInvoice" cssClass="error" />	
-		<div class="col-sm-1">
-		<form:checkbox path="billToPatient" title="billToPatient"  /> 
-				</div>
-				<label class="col-sm-3" for="billToPatient">Bill to patient</label>
-		<form:errors path="billToPatient" cssClass="error" />	
-</div>		
+			
+			<div class="col-sm-1">
+				<form:checkbox path="billToPatient" title="billToPatient" />
+			</div>
+			<label class="col-sm-3" for="billToPatient">Bill to patient</label>
+			<form:errors path="billToPatient" cssClass="error" />
+			<div class="col-sm-1">
+				<form:checkbox path="printMRP" title="printMRP" />
+			</div>
+			<label class="col-sm-3" for="printMRP">Print MRP</label>
+			<form:errors path="printMRP" cssClass="error" />
+		</div>
 	</div>
 
 
@@ -625,7 +551,7 @@
 		<button type="submit" formmethod="post" class="btn btn-primary"
 			formaction="${action}">Save Invoice</button>
 		<button type="submit" formmethod="get" class="btn btn-default"
-			formaction="${searchInvoiceAction}">Cancel</button>
+			formaction="${searchInvoiceAction}">Cancel / Back</button>
 		<br /> <br />
 
 		<!-- <input type="button" value="Edit Products in Invoice"

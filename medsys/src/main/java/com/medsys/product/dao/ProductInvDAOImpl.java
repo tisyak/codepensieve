@@ -1,5 +1,7 @@
 package com.medsys.product.dao;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.exception.SysException;
+import com.medsys.product.model.ProductDeficit;
 import com.medsys.product.model.ProductInv;
 import com.medsys.util.EpSystemError;
 
@@ -211,7 +214,8 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 	public List<ProductInv> searchForProduct(ProductInv product) {
 		logger.debug("ProductInvDAOImpl.searchForProduct() - [" + product.toString() + "]");
 		Query<ProductInv> query = getCurrentSession().createQuery(
-				"from ProductInv where lower(product.productCode) like :productCode  order by product.productCode asc",ProductInv.class);
+				"from ProductInv where lower(product.productCode) like :productCode  order by product.productCode asc",
+				ProductInv.class);
 
 		if (product.getProduct().getProductCode() != null) {
 			query.setParameter("productCode", "%" + product.getProduct().getProductCode().toLowerCase() + "%");
@@ -250,8 +254,65 @@ public class ProductInvDAOImpl implements ProductInvDAO {
 
 	@Override
 	public int getCountOfProductsInDeficit() {
-		// TODO Auto-generated method stub
-		return 0;
+
+		logger.debug("getCountOfProductsInDeficit()");
+		@SuppressWarnings({ "rawtypes" })
+		Query countQuery = getCurrentSession().createNativeQuery(
+				"select count(setpdt.pid) from product_inv pinv inner join "
+						+ " (select sum(qty) as requiredqty,product_id as pid from set s "
+						+ " inner join set_pdt_template on s.set_id = set_pdt_template.set_id "
+						+ " where s.account_for_inventory = true group by product_id) as setpdt "
+						+ " on pinv.product_id = setpdt.pid  where (available_qty + engaged_qty) <requiredqty");
+
+		logger.debug(countQuery.toString());
+		return ((BigInteger)countQuery.getSingleResult()).intValue();
+
+	}
+
+	@Override
+	public List<ProductDeficit> getProductDeficit() {
+
+		logger.debug("ProductInvDAOImpl.getProductDeficit() ");
+		@SuppressWarnings("rawtypes")
+		Query query = getCurrentSession().createNativeQuery(
+				"select setpdt.pid as productId,product_code as productCode,product_desc as productDesc,"
+						+ " available_qty as availableQty,engaged_qty as engagedQty,setpdt.requiredqty as requiredQty, "
+						+ " (setpdt.requiredqty-engaged_qty-available_qty) as deficit,setsWithDeficit from product_inv pinv inner join "
+						+ " (select sum(qty) as requiredqty,product_id as pid ,"
+						+ " string_agg( set_name || '{' || qty || '}',',') as setsWithDeficit "
+						+ " from set s inner join set_pdt_template " + " on s.set_id = set_pdt_template.set_id "
+						+ " where s.account_for_inventory = true group by product_id) as setpdt "
+						+ " on  pinv.product_id = setpdt.pid "
+						+ " inner join m_product on setpdt.pid = m_product.product_id "
+						+ " where (available_qty + engaged_qty) < requiredqty order by product_code asc");
+
+		logger.debug(query.toString());
+		if (query.getResultList().size() == 0) {
+			logger.debug("No product deficit found.");
+			return null;
+		} else {
+
+			logger.debug("Product deficit found size: " + query.getResultList().size());
+			@SuppressWarnings("unchecked")
+			List<Object[]> list = query.getResultList();
+			List<ProductDeficit> lstProductDeficit = new ArrayList<>();
+			
+			for (Object[] rowData : list) {
+
+				ProductDeficit productDeficit = new ProductDeficit();
+				productDeficit.setProductId((Integer) rowData[0]);
+				productDeficit.setProductCode((String) rowData[1]);
+				productDeficit.setProductDesc((String) rowData[2]);
+				productDeficit.setAvailableQty((Integer) rowData[3]);
+				productDeficit.setEngagedQty((Integer) rowData[4]);
+				productDeficit.setRequiredQty(((BigInteger) rowData[5]).intValue());
+				productDeficit.setDeficit(((BigInteger) rowData[6]).intValue());
+				productDeficit.setSetsWithDeficit((String) rowData[7]);
+				lstProductDeficit.add(productDeficit);
+			}
+			return lstProductDeficit;
+		}
+
 	}
 
 }

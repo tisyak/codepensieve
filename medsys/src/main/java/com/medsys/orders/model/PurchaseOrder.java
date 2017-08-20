@@ -1,7 +1,6 @@
 package com.medsys.orders.model;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -16,17 +15,16 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.medsys.master.model.POStatusMaster;
+import com.medsys.master.model.PurchaseOrderStatusMaster;
 import com.medsys.supplier.model.Supplier;
 
 @Entity
-@Table(name = "purchase_po")
+@Table(name = "purchase_order")
 public class PurchaseOrder {
 
 	static Logger logger = LoggerFactory.getLogger(PurchaseOrder.class);
@@ -34,30 +32,30 @@ public class PurchaseOrder {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "po_id", columnDefinition = "serial")
-	private Integer poId;
+	private Integer purchaseOrderId;
 
 	@NotBlank(message = "{error.field.empty}")
 	@Size(max = 20, message = "{error.field.max}")
 	@Column(name = "po_number", length = 20)
-	private String poNumber;
+	private String purchaseOrderNumber;
 
 	@ManyToOne
-	@JoinColumn(columnDefinition = "uuid", name = "customer_id", referencedColumnName = "customer_id")
+	@JoinColumn(name = "supplier_id", referencedColumnName = "supplier_id")
 	private Supplier supplier;
 
 	@Column(name = "po_date")
 	@Type(type = "date")
 	@NotNull
-	private Date poDate;
+	private Date purchaseOrderDate;
 
 	@Column(name = "recieve_date")
 	@Type(type = "date")
 	@NotNull
-	private Date recieveDate;
+	private Date receiveDate;
 
 	@ManyToOne
 	@JoinColumn(name = "po_status_id", referencedColumnName = "po_status_id")
-	private POStatusMaster poStatus; 
+	private PurchaseOrderStatusMaster purchaseOrderStatus; 
 
 	/** The update by. */
 	@Column(name = "update_by")
@@ -67,58 +65,40 @@ public class PurchaseOrder {
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
 
-	@OneToMany(mappedBy = "poId")
-	java.util.SortedSet<POProductSet> products;
+	@OneToMany(mappedBy = "purchaseOrderId")
+	@javax.persistence.OrderBy("product ASC")
+	java.util.SortedSet<PurchaseOrderProductSet> products;
 
-	public PurchaseOrder() {}
-
-	public PurchaseOrder(boolean generatePONumber) {
-		super();
-		if (generatePONumber) {
-			Date date = new Date();
-			String modifiedDate = new SimpleDateFormat("yyMMdd").format(date);
-			this.setPONumber("RD-" + modifiedDate + "-" + RandomStringUtils.random(4, true, true));
-		}
+	public Integer getPurchaseOrderId() {
+		return purchaseOrderId;
 	}
 
-	public Integer getPOId() {
-		return poId;
+	public void setPurchaseOrderId(Integer purchaseOrderId) {
+		this.purchaseOrderId = purchaseOrderId;
 	}
 
-	public void setPOId(Integer poId) {
-		this.poId = poId;
+	public String getPurchaseOrderNumber() {
+		return purchaseOrderNumber;
 	}
 
-	public String getPONumber() {
-		return poNumber;
+	public void setPurchaseOrderNumber(String purchaseOrderNumber) {
+		this.purchaseOrderNumber = purchaseOrderNumber;
 	}
 
-	public void setPONumber(String poNumber) {
-		this.poNumber = poNumber;
+	public Date getPurchaseOrderDate() {
+		return purchaseOrderDate;
 	}
 
-	public Date getPODate() {
-		return poDate;
+	public void setPurchaseOrderDate(Date purchaseOrderDate) {
+		this.purchaseOrderDate = purchaseOrderDate;
 	}
 
-	public void setPODate(Date poDate) {
-		this.poDate = poDate;
+	public PurchaseOrderStatusMaster getPurchaseOrderStatus() {
+		return purchaseOrderStatus;
 	}
 
-	public Integer getPoId() {
-		return poId;
-	}
-
-	public void setPoId(Integer poId) {
-		this.poId = poId;
-	}
-
-	public String getPoNumber() {
-		return poNumber;
-	}
-
-	public void setPoNumber(String poNumber) {
-		this.poNumber = poNumber;
+	public void setPurchaseOrderStatus(PurchaseOrderStatusMaster purchaseOrderStatus) {
+		this.purchaseOrderStatus = purchaseOrderStatus;
 	}
 
 	public Supplier getSupplier() {
@@ -129,36 +109,12 @@ public class PurchaseOrder {
 		this.supplier = supplier;
 	}
 
-	public Date getPoDate() {
-		return poDate;
+	public Date getReceiveDate() {
+		return receiveDate;
 	}
 
-	public void setPoDate(Date poDate) {
-		this.poDate = poDate;
-	}
-
-	public Date getRecieveDate() {
-		return recieveDate;
-	}
-
-	public void setRecieveDate(Date recieveDate) {
-		this.recieveDate = recieveDate;
-	}
-
-	public POStatusMaster getPoStatus() {
-		return poStatus;
-	}
-
-	public void setPoStatus(POStatusMaster poStatus) {
-		this.poStatus = poStatus;
-	}
-
-	public POStatusMaster getPOStatus() {
-		return poStatus;
-	}
-
-	public void setPOStatus(POStatusMaster poStatus) {
-		this.poStatus = poStatus;
+	public void setReceiveDate(Date receiveDate) {
+		this.receiveDate = receiveDate;
 	}
 
 	public String getUpdateBy() {
@@ -177,11 +133,11 @@ public class PurchaseOrder {
 		this.updateTimestamp = updateTimestamp;
 	}
 
-	public java.util.SortedSet<POProductSet> getProducts() {
+	public java.util.SortedSet<PurchaseOrderProductSet> getProducts() {
 		return products;
 	}
 
-	public void setProducts(java.util.SortedSet<POProductSet> products) {
+	public void setProducts(java.util.SortedSet<PurchaseOrderProductSet> products) {
 		this.products = products;
 	}
 
@@ -189,8 +145,8 @@ public class PurchaseOrder {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((poId == null) ? 0 : poId.hashCode());
-		result = prime * result + ((poNumber == null) ? 0 : poNumber.hashCode());
+		result = prime * result + ((purchaseOrderId == null) ? 0 : purchaseOrderId.hashCode());
+		result = prime * result + ((purchaseOrderNumber == null) ? 0 : purchaseOrderNumber.hashCode());
 		return result;
 	}
 
@@ -203,24 +159,24 @@ public class PurchaseOrder {
 		if (getClass() != obj.getClass())
 			return false;
 		PurchaseOrder other = (PurchaseOrder) obj;
-		if (poId == null) {
-			if (other.poId != null)
+		if (purchaseOrderId == null) {
+			if (other.purchaseOrderId != null)
 				return false;
-		} else if (!poId.equals(other.poId))
+		} else if (!purchaseOrderId.equals(other.purchaseOrderId))
 			return false;
-		if (poNumber == null) {
-			if (other.poNumber != null)
+		if (purchaseOrderNumber == null) {
+			if (other.purchaseOrderNumber != null)
 				return false;
-		} else if (!poNumber.equals(other.poNumber))
+		} else if (!purchaseOrderNumber.equals(other.purchaseOrderNumber))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "PurchasePO [poId=" + poId + ", poNumber=" + poNumber + ", supplier=" + supplier + ", poDate=" + poDate
-				+ ", recieveDate=" + recieveDate + ", poStatus=" + poStatus + ", updateBy=" + updateBy
-				+ ", updateTimestamp=" + updateTimestamp + ", products=" + products + "]";
+		return "PurchasePO [poId=" + purchaseOrderId + ", poNumber=" + purchaseOrderNumber + ", supplier=" + supplier + ", poDate=" + purchaseOrderDate
+				+ ", recieveDate=" + receiveDate + ", poStatus=" + purchaseOrderStatus + ", updateBy=" + updateBy
+				+ ", updateTimestamp=" + updateTimestamp + "]";
 	}
 
 

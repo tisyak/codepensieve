@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -28,13 +29,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.medsys.adminuser.model.Roles;
 import com.medsys.common.model.Response;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.product.bd.ProductMasterBD;
 import com.medsys.product.bd.SetBD;
+import com.medsys.product.model.ProductGroup;
 import com.medsys.product.model.ProductMaster;
 import com.medsys.product.model.Set;
 import com.medsys.product.model.SetPdtTemplate;
+import com.medsys.ui.jasper.service.SetReportDownloadService;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
 import com.medsys.ui.util.UIConstants;
@@ -42,6 +46,7 @@ import com.medsys.ui.util.jqgrid.JqgridResponse;
 import com.medsys.util.EpMessage;
 
 @Controller
+@Secured(Roles.MASTER_ADMIN)
 public class SetController {
 
 	static Logger logger = LoggerFactory.getLogger(SetController.class);
@@ -51,6 +56,9 @@ public class SetController {
 	
 	@Autowired
 	private ProductMasterBD productMasterBD;
+	
+	@Autowired
+	private SetReportDownloadService setReportDownloadService;
 	
 	@RequestMapping(value = { UIActions.FORWARD_SLASH + UIActions.LIST_ALL_SETS }, method = RequestMethod.GET)
 	public String listOfSets(Model model) {
@@ -230,6 +238,36 @@ public class SetController {
 	}
 	
 	@RequestMapping(value = UIActions.FORWARD_SLASH
+			+ UIActions.SEARCH_PRODUCT_GRP_BY_SET_URL, produces = "application/json")
+	public @ResponseBody String searchBySetandGroup(
+			@RequestParam(value = "setId", required = false) Integer setId) {
+
+		
+		logger.debug("search Product grp By Set: " );
+		List<ProductGroup> setPdtGroups = null;
+		if((setId!=null && !setId.equals(0))){
+			setPdtGroups = setBD.getAllProductGroupForSet(setId);
+		}else{
+			logger.debug("No search criteria given. Hence, returning empty: " );
+		}
+	
+		final StringWriter sw =new StringWriter();
+	    final ObjectMapper mapper = new ObjectMapper();
+
+	    try {
+			mapper.writeValue(sw, setPdtGroups);
+		} catch (IOException e) {
+			logger.error("Unable to convert to JSON. Error: " + e.getMessage());
+		}
+
+		String productGroupsList = sw.toString();
+		logger.debug("productGroupsList: " + productGroupsList);
+		
+		return productGroupsList;
+	}
+
+	
+	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.SEARCH_PRODUCTS_BY_SET_GRP_URL, produces = "application/json")
 	public @ResponseBody String searchBySetandGroup(
 			@RequestParam(value = "setId", required = false) Integer setId,
@@ -237,17 +275,12 @@ public class SetController {
 
 		
 		logger.debug("search By Set and Group: " );
-		List<SetPdtTemplate> setPdtTemplates;
-		List<ProductMaster> pdtMasterList;
+		List<ProductMaster> pdtMasterList = null;
 		if((setId!=null && !setId.equals(0)) || (groupId!=null && !groupId.equals(0))){
-			setPdtTemplates = setBD.getAllProductsInSetAndGroup(setId,groupId);
-			pdtMasterList = new ArrayList<>(setPdtTemplates.size());
-			for (SetPdtTemplate pdt : setPdtTemplates) {
-				pdtMasterList.add(pdt.getProduct());
-			}
+			pdtMasterList = setBD.getAllProductsInSetAndGroup(setId,groupId);
+			
 		}else{
-			logger.debug("No search criteria given. Hence, retrieving complete Product Master List: " );
-			pdtMasterList = productMasterBD.getAllProductMaster();
+			logger.debug("No search criteria given. Hence, returning empty List: " );
 		}
 	
 		final StringWriter sw =new StringWriter();
@@ -279,8 +312,7 @@ public class SetController {
 			HttpServletResponse httpServletResponse) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
-		Set parentSet = setBD.getSet(setId);
-		SetPdtTemplate newSetPdtTemplate = new SetPdtTemplate(parentSet, null, product, qty);
+		SetPdtTemplate newSetPdtTemplate = new SetPdtTemplate(setId, null, product, qty);
 
 		logger.debug("Adding the product to set: " + newSetPdtTemplate);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -307,8 +339,7 @@ public class SetController {
 		} catch (NumberFormatException numEx) {
 			logger.debug("Received Id is not an Integer. Hence passing on Null");
 		}
-		Set parentSet = setBD.getSet(setId);
-		SetPdtTemplate toBeUpdatedSetPdtTemplate = new SetPdtTemplate(parentSet, convertIdtoInt, product, qty);
+		SetPdtTemplate toBeUpdatedSetPdtTemplate = new SetPdtTemplate(setId, convertIdtoInt, product, qty);
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		toBeUpdatedSetPdtTemplate.setUpdateBy(auth.getName());
 		toBeUpdatedSetPdtTemplate.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
@@ -341,5 +372,19 @@ public class SetController {
 			orderProducts.add(orderProduct);
 		}
 		return orderProducts;
+	}
+	
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_SET_REPORT)
+	public void download(@RequestParam String type, @RequestParam String token, @RequestParam Integer setId,
+			@RequestParam String challanKind, 
+			@RequestParam String extraParam, 
+			HttpServletResponse response) {
+		logger.debug("Requesting download of type: " + type + " with token: " + token);
+		setReportDownloadService.download(type, token, setId,challanKind,extraParam, response);
+	}
+	
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_QUOTATION)
+	public String loadSalesTaxReportPage(Model model) {
+		return MedsysUITiles.QUOTATION.getTile();
 	}
 }

@@ -47,5 +47,5 @@
 							
 		<button type="submit" formmethod="get" class="btn btn-default"
 											formaction="${viewProfile}">
-		Cancel </button> 
+		Cancel / Back </button> 
     </form:form>

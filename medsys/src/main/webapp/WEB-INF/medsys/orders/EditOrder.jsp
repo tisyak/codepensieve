@@ -363,7 +363,7 @@
 			formaction="${action}">Save Order</button>
 		
 		<button type="submit" formmethod="get" class="btn btn-default"
-			formaction="${searchOrdersAction}">Cancel</button>
+			formaction="${searchOrdersAction}">Cancel / Back</button>
 		<br /> <br />
 		
 		<input type="button" value="Edit Products in Order"

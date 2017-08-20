@@ -72,7 +72,7 @@
   <logger name="org.w3c.tidy" level="OFF"/>
   <logger name="ch.qos" level="WARN"/>
   <logger name="org.slf4j" level="OFF"/>
-  <logger name="org.springframework" level="ERROR"/>
+  <logger name="org.springframework" level="WARN"/>
   <logger name="org.apache" level="WARN"/>
   <logger name="org.jboss" level="WARN"/>
   <logger name="org.hibernate" level="DEBUG"/>

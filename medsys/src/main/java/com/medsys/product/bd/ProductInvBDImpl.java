@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.medsys.common.model.Response;
 import com.medsys.exception.SysException;
 import com.medsys.product.dao.ProductInvDAO;
+import com.medsys.product.model.ProductDeficit;
 import com.medsys.product.model.ProductInv;
  
 @Service
@@ -86,10 +87,8 @@ public class ProductInvBDImpl implements ProductInvBD {
 				+ ".Adding quantity: " + qtyTobeAdded + " and Discarding Qty: " + qtyTobeDiscarded 
 				+ ".Other properties:- {MRP: " + product.getMrp() + " , Price: " + product.getPrice() + "}");
 		ProductInv toBeUpdatedProductInv = productInvDAO.getProduct(product.getProductInvId());
-		Integer orgQty = toBeUpdatedProductInv.getOrgQty();
 		Integer avlQty = toBeUpdatedProductInv.getAvailableQty();
 		Integer dscrdQty = toBeUpdatedProductInv.getDiscardedQty();
-		toBeUpdatedProductInv.setOrgQty(orgQty + qtyTobeAdded);
 		toBeUpdatedProductInv.setAvailableQty(avlQty + qtyTobeAdded - qtyTobeDiscarded);
 		toBeUpdatedProductInv.setDiscardedQty(dscrdQty + qtyTobeDiscarded);
 		toBeUpdatedProductInv.setMrp(product.getMrp());
@@ -109,6 +108,9 @@ public class ProductInvBDImpl implements ProductInvBD {
 		return productInvDAO.getCountOfProductsInDeficit();
 	}
 
-	
+	@Override
+	public List<ProductDeficit> getProductDeficit() {
+		return productInvDAO.getProductDeficit();
+	}
    
 }

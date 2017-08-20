@@ -1,5 +1,6 @@
 package com.medsys.product.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import javax.persistence.Column;
@@ -17,8 +18,13 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "set")
-public class Set {
+public class Set implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2595844272504689472L;
+
 	static Logger logger = LoggerFactory.getLogger(Set.class);
 
 	@Id
@@ -48,6 +54,10 @@ public class Set {
 	@OneToMany(mappedBy = "setId")
 	@javax.persistence.OrderBy("instrDesc ASC")
 	java.util.SortedSet<SetInstrument> instruments;
+	
+	@OneToMany(mappedBy = "setId")
+	@javax.persistence.OrderBy("product ASC")
+	java.util.SortedSet<SetPdtTemplate> pdtTemplates;
 	
 	public Integer getSetId() {
 		return setId;
@@ -81,6 +91,14 @@ public class Set {
 		this.instruments = instruments;
 	}
 
+	public java.util.SortedSet<SetPdtTemplate> getPdtTemplates() {
+		return pdtTemplates;
+	}
+
+	public void setPdtTemplates(java.util.SortedSet<SetPdtTemplate> pdtTemplates) {
+		this.pdtTemplates = pdtTemplates;
+	}
+
 	public String getUpdateBy() {
 		return updateBy;
 	}
@@ -101,6 +119,37 @@ public class Set {
 	public String toString() {
 		return "Set [setId=" + setId + ", setName=" + setName + ", setDesc=" + setDesc + ", updateBy=" + updateBy
 				+ ", updateTimestamp=" + updateTimestamp + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((setId == null) ? 0 : setId.hashCode());
+		result = prime * result + ((setName == null) ? 0 : setName.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Set other = (Set) obj;
+		if (setId == null) {
+			if (other.setId != null)
+				return false;
+		} else if (!setId.equals(other.setId))
+			return false;
+		if (setName == null) {
+			if (other.setName != null)
+				return false;
+		} else if (!setName.equals(other.setName))
+			return false;
+		return true;
 	}
 	
 	

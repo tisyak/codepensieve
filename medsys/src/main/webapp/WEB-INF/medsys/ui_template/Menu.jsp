@@ -35,8 +35,8 @@
 							<li><spring:url
 									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_ORDER%>"
 									var="addOrder" /> <a href="${addOrder}"><i
-									class="glyphicon glyphicon-file"></i><span> Create
-										New Order </span></a></li>
+									class="glyphicon glyphicon-file"></i><span> Create New
+										Order </span></a></li>
 
 							<li><spring:url
 									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_SEARCH_INVOICES%>"
@@ -47,14 +47,34 @@
 							<li><spring:url
 									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_INVOICE%>"
 									var="addInvoice" /> <a href="${addInvoice}"><i
-									class="glyphicon  glyphicon-upload"></i><span>
-										Generate Invoice </span></a></li>
+									class="glyphicon  glyphicon-upload"></i><span> Generate
+										Invoice </span></a></li>
 
 
 
 						</ul></li>
 
+					<li class="nav-header hidden-md">Purchase Section</li>
+					<li class="accordion"><a href="#"><i
+							class="glyphicon glyphicon-plus"></i><span> Purchase Orders</span></a>
+						<ul class="nav nav-pills nav-stacked">
 
+
+							<li><spring:url
+									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_SEARCH_PURCHASE_ORDER%>"
+									var="searchPurchaseOrder" /> <a href="${searchPurchaseOrder}"><i
+									class="glyphicon  glyphicon-search"></i><span> Search
+										PO</span></a></li>
+
+							<li><spring:url
+									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_PURCHASE_ORDER%>"
+									var="addPO" /> <a href="${addPO}"><i
+									class="glyphicon  glyphicon-upload"></i><span> Raise new
+										PO </span></a></li>
+
+
+
+						</ul></li>
 
 					<li class="nav-header hidden-md">Product Management Section</li>
 					<li><spring:url
@@ -75,15 +95,20 @@
 							<li><spring:url
 									value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_SET%>"
 									var="addSet" /> <a href="${addSet}"><i
-									class="glyphicon glyphicon-file"></i><span> Create
-										New Set </span></a></li>
+									class="glyphicon glyphicon-file"></i><span> Create New
+										Set </span></a></li>
 
 						</ul></li>
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_PRODUCT_GROUP%>"
 							var="manageProductGroup" /> <a href="${manageProductGroup}"><i
-							class="glyphicon  glyphicon-folder-open"></i><span>  Manage
+							class="glyphicon  glyphicon-folder-open"></i><span> Manage
 								Product Group</span></a></li>
+					<li><spring:url
+							value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_QUOTATION%>"
+							var="generateQuotation" /> <a href="${generateQuotation}"><i
+							class="glyphicon  glyphicon-exclamation-sign"></i><span>
+								Generate Quote</span></a></li>
 					<li class="nav-header hidden-md">Master Records</li>
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_CUSTOMERS%>"
@@ -104,7 +129,8 @@
 							<li><spring:url
 									value="<%=UIActions.FORWARD_SLASH + UIActions.MANAGE_TAX_MASTER%>"
 									var="manageTaxMaster" /> <a href="${manageTaxMaster}"><i
-									class="glyphicon  glyphicon-pencil"></i><span> Tax Master</span></a></li>
+									class="glyphicon  glyphicon-pencil"></i><span> Tax
+										Master</span></a></li>
 							<li>
 						</ul></li>
 
@@ -112,7 +138,8 @@
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_SALES_TAX_REPORT%>"
 							var="viewSalesTax" /> <a href="${viewSalesTax}"><i
-							class="glyphicon  glyphicon-exclamation-sign"></i><span> Sales Tax</span></a></li>
+							class="glyphicon  glyphicon-exclamation-sign"></i><span>
+								Sales Tax</span></a></li>
 					<li><spring:url
 							value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_PRODUCT_DEFICIT_REPORT%>"
 							var="productsInDeficit" /> <a href="${productsInDeficit}"><i
