@@ -153,10 +153,10 @@ public class PurchaseOrderProductController {
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_PURCHASE_ORDER, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer purchaseOrderProductSetId,
+	public @ResponseBody Response delete(@RequestParam Integer id,
 			HttpServletResponse httpServletResponse) {
 
-		PurchaseOrderProductSet purchaseOrderProductSet = purchaseOrderBD.getProductInPurchaseOrder(purchaseOrderProductSetId);
+		PurchaseOrderProductSet purchaseOrderProductSet = purchaseOrderBD.getProductInPurchaseOrder(id);
 		logger.debug("Deleting the product in purchaseOrder: " + purchaseOrderProductSet);
 		Response response = purchaseOrderBD.deleteProductFromPurchaseOrder(purchaseOrderProductSet);
 		if (!response.isStatus()) {

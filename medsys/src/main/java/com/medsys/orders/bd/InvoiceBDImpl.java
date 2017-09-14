@@ -100,8 +100,11 @@ public class InvoiceBDImpl implements InvoiceBD {
 		try {
 
 			newInvoiceProduct = this.calculateEffectiveTaxAndPrice(newInvoiceProduct);
-
-			productInvBD.sellProduct(newInvoiceProduct.getProduct().getProductCode(), newInvoiceProduct.getQty());
+			if (!newInvoiceProduct.getProduct().isExemptFromInventoryControl()) {
+				productInvBD.sellProduct(newInvoiceProduct.getProduct().getProductCode(), newInvoiceProduct.getQty());
+			} else {
+				logger.info("Bypassing inventory because product exempt from inventory control!!!");
+			}
 
 			Response response = invoiceDAO.addProductToInvoice(newInvoiceProduct);
 
@@ -134,7 +137,8 @@ public class InvoiceBDImpl implements InvoiceBD {
 		if (!orgInvoiceProduct.getProduct().getProductId().equals(invoiceProduct.getProduct().getProductId())) {
 			return new Response(false, EpSystemError.INVOICE_PRODUCT_ID_MISMATCH);
 		}
-		if (orgInvoiceProduct.getQty() != invoiceProduct.getQty()) {
+		if (orgInvoiceProduct.getQty() != invoiceProduct.getQty()
+				&& !invoiceProduct.getProduct().isExemptFromInventoryControl()) {
 
 			// Managing product inventory before updating product to the invoice
 			try {
@@ -146,7 +150,9 @@ public class InvoiceBDImpl implements InvoiceBD {
 				return new Response(false, e.getErrorCode());
 			}
 		} else {
-			logger.info("Quantities are same ... Nothing to update in Product Inventory! Proceeding ahead.");
+			logger.info("Quantities are same OR Product is exempt from inventory control ( "
+					+ invoiceProduct.getProduct().isExemptFromInventoryControl()
+					+ " ) ... Nothing to update in Product Inventory! Proceeding ahead.");
 		}
 
 		invoiceProduct = this.calculateEffectiveTaxAndPrice(invoiceProduct);
@@ -180,7 +186,7 @@ public class InvoiceBDImpl implements InvoiceBD {
 		BigDecimal effectiveCgst = totalAmountBeforeTax.multiply(cgstPercentageMultiplier);
 		logger.debug("effectiveCgst " + effectiveCgst);
 		invoiceProduct.setCgstAmount(effectiveCgst);
-		totalAmountAfterTax = totalAmountBeforeTax.add(effectiveCgst);
+		totalAmountAfterTax = totalAmountBeforeTax.add(invoiceProduct.getCgstAmount());
 		logger.debug("totalAmountAfter CGST Tax " + totalAmountAfterTax);
 
 		BigDecimal sgstPercentage = invoiceProduct.getSgstType().getTax_percentage();
@@ -189,7 +195,7 @@ public class InvoiceBDImpl implements InvoiceBD {
 		BigDecimal effectiveSgst = totalAmountBeforeTax.multiply(sgstPercentageMultiplier);
 		logger.debug("effectiveSgst " + effectiveSgst);
 		invoiceProduct.setSgstAmount(effectiveSgst);
-		totalAmountAfterTax = totalAmountAfterTax.add(effectiveSgst);
+		totalAmountAfterTax = totalAmountAfterTax.add(invoiceProduct.getSgstAmount());
 		logger.debug("totalAmountAfter SGST Tax " + totalAmountAfterTax);
 		/* End Of GST multiplier */
 
@@ -218,7 +224,13 @@ public class InvoiceBDImpl implements InvoiceBD {
 		logger.info("DELETE invoiceProduct: " + invoiceProduct);
 		// Managing product inventory before deleting product to the invoice
 		try {
-			productInvBD.cancelProductSale(invoiceProduct.getProduct().getProductCode(), invoiceProduct.getQty());
+			
+			if (!invoiceProduct.getProduct().isExemptFromInventoryControl()) {
+				productInvBD.cancelProductSale(invoiceProduct.getProduct().getProductCode(), invoiceProduct.getQty());
+			} else {
+				logger.info("Bypassing inventory because product exempt from inventory control!!!");
+			}
+			
 
 			Response response = invoiceDAO.deleteProductFromInvoice(invoiceProduct);
 

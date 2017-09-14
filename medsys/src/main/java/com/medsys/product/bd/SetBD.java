@@ -44,6 +44,8 @@ public interface SetBD {
 	
 	public List<Set>  getQuotation(Integer pricelistPercent);
 
+	public List<ProductMaster> getMiscellaneousProducts(Integer setId);
+
 	
 
 	

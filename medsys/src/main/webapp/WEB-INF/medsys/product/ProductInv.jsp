@@ -54,7 +54,6 @@
 
 	pageContext.setAttribute("setList", request.getAttribute("setList"));
 	pageContext.setAttribute("pdtGroupList", request.getAttribute("pdtGroupList"));
-	pageContext.setAttribute("pdtList", request.getAttribute("pdtList"));
 
 %>
 <script>
@@ -65,7 +64,6 @@
 	
 	var setList = ${setList};
 	var pdtGroupList = ${pdtGroupList};
-	var pdtList = ${pdtList};
 	//headers[csrfHeader] = csrfToken; 
 	
 	//alert("data for ajax submit: " + data);
@@ -158,7 +156,24 @@
 								} // end type
 							] // dataevents
 					}},
-				{name:'product.productId',index:'product.productId', width:20, hidden:true, width:50, editable: true, editrules: { edithidden: true }},
+				{name:'product.productId',index:'product.productId', width:20, hidden:true, editable: true, editrules: { edithidden: true }, 
+					edittype:"select", editoptions: {
+						dataUrl: '${getFilteredProductsUrl}',
+						buildSelect: function(response){
+                                            var data = $.parseJSON(eval(response));
+                                            s = "<select>";
+											 
+											$.each(data, function(i, item) {
+												 
+												 s += '<option value="' + data[i].productId + '">' + data[i].productCode +
+                                                   '</option>';
+											})
+                                            
+                                            return s + "</select>";
+                                        }
+						}	
+				
+				},
 				{name:'product.productCode',index:'product.productCode', width: 30 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
 		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
@@ -229,11 +244,11 @@
 			
 		});
 		$("#grid").jqGrid('navGrid','#pager',
-				{edit:false, add:false, del:false, search:true, cloneToTop: true },
+				{edit:false, add:true, del:false, search:true, cloneToTop: true },
 				{}, 
 				// options for the Add Dialog
                 {
-					/*beforeShowForm: function(form) { 
+					beforeShowForm: function(form) { 
 												//During edit hide the Set and Group Columns 
 												//and disable the Product Code
 												$("#tr_qtyTobeAdded", form).hide(); 

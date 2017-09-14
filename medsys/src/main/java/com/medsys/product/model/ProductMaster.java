@@ -13,9 +13,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 @Entity
 @Table(name = "m_product")
@@ -54,6 +56,9 @@ public class ProductMaster implements Serializable, Comparable<ProductMaster> {
 	@ManyToOne
 	@JoinColumn(name = "group_id", referencedColumnName = "group_id")
 	private ProductGroup group;
+	
+	@Column(name = "exempt_from_inventory_control")
+	private Boolean exemptFromInventoryControl;
 
 	public Integer getProductId() {
 		return productId;
@@ -103,7 +108,18 @@ public class ProductMaster implements Serializable, Comparable<ProductMaster> {
 		this.group = group;
 	}
 	
-	
+	@JsonIgnore
+	public Boolean isExemptFromInventoryControl() {
+		return exemptFromInventoryControl;
+	}
+
+	public Boolean getExemptFromInventoryControl() {
+		return exemptFromInventoryControl;
+	}
+
+	public void setExemptFromInventoryControl(Boolean exemptFromInventoryControl) {
+		this.exemptFromInventoryControl = exemptFromInventoryControl;
+	}
 
 	@Override
 	public int hashCode() {

@@ -132,13 +132,13 @@ public class POExcelDownloadService {
 
 				File newFile = new File(POFileName);
 				boolean isFileCreated = newFile.createNewFile();
-				if (isFileCreated) {
+				//if (isFileCreated) {
 					FileOutputStream outputStream = new FileOutputStream(newFile);
 					templateWorkbook.write(outputStream);
 					outputStream.close();
-				} else {
+				/*} else {
 					logger.error("Unable to create new file in path: " + POFileName);
-				}
+				}*/
 				templateWorkbook.close();
 				templateInputStream.close();
 

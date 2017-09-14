@@ -167,9 +167,22 @@ $(function() {
 						] // dataevents
 				}},
 			{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
-	   			edittype:"select", editoptions: {
-	   										value: ${pdtList}
-										}	
+					edittype:"select", editoptions: {
+						dataUrl: '${getFilteredProductsUrl}',
+						buildSelect: function(response){
+                                            var data = $.parseJSON(eval(response));
+                                            s = "<select>";
+											 
+											$.each(data, function(i, item) {
+												 
+												 s += '<option value="' + data[i].productId + '">' + data[i].productCode +
+                                                   '</option>';
+											})
+                                            
+                                            return s + "</select>";
+                                        }
+						}	
+					
 	   		},
 				{name:'product.productCode',index:'product.productCode', width: 40 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
@@ -191,7 +204,11 @@ $(function() {
 							//triggering reloadGrid after save
 							afterSave: function () { $("#grid").setGridParam({datatype:'json',postData: data}).trigger('reloadGrid');},
 							//if true will show delete icon, else will hide
-							delbutton : true 
+							delbutton : true ,
+							delOptions:{
+								url: '${deleteUrl}'
+								
+							} 
                     }
 				}
 		   	],

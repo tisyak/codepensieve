@@ -53,13 +53,13 @@ public class SetController {
 
 	@Autowired
 	private SetBD setBD;
-	
+
 	@Autowired
 	private ProductMasterBD productMasterBD;
-	
+
 	@Autowired
 	private SetReportDownloadService setReportDownloadService;
-	
+
 	@RequestMapping(value = { UIActions.FORWARD_SLASH + UIActions.LIST_ALL_SETS }, method = RequestMethod.GET)
 	public String listOfSets(Model model) {
 		logger.info("IN: Set/list-GET");
@@ -128,7 +128,7 @@ public class SetController {
 			logger.info("Set-add error: " + result.toString());
 			model.addAttribute(UIConstants.MSG_FOR_USER_ERROR.getValue(), result.getAllErrors());
 			model.addAttribute("set", set);
-			return  UIActions.FORWARD + UIActions.LOAD_ADD_SET;
+			return UIActions.FORWARD + UIActions.LOAD_ADD_SET;
 		} else {
 			logger.info("Set-add: " + set);
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -166,8 +166,8 @@ public class SetController {
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.SAVE_SET, method = RequestMethod.POST)
-	public String saveSet(@Valid @ModelAttribute Set set, BindingResult result,
-			RedirectAttributes redirectAttrs, HttpServletRequest request) {
+	public String saveSet(@Valid @ModelAttribute Set set, BindingResult result, RedirectAttributes redirectAttrs,
+			HttpServletRequest request) {
 
 		logger.info("IN: Set/save-POST: " + set);
 
@@ -189,7 +189,6 @@ public class SetController {
 
 		return UIActions.REDIRECT + UIActions.LIST_ALL_SETS;
 	}
-
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.LIST_ALL_PRODUCT_SET_TEMPLATE, produces = "application/json")
@@ -236,25 +235,23 @@ public class SetController {
 			return response;
 		}
 	}
-	
+
 	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.SEARCH_PRODUCT_GRP_BY_SET_URL, produces = "application/json")
-	public @ResponseBody String searchBySetandGroup(
-			@RequestParam(value = "setId", required = false) Integer setId) {
+	public @ResponseBody String searchBySetandGroup(@RequestParam(value = "setId", required = false) Integer setId) {
 
-		
-		logger.debug("search Product grp By Set: " );
+		logger.debug("search Product grp By Set: ");
 		List<ProductGroup> setPdtGroups = null;
-		if((setId!=null && !setId.equals(0))){
+		if ((setId != null && !setId.equals(0))) {
 			setPdtGroups = setBD.getAllProductGroupForSet(setId);
-		}else{
-			logger.debug("No search criteria given. Hence, returning empty: " );
+		} else {
+			logger.debug("No search criteria given. Hence, returning empty: ");
 		}
-	
-		final StringWriter sw =new StringWriter();
-	    final ObjectMapper mapper = new ObjectMapper();
 
-	    try {
+		final StringWriter sw = new StringWriter();
+		final ObjectMapper mapper = new ObjectMapper();
+
+		try {
 			mapper.writeValue(sw, setPdtGroups);
 		} catch (IOException e) {
 			logger.error("Unable to convert to JSON. Error: " + e.getMessage());
@@ -262,31 +259,37 @@ public class SetController {
 
 		String productGroupsList = sw.toString();
 		logger.debug("productGroupsList: " + productGroupsList);
-		
+
 		return productGroupsList;
 	}
 
-	
 	@RequestMapping(value = UIActions.FORWARD_SLASH
 			+ UIActions.SEARCH_PRODUCTS_BY_SET_GRP_URL, produces = "application/json")
-	public @ResponseBody String searchBySetandGroup(
-			@RequestParam(value = "setId", required = false) Integer setId,
+	public @ResponseBody String searchBySetandGroup(@RequestParam(value = "setId", required = false) Integer setId,
 			@RequestParam(value = "groupId", required = false) Integer groupId) {
 
-		
-		logger.debug("search By Set and Group: " );
+		logger.debug("search By Set and Group: ");
 		List<ProductMaster> pdtMasterList = null;
-		if((setId!=null && !setId.equals(0)) || (groupId!=null && !groupId.equals(0))){
-			pdtMasterList = setBD.getAllProductsInSetAndGroup(setId,groupId);
-			
-		}else{
-			logger.debug("No search criteria given. Hence, returning empty List: " );
-		}
-	
-		final StringWriter sw =new StringWriter();
-	    final ObjectMapper mapper = new ObjectMapper();
+		// if((setId!=null && !setId.equals(0)) || (groupId!=null &&
+		// !groupId.equals(0))){
+		pdtMasterList = setBD.getAllProductsInSetAndGroup(setId, groupId);
 
-	    try {
+		// }else{
+		// logger.debug("No search criteria given. Hence, returning empty List:
+		// " );
+		// }
+		Set searchMiscSet = new Set();
+		searchMiscSet.setSetName(UIConstants.MISCELLANEOUS_SET_NAME.getValue());
+		List<Set> miscSet = setBD.searchForSet(searchMiscSet);
+		logger.info(
+				"Adding Products in Miscellaneous. Expecting only one set else system error!!! miscSet: " + miscSet);
+		// Expecting only one set Else system error!!!
+		pdtMasterList.addAll(setBD.getMiscellaneousProducts(miscSet.get(0).getSetId()));
+
+		final StringWriter sw = new StringWriter();
+		final ObjectMapper mapper = new ObjectMapper();
+
+		try {
 			mapper.writeValue(sw, pdtMasterList);
 		} catch (IOException e) {
 			logger.error("Unable to convert to JSON. Error: " + e.getMessage());
@@ -294,7 +297,7 @@ public class SetController {
 
 		String productsList = sw.toString();
 		logger.debug("productsList: " + productsList);
-		
+
 		return productsList;
 	}
 
@@ -308,8 +311,7 @@ public class SetController {
 	@RequestMapping(value = UIActions.ADD_PRODUCT_SET_TEMPLATE, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response create(@RequestParam(value = "setId", required = true) Integer setId,
 			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam(value = "qty", required = true) Integer qty,
-			HttpServletResponse httpServletResponse) {
+			@RequestParam(value = "qty", required = true) Integer qty, HttpServletResponse httpServletResponse) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
 		SetPdtTemplate newSetPdtTemplate = new SetPdtTemplate(setId, null, product, qty);
@@ -319,7 +321,7 @@ public class SetController {
 		newSetPdtTemplate.setUpdateBy(auth.getName());
 		newSetPdtTemplate.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		Response response = setBD.addProductToSet(newSetPdtTemplate);
-		if(!response.isStatus()){
+		if (!response.isStatus()) {
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return response;
@@ -328,8 +330,7 @@ public class SetController {
 	@RequestMapping(value = UIActions.EDIT_PRODUCT_SET_TEMPLATE, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response update(@RequestParam String id,
 			@RequestParam(value = "setId", required = true) Integer setId,
-			@RequestParam(value = "product.productCode", required = true) String productCode,
-			@RequestParam Integer qty,
+			@RequestParam(value = "product.productCode", required = true) String productCode, @RequestParam Integer qty,
 			HttpServletResponse httpServletResponse) {
 
 		ProductMaster product = productMasterBD.getProductByCode(productCode);
@@ -345,7 +346,7 @@ public class SetController {
 		toBeUpdatedSetPdtTemplate.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
 		logger.debug("Updating the product in set: " + toBeUpdatedSetPdtTemplate);
 		Response response = setBD.updateProductInSet(toBeUpdatedSetPdtTemplate);
-		if(!response.isStatus()){
+		if (!response.isStatus()) {
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return response;
@@ -353,19 +354,17 @@ public class SetController {
 	}
 
 	@RequestMapping(value = UIActions.DELETE_PRODUCT_SET_TEMPLATE, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response delete(@RequestParam Integer id,
-			HttpServletResponse httpServletResponse) {
+	public @ResponseBody Response delete(@RequestParam Integer id, HttpServletResponse httpServletResponse) {
 
 		SetPdtTemplate setPdtTemplate = setBD.getProductInSet(id);
 		logger.debug("Deleting the product in set: " + setPdtTemplate);
 		Response response = setBD.deleteProductFromSet(setPdtTemplate);
-		if(!response.isStatus()){
+		if (!response.isStatus()) {
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
 		return response;
 	}
 
-	
 	public static List<OrderProductSet> map(Page<OrderProductSet> pageOfOrderProducts) {
 		List<OrderProductSet> orderProducts = new ArrayList<OrderProductSet>();
 		for (OrderProductSet orderProduct : pageOfOrderProducts) {
@@ -373,16 +372,14 @@ public class SetController {
 		}
 		return orderProducts;
 	}
-	
+
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.GET_SET_REPORT)
 	public void download(@RequestParam String type, @RequestParam String token, @RequestParam Integer setId,
-			@RequestParam String challanKind, 
-			@RequestParam String extraParam, 
-			HttpServletResponse response) {
+			@RequestParam String challanKind, @RequestParam String extraParam, HttpServletResponse response) {
 		logger.debug("Requesting download of type: " + type + " with token: " + token);
-		setReportDownloadService.download(type, token, setId,challanKind,extraParam, response);
+		setReportDownloadService.download(type, token, setId, challanKind, extraParam, response);
 	}
-	
+
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_REQUEST_FOR_QUOTATION)
 	public String loadSalesTaxReportPage(Model model) {
 		return MedsysUITiles.QUOTATION.getTile();

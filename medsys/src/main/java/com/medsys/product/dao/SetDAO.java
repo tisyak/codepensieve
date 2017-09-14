@@ -42,4 +42,6 @@ public interface SetDAO {
 
 	public List<Set> getAllSetsWithProducts();
 
+	public List<ProductMaster> getMiscellaneousProducts(Integer setId);
+
 }

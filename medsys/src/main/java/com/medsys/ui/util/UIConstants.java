@@ -28,6 +28,9 @@ public enum UIConstants {
     SCALE("0"),
     EMPTY_QTY("0"),
     ONE_HUNDRED("100"),
+    
+    /***************************** System Constants ************************************/
+    MISCELLANEOUS_SET_NAME("Miscellaneous"),
        
     /***************************** ENCODED URL MANIPULTATION CONSTANTS ***********************************. */
     /**

@@ -1,6 +1,7 @@
 package com.medsys.ui.controller;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +43,7 @@ import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.SetBD;
 import com.medsys.product.model.ProductGroup;
 import com.medsys.product.model.ProductMaster;
+import com.medsys.product.model.Set;
 import com.medsys.ui.jasper.service.InvoiceReportDownloadService;
 import com.medsys.ui.util.MedsysUITiles;
 import com.medsys.ui.util.UIActions;
@@ -244,22 +246,30 @@ public class InvoiceController extends SuperController {
 		pdtGroupList += "}";
 		// Figure out how to cache all these values
 		model.addAttribute("pdtGroupList", pdtGroupList);
-		
+		List<ProductMaster> productMasterList = new ArrayList<>();
 		if (productGroupMasterList != null && productGroupMasterList.size() > 0) {
-			List<ProductMaster> productMasterList = setBD.getAllProductsInSetAndGroup(invoice.getOrder().getSet().getSetId(),
+			productMasterList = setBD.getAllProductsInSetAndGroup(invoice.getOrder().getSet().getSetId(),
 					productGroupMasterList.get(0).getGroupId());
-			String pdtList = "{";
-			for (ProductMaster product : productMasterList) {
-				pdtList += "'" + product.getProductId() + "':'" + product.getProductCode() + " - "
-						+ product.getProductDesc() + "',";
-			}
-			pdtList = pdtList.substring(0, pdtList.length() - 1);
-			pdtList += "}";
-			// Figure out how to cache all these values
-			model.addAttribute("pdtList", pdtList);
 		} else {
 			logger.error("NO SETs found hence, products search aborted!");
 		}
+		
+		Set searchMiscSet = new Set();
+		searchMiscSet.setSetName(UIConstants.MISCELLANEOUS_SET_NAME.getValue());
+		List<Set> miscSet = setBD.searchForSet(searchMiscSet);
+		logger.info("Expecting only one set else system error!!! miscSet: " + miscSet);
+		//Expecting only one set Else system error!!!
+		productMasterList.addAll(setBD.getMiscellaneousProducts(miscSet.get(0).getSetId()));
+		
+		String pdtList = "{";
+		for (ProductMaster product : productMasterList) {
+			pdtList += "'" + product.getProductId() + "':'" + product.getProductCode() + " - "
+					+ product.getProductDesc() + "',";
+		}
+		pdtList = pdtList.substring(0, pdtList.length() - 1);
+		pdtList += "}";
+		// Figure out how to cache all these values
+		model.addAttribute("pdtList", pdtList);
 
 		/** VAT Listing for ADD Product Filter **/
 		List<MasterData> taxMasterList = masterDataBD.getAll(TaxMaster.class);

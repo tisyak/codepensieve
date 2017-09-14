@@ -127,10 +127,22 @@
 							] // dataevents
 					}},
 				{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
-		   			edittype:"select", editoptions: {
-		   				
-							value: ${pdtList}
-				},},
+			   			edittype:"select", editoptions: {
+							dataUrl: '${getFilteredProductsUrl}?setId='+${setId},
+							buildSelect: function(response){
+                                                var data = $.parseJSON(eval(response));
+                                                s = "<select>";
+												 
+												$.each(data, function(i, item) {
+													 
+													 s += '<option value="' + data[i].productId + '">' + data[i].productCode + ' - '+ data[i].productDesc + 
+                                                       '</option>';
+												})
+                                                
+                                                return s + "</select>";
+                                            }
+							}	
+				},
 				{name:'product.productCode',index:'product.productCode', width: 40 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
 		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },

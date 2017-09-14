@@ -262,4 +262,18 @@ public class SetDAOImpl implements SetDAO {
 		return pdtList;
 	}
 
+	@Override
+	public List<ProductMaster> getMiscellaneousProducts(Integer setId) {
+		logger.debug("Fetching all Miscellaneous products: ");
+		String queryForFilteredPdts = "select spt.product from SetPdtTemplate spt  WHERE ";
+
+		queryForFilteredPdts += " spt.setId = " + setId;
+
+		queryForFilteredPdts += " order by spt.product.productCode ";
+		
+		List<ProductMaster> pdtList = getCurrentSession().createQuery(queryForFilteredPdts,ProductMaster.class).getResultList();
+		logger.debug("pdtList: " + pdtList);
+		return pdtList;
+	}
+
 }

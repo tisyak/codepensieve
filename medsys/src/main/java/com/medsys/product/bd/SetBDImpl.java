@@ -154,6 +154,13 @@ public class SetBDImpl implements SetBD {
 		
 	}
 
+	@Override
+	public List<ProductMaster> getMiscellaneousProducts(Integer setId) {
+		logger.debug("Get All Miscellaneous products: ");
+		List<ProductMaster> pdtList =  setDAO.getMiscellaneousProducts(setId);
+		return pdtList;
+	}
+
 
    
 }
