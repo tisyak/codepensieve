@@ -93,6 +93,9 @@ public class Invoice {
 
 	@Formula("(select SUM(invPdt.total) from invoice_product invPdt where invPdt.invoice_id= invoice_id)")
 	private BigDecimal totalAmount;
+	
+	@Formula("(select SUM(invPdt.qty) from invoice_product invPdt where invPdt.invoice_id= invoice_id)")
+	private Integer totalQty;
 
 	/** The update by. */
 	@Column(name = "update_by")
@@ -290,6 +293,10 @@ public class Invoice {
 
 	public BigDecimal getTotalBeforeTax() {
 		return totalBeforeTax;
+	}
+
+	public Integer getTotalQty() {
+		return totalQty;
 	}
 
 	public String getUpdateBy() {

@@ -95,8 +95,9 @@ public class InvoiceProductController {
 	}
 
 	@RequestMapping(value = UIActions.ADD_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
-	public @ResponseBody Response create(@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
-			@RequestParam(value = "product.productId", required = false) Integer productId,
+	public @ResponseBody Response create(@RequestParam(value = "invoiceId", required = true) Integer invoiceId,
+			@RequestParam(value = "product.productId", required = true) Integer productId,
+			@RequestParam(value = "productDesc", required = true) String productDesc,
 			@RequestParam(value = "qty", required = false) Integer qty,
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
 			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId,
@@ -111,6 +112,7 @@ public class InvoiceProductController {
 		InvoiceProduct newInvoiceProduct = new InvoiceProduct();
 		newInvoiceProduct.setInvoiceId(invoiceId);
 		newInvoiceProduct.setProduct(product);
+		newInvoiceProduct.setProductDesc(product.getProductDesc() + " " + productDesc);
 		newInvoiceProduct.setQty(qty);
 		newInvoiceProduct.setRatePerUnit(ratePerUnit);
 
@@ -135,7 +137,8 @@ public class InvoiceProductController {
 	@RequestMapping(value = UIActions.EDIT_PRODUCT_INVOICE, produces = "application/json", method = RequestMethod.POST)
 	public @ResponseBody Response update(@RequestParam Integer id,
 			@RequestParam(value = "invoiceId", required = false) Integer invoiceId,
-			@RequestParam(value = "product.productId", required = false) Integer productId,
+			
+			@RequestParam(value = "productDesc", required = true) String productDesc,
 			@RequestParam(value = "qty", required = false) Integer qty,
 			@RequestParam(value = "ratePerUnit", required = false) BigDecimal ratePerUnit,
 			@RequestParam(value = "vatType.taxId", required = false) Integer vatTypeId,
@@ -145,16 +148,16 @@ public class InvoiceProductController {
 			HttpServletResponse httpServletResponse) {
 
 		logger.debug("invoiceId in request: " + invoiceId);
-		logger.debug("productId in request: " + productId);
+		logger.debug("invoiceProductId in request: " + id);
 		InvoiceProduct invoiceProduct = invoiceBD.getProductInInvoice(id);
 		logger.debug("InvoiceProduct from DB: " + invoiceProduct);
 
-		if (invoiceProduct.getInvoiceId().equals(invoiceId)
-				&& invoiceProduct.getProduct().getProductId().equals(productId)) {
+		if (invoiceProduct.getInvoiceId().equals(invoiceId)) {
 			InvoiceProduct toBeUpdatedInvoiceProduct = new InvoiceProduct();
 			toBeUpdatedInvoiceProduct.setInvoiceProductId(id);
 			toBeUpdatedInvoiceProduct.setInvoiceId(invoiceId);
 			toBeUpdatedInvoiceProduct.setProduct(invoiceProduct.getProduct());
+			toBeUpdatedInvoiceProduct.setProductDesc(productDesc);
 			toBeUpdatedInvoiceProduct.setQty(qty);
 			toBeUpdatedInvoiceProduct.setRatePerUnit(ratePerUnit);
 

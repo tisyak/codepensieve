@@ -20,6 +20,7 @@ import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.InvoiceProduct;
 import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.ProductInvBD;
+import com.medsys.util.CalendarUtility;
 import com.medsys.util.EpSystemError;
 
 @Service
@@ -73,6 +74,15 @@ public class InvoiceBDImpl implements InvoiceBD {
 	public List<Invoice> getAllInvoice() {
 		return invoiceDAO.getAllInvoice();
 	}
+	
+	@Override
+	public List<Invoice> getLastThreeMonthsInvoice() {
+		
+		Date startDate = CalendarUtility.getStartDateForLastThreeMonths();
+		Date endDate = CalendarUtility.getEndDateAndTimeOfToday();
+		return invoiceDAO.searchForInvoice(startDate, endDate);
+	}
+
 
 	@Override
 	public List<Invoice> searchForInvoice(Invoice invoice) {
@@ -287,5 +297,6 @@ public class InvoiceBDImpl implements InvoiceBD {
 	public int getCountOfCustomerBilledForYear() {
 		return invoiceDAO.getCountOfCustomerBilledForYear();
 	}
+
 
 }

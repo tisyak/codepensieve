@@ -19,6 +19,7 @@ import com.medsys.orders.dao.OrderDAO;
 import com.medsys.orders.model.OrderProductSet;
 import com.medsys.orders.model.Orders;
 import com.medsys.product.bd.ProductInvBD;
+import com.medsys.util.CalendarUtility;
 import com.medsys.util.EpSystemError;
 
 @Service
@@ -67,6 +68,16 @@ public class OrderBDImpl implements OrderBD {
 	public List<Orders> getAllOrders() {
 		return orderDAO.getAllOrders();
 	}
+	
+	@Override
+	public List<Orders> getLastThreeMonthsOrders() {
+		
+		Date startDate = CalendarUtility.getStartDateForLastThreeMonths();
+		Date endDate = CalendarUtility.getEndDateAndTimeOfToday();
+		
+		return orderDAO.searchForOrdersInDateRange(startDate,endDate);
+	}
+
 
 	@Override
 	public List<Orders> searchForOrders(Orders order) {
@@ -250,5 +261,6 @@ public class OrderBDImpl implements OrderBD {
 		return  orderDAO.getOrderWithInstr(orderId);
 	}
 
+	
 	
 }

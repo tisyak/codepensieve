@@ -78,7 +78,7 @@ public class UIActions {
     public static final String EDIT_PRODUCT_SET_TEMPLATE="setPdtTemplate/edit";
     public static final String SAVE_PRODUCT_SET_TEMPLATE="setPdtTemplate/save";
     public static final String LOAD_DELETE_PRODUCT_SET_TEMPLATE="setPdtTemplate/loadDelete";
-    public static final String LOAD_REQUEST_FOR_QUOTATION="set/deleteRequestForQuotation";
+    public static final String LOAD_REQUEST_FOR_QUOTATION="set/requestForQuotation";
     
     public static final String MANAGE_PRODUCT_GROUP="productGroup/loadManage";
     public static final String LIST_ALL_PRODUCT_GROUP="productGroup/list";

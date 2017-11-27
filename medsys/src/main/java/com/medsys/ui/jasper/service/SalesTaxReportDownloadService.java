@@ -7,9 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -125,14 +123,12 @@ public class SalesTaxReportDownloadService {
 	 */
 	private JRDataSource getSalesTaxData(Date fromDate, Date toDate) {
 		List<Invoice> lstInvoices = invoiceBD.searchForInvoice(fromDate, toDate);
-		Set<Invoice> invoiceSetForVAT = new HashSet<Invoice>();
-		Set<Invoice> invoiceSetForCGST = new HashSet<Invoice>();
-		Set<Invoice> invoiceSetForSGST = new HashSet<Invoice>();
+		List<Invoice> invoiceSetForCGST = new ArrayList<Invoice>();
+		List<Invoice> invoiceSetForSGST = new ArrayList<Invoice>();
 		List<SalesTax> lstSalesTax = new ArrayList<SalesTax>();
 		SalesTax salesTax = new SalesTax();
 		salesTax.setFromDate(fromDate);
 		salesTax.setToDate(toDate);
-		salesTax.setTotalVATTax(new BigDecimal(Integer.parseInt(UIConstants.TOTAL_ZERO.getValue())));
 		salesTax.setTotalCGSTTax(new BigDecimal(Integer.parseInt(UIConstants.TOTAL_ZERO.getValue())));
 		salesTax.setTotalSGSTTax(new BigDecimal(Integer.parseInt(UIConstants.TOTAL_ZERO.getValue())));
 		for (Invoice invoice : lstInvoices) {
@@ -145,16 +141,10 @@ public class SalesTaxReportDownloadService {
 				salesTax.setTotalSGSTTax(salesTax.getTotalSGSTTax().add(invoice.getTotalSgst()));
 				invoiceSetForSGST.add(invoice);
 			}
-			
-			if (invoice.getTotalVat() != null) {
-				salesTax.setTotalVATTax(salesTax.getTotalVATTax().add(invoice.getTotalVat()));
-				invoiceSetForVAT.add(invoice);
-			}
-
+		
 		}
 		salesTax.setInvoicesHavingCGST(invoiceSetForCGST);
 		salesTax.setInvoicesHavingSGST(invoiceSetForSGST);
-		salesTax.setInvoicesHavingVAT(invoiceSetForVAT);
 		lstSalesTax.add(salesTax);
 		// Return wrapped collection
 		return new JRBeanCollectionDataSource(lstSalesTax);

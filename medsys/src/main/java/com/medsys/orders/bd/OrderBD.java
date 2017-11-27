@@ -45,6 +45,8 @@ public interface OrderBD {
 
 	public Orders getOrderWithInstr(Integer orderId);
 
+	public List<Orders> getLastThreeMonthsOrders();
+
 	
 
 	

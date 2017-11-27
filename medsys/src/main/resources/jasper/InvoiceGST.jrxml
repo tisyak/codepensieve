@@ -122,6 +122,9 @@
 		<field name="product" class="com.medsys.product.model.ProductMaster">
 			<fieldDescription><![CDATA[product]]></fieldDescription>
 		</field>
+		<field name="productDesc" class="java.lang.String">
+			<fieldDescription><![CDATA[productDesc]]></fieldDescription>
+		</field>
 		<field name="mrp" class="java.math.BigDecimal">
 			<fieldDescription><![CDATA[mrp]]></fieldDescription>
 		</field>
@@ -471,7 +474,7 @@
 								<textElement verticalAlignment="Middle">
 									<font size="9"/>
 								</textElement>
-								<textFieldExpression><![CDATA[$F{product}.getProductDesc()]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$F{productDesc}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
@@ -488,13 +491,13 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="Table 2_TD" height="30">
-							<staticText>
+							<textField  isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="37" height="30" uuid="a30681fd-23ed-4954-969b-0e00e8e2747c"/>
 								<textElement verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
-								<text><![CDATA[90211000]]></text>
-							</staticText>
+								<textFieldExpression><![CDATA[$F{product}.getHsnCode()]]></textFieldExpression>
+							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="34" uuid="149f0206-5d25-4f37-a47b-621ebc4d23b3">

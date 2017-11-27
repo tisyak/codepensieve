@@ -40,6 +40,8 @@
 <c:url value="/invoiceproduct/update" var="editUrl" />
 <c:url value="/${UIActions.DELETE_PRODUCT_INVOICE}" var="deleteUrl" />
 
+<c:url value="/${UIActions.SEARCH_PRODUCT_GRP_BY_SET_URL}"
+	var="getFilteredProductGroupsUrl" />
 <c:url value="/${UIActions.SEARCH_PRODUCTS_BY_SET_GRP_URL}"
 	var="getFilteredProductsUrl" />
 
@@ -54,6 +56,7 @@
 
 	pageContext.setAttribute("cgstTypeList", request.getAttribute("cgstTypeList"));
 	pageContext.setAttribute("sgstTypeList", request.getAttribute("sgstTypeList"));
+	pageContext.setAttribute("setList", request.getAttribute("setList"));
 	pageContext.setAttribute("pdtGroupList", request.getAttribute("pdtGroupList"));
 	pageContext.setAttribute("pdtList", request.getAttribute("pdtList"));
 
@@ -83,14 +86,73 @@
 	});
 	
 	$(function() {
+		lastSel = '';
 		$("#grid").jqGrid({
 		   	url:'${recordsUrl}',
 			datatype: 'json',
 			mtype: 'POST',
 			postData: data,
-		   	colNames:['invoiceProductId', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','Discount','Taxable Value','CGST %','CGST Amount','SGST %','SGST Amount','Total', 'Actions'],
+		   	colNames:['invoiceProductId','Set ID', 'Group ID','Product Id','Product Code', 'Group Name','Product Name', 'Rate per Unit','Qty','Discount','Taxable Value','CGST %','CGST Amount','SGST %','SGST Amount','Total', 'Actions'],
 		   	colModel:[
 		   		{name:'invoiceProductSetId',index:'id',  hidden:true},
+		   		
+		   		{name:'setId',index:'setId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, 
+					editoptions: { 
+						value: ${setList},
+						
+						dataEvents :[
+								{ type: 'change', fn: function(e) {
+									//alert("Calling filter products");
+									var thisval = $(e.target).val();
+									form = $(e.target).closest('form.FormGrid');
+                                    //alert($(e.target).attr("id"));
+									$.get('${getFilteredProductGroupsUrl}?setId='+thisval, 
+										function(data)
+										{ 
+											//alert("data: " + data);
+											var res = $.parseJSON(data);
+											//alert(res);
+											s = "";
+																 
+											$.each(res, function(i, item) {
+												 
+												 s += '<option value="' + res[i].groupId  + '">' + res[i].groupName + 
+												   '</option>';
+											})
+											
+											//s += "</select>";
+											//alert(s);
+											form = $(e.target).closest('form.FormGrid');
+                                            $("#groupId", form[0]).html(s);
+											//alert($("select#product\\.productId.FormElement", form[0]).html());
+										}
+									); // end get
+									$.get('${getFilteredProductsUrl}?setId='+thisval, 
+										function(data)
+										{ 
+											//alert("data: " + data);
+											var res = $.parseJSON(data);
+											//alert(res);
+											s = "";
+																 
+											$.each(res, function(i, item) {
+												 
+												 s += '<option value="' + res[i].productId  + '">' + res[i].productCode + ' - '+ res[i].productDesc + 
+												   '</option>';
+											})
+											
+											//s += "</select>";
+											//alert(s);
+											form = $(e.target).closest('form.FormGrid');
+                                            $("#product\\.productId", form[0]).html(s);
+											//alert($("select#product\\.productId.FormElement", form[0]).html());
+										}
+									); // end get
+									}//end func
+								} // end type
+							] // dataevents
+					}},
+		   		
 		   			{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, 
 					editoptions: { 
 						value: ${pdtGroupList},
@@ -99,8 +161,8 @@
 									//alert("Calling filter products");
 									var thisval = $(e.target).val();
 									form = $(e.target).closest('form.FormGrid');
-                                    var chosenSetId=${setId};
-									//alert($(e.target).attr("id"));
+                                    var chosenSetId=$("#setId", form[0]).val();
+									//alert("Set Id: " + $("#setId", form[0]).val());
 									$.get('${getFilteredProductsUrl}?groupId='+thisval+'&setId='+chosenSetId, 
 										function(data)
 										{ 
@@ -126,9 +188,10 @@
 								} // end type
 							] // dataevents
 					}},
-				{name:'product.productId',index:'product.productId', hidden:true, width:50, editable: true, editrules: { edithidden: true },
+				{name:'product.productId',index:'product.productId',hidden: true, width:50, editable: true, editrules: { edithidden: true },
 			   			edittype:"select", editoptions: {
-							dataUrl: '${getFilteredProductsUrl}?setId='+${setId},
+							value: ${pdtList}
+							/*dataUrl: '${getFilteredProductsUrl}?setId='+${setId},
 							buildSelect: function(response){
                                                 var data = $.parseJSON(eval(response));
                                                 s = "<select>";
@@ -140,12 +203,12 @@
 												})
                                                 
                                                 return s + "</select>";
-                                            }
-							}	
+                                            }*/
+							}
 				},
 				{name:'product.productCode',index:'product.productCode', width: 40 },
 		   		{name:'product.group.groupName',index:'product.group.groupName', width:200},
-		   		{name:'product.productDesc',index:'product.productDesc', width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
+		   		{name:'productDesc',index:'productDesc', editable: true, editrules: { edithidden: true }, width:125,cellattr: function (rowId, tv, rawObject, cm, rdata) { return 'style="white-space: normal;"' } },
 		   		{name:'ratePerUnit',index:'ratePerUnit', editable: true, editrules: { edithidden: true }, width:30,align:'right'},
 		   		{name:'qty',index:'qty', width:15, editable:true, editrules:{required:true}, editoptions:{size:5} ,align:'center'},
 				{name:'discount',index:'discount', editable: true, editrules: { edithidden: true }, width:30,align:'right'},
@@ -212,6 +275,16 @@
 		   	},
 			footerrow: true,
 			userDataOnFooter : false,
+			/*onSelectRow: function(id) {
+					if (id && id !== lastSel) {
+						$("#grid").jqGrid('restoreRow',lastSel);
+						var cm = $("#grid").jqGrid('getColProp','product.productId');
+						cm.editable = 'readonly';
+						$("#grid").jqGrid('editRow', id, true, null, null, 'clientArray');
+						cm.editable = true;
+						lastSel = id;
+					}
+			},*/
 			loadComplete: function () {
 				var $this = $(this),
 					totalAmount = $this.jqGrid("getCol", "totalPrice", false, "sum"),
@@ -298,7 +371,8 @@
 				{}, 
 				// options for the Add Dialog
                 {
-                    closeAfterAdd: true,
+                   
+					closeAfterAdd: true,
 					url:'${addUrl}', 
 					editData: {
                            invoiceId: ${invoiceId}

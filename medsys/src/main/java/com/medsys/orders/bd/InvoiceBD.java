@@ -50,6 +50,8 @@ public interface InvoiceBD {
 
 	public int getCountOfCustomerBilledForYear();
 
+	public List<Invoice> getLastThreeMonthsInvoice();
+
 	
 
 }

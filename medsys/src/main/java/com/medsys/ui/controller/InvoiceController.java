@@ -107,7 +107,8 @@ public class InvoiceController extends SuperController {
 		if (invoice.getInvoiceNo() == null && invoice.getCustomer().getName() == null
 				&& invoice.getInvoiceDate() == null && invoice.getInvoiceStatus() == null) {
 			logger.info("Fetching All invoices.");
-			List<Invoice> invoices = invoiceBD.getAllInvoice();
+			//List<Invoice> invoices = invoiceBD.getAllInvoice();
+			List<Invoice> invoices = invoiceBD.getLastThreeMonthsInvoice();
 			model.addAttribute("invoices", invoices);
 		} else {
 			logger.info("Fetching invoices as per search criteria.");
@@ -235,6 +236,18 @@ public class InvoiceController extends SuperController {
 		 * START Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
+		
+		/** Set Listing for ADD Product Filter **/
+		List<Set> setMasterList = setBD.getAllSet();
+		String setList = "{";
+		for (Set set : setMasterList) {
+			setList += "'" + set.getSetId() + "':'" + set.getSetName() + "',";
+		}
+		setList = setList.substring(0, setList.length() - 1);
+		setList += "}";
+		// Figure out how to cache all these values
+		model.addAttribute("setList", setList);
+		
 		
 		/** ProductGroup Listing for ADD Product Filter **/
 		List<ProductGroup> productGroupMasterList = setBD.getAllProductGroupForSet(invoice.getOrder().getSet().getSetId());

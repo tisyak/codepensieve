@@ -126,7 +126,7 @@ public class OrderDAOImpl implements OrderDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Orders> getAllOrders() {
-		return getCurrentSession().createQuery("from Orders order by orderDate desc").getResultList();
+		return getCurrentSession().createQuery("from Orders order by orderNumber desc, orderDate asc").getResultList();
 	}
 
 	@Override
@@ -168,7 +168,7 @@ public class OrderDAOImpl implements OrderDAO {
 		logger.debug("OrderDAOImpl.searchForOrders() - [" + order.toString() + "]");
 		Query<Orders> query = getCurrentSession().createQuery(
 				"from Orders where lower(orderNumber) like :orderNo OR lower(customer.name) like :custName "
-						+ " OR orderDate = :orderDate " + " order by orderNumber asc",
+						+ " OR orderDate = :orderDate " + "  order by orderNumber desc, orderDate asc",
 				Orders.class);
 
 		if (order.getOrderNumber() != null) {
@@ -211,7 +211,7 @@ public class OrderDAOImpl implements OrderDAO {
 		logger.debug("OrderDAOImpl.searchForOrdersInDateRange() for the Year - [" + startDate + " - " + endDate + "]");
 
 		Query<Orders> searchQuery = getCurrentSession()
-				.createQuery("from Orders WHERE orderDate BETWEEN :stDate AND :edDate ", Orders.class);
+				.createQuery("from Orders WHERE orderDate BETWEEN :stDate AND :edDate order by orderNumber desc, orderDate asc", Orders.class);
 
 		searchQuery.setParameter("stDate", startDate, TemporalType.DATE);
 		searchQuery.setParameter("edDate", endDate, TemporalType.DATE);

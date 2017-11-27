@@ -14,8 +14,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.Formula;
+import org.hibernate.validator.constraints.NotBlank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,11 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 	@ManyToOne
 	@JoinColumn(name = "product_id", referencedColumnName = "product_id")
 	private ProductMaster product;
+	
+	@NotBlank(message = "{error.field.empty}")
+	@Size(max = 250, message = "{error.field.max}")
+	@Column(name = "product_desc", length = 250)
+	private String productDesc;
 
 	@Formula("(select pdtInv.mrp from product_inv pdtInv where pdtInv.product_id= product_id)")
 	private BigDecimal mrp;
@@ -124,6 +131,14 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 
 	public void setProduct(ProductMaster product) {
 		this.product = product;
+	}
+	
+	public String getProductDesc() {
+		return productDesc;
+	}
+
+	public void setProductDesc(String productDesc) {
+		this.productDesc = productDesc;
 	}
 
 	public BigDecimal getMrp() {

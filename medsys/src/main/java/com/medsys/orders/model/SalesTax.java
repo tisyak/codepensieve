@@ -15,15 +15,13 @@ public class SalesTax {
 	
 	private Date toDate;
 
-	private BigDecimal totalVATTax;
 	
 	private BigDecimal totalCGSTTax;
 	
 	private BigDecimal totalSGSTTax;
 
-	java.util.Set<Invoice> invoicesHavingVAT;
-	java.util.Set<Invoice> invoicesHavingCGST;
-	java.util.Set<Invoice> invoicesHavingSGST;
+	java.util.List<Invoice> invoicesHavingCGST;
+	java.util.List<Invoice> invoicesHavingSGST;
 
 	public Date getFromDate() {
 		return fromDate;
@@ -39,18 +37,6 @@ public class SalesTax {
 
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
-	}
-
-	public BigDecimal getTotalVATTax() {
-		return totalVATTax;
-	}
-
-	public void setTotalVATTax(BigDecimal totalVATTax) {
-		if (totalVATTax != null) {
-			this.totalVATTax = totalVATTax.setScale(0, RoundingMode.HALF_UP);
-		} else {
-			this.totalVATTax = totalVATTax;
-		}
 	}
 
 	public BigDecimal getTotalCGSTTax() {
@@ -77,33 +63,26 @@ public class SalesTax {
 		}
 	}
 
-	public java.util.Set<Invoice> getInvoicesHavingVAT() {
-		return invoicesHavingVAT;
-	}
-
-	public void setInvoicesHavingVAT(java.util.Set<Invoice> invoicesHavingVAT) {
-		this.invoicesHavingVAT = invoicesHavingVAT;
-	}
-
-	public java.util.Set<Invoice> getInvoicesHavingCGST() {
+	
+	public java.util.List<Invoice> getInvoicesHavingCGST() {
 		return invoicesHavingCGST;
 	}
 
-	public void setInvoicesHavingCGST(java.util.Set<Invoice> invoicesHavingCGST) {
+	public void setInvoicesHavingCGST(java.util.List<Invoice> invoicesHavingCGST) {
 		this.invoicesHavingCGST = invoicesHavingCGST;
 	}
 
-	public java.util.Set<Invoice> getInvoicesHavingSGST() {
+	public java.util.List<Invoice> getInvoicesHavingSGST() {
 		return invoicesHavingSGST;
 	}
 
-	public void setInvoicesHavingSGST(java.util.Set<Invoice> invoicesHavingSGST) {
+	public void setInvoicesHavingSGST(java.util.List<Invoice> invoicesHavingSGST) {
 		this.invoicesHavingSGST = invoicesHavingSGST;
 	}
 
 	@Override
 	public String toString() {
-		return "SalesTax [fromDate=" + fromDate + ", toDate=" + toDate + ", totalVATTax=" + totalVATTax
+		return "SalesTax [fromDate=" + fromDate + ", toDate=" + toDate
 				+ ", totalCGSTTax=" + totalCGSTTax + ", totalSGSTTax=" + totalSGSTTax + "]";
 	}
 

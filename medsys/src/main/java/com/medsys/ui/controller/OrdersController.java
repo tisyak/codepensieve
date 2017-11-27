@@ -92,7 +92,8 @@ public class OrdersController extends SuperController {
 		if (order.getOrderNumber() == null && order.getCustomer().getName() == null && order.getOrderDate() == null
 				&& order.getOrderStatus() == null) {
 			logger.info("Fetching All orders.");
-			List<Orders> orders = ordersBD.getAllOrders();
+			//List<Orders> orders = ordersBD.getAllOrders();
+			List<Orders> orders = ordersBD.getLastThreeMonthsOrders();
 			model.addAttribute("ordersList", orders);
 		} else {
 			logger.info("Fetching orders as per search criteria.");

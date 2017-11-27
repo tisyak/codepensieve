@@ -44,6 +44,10 @@ public class ProductMaster implements Serializable, Comparable<ProductMaster> {
 	@Size(max = 250, message = "{error.field.max}")
 	@Column(name = "product_desc", length = 250)
 	private String productDesc;
+	
+	@Size(max = 10, message = "{error.field.max}")
+	@Column(name = "hsn_code", length = 250)
+	private String hsnCode;
 
 	/** The update by. */
 	@Column(name = "update_by")
@@ -82,6 +86,14 @@ public class ProductMaster implements Serializable, Comparable<ProductMaster> {
 
 	public void setProductDesc(String productDesc) {
 		this.productDesc = productDesc;
+	}
+
+	public String getHsnCode() {
+		return hsnCode;
+	}
+
+	public void setHsnCode(String hsnCode) {
+		this.hsnCode = hsnCode;
 	}
 
 	public String getUpdateBy() {
@@ -149,7 +161,8 @@ public class ProductMaster implements Serializable, Comparable<ProductMaster> {
 	@Override
 	public String toString() {
 		return "ProductMaster [productId=" + productId + ", productCode=" + productCode + ", productDesc=" + productDesc
-				+ ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + ", group=" + group + "]";
+				+ ", updateBy=" + updateBy + ", updateTimestamp=" + updateTimestamp + ", group=" + group
+				+ ", exemptFromInventoryControl=" + exemptFromInventoryControl + "]";
 	}
 
 	@Override
