@@ -11,8 +11,8 @@
 <spring:url value="<%=UIActions.FORWARD_SLASH + UIActions.EDIT_INVOICE%>"
 	var="editInvoice" />
 <spring:url
-	value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_DELETE_INVOICE%>"
-	var="deleteInvoice" />
+	value="<%=UIActions.FORWARD_SLASH + UIActions.LOAD_CANCEL_INVOICE%>"
+	var="cancelInvoice" />
 
 
 
@@ -79,9 +79,10 @@
 			<tr>
 				<th style="width: 20%">Invoice Number</th>
 				<th style="width: 20%">Customer</th>
-				<th style="width: 30%">Patient</th>
+				<th style="width: 20%">Patient</th>
 				<th style="width: 10%">Invoice Date</th>
 				<th style="width: 10%">Total Amount</th>
+				<th style="width: 10%">Invoice Status</th>
 				<th style="width: 10%">Actions</th>
 			</tr>
 		</thead>
@@ -96,6 +97,7 @@
 				<td class="hidden-phone"><%=invoice.getPatientName()%></td>
 				<td class="hidden-phone"><%=invoice.getInvoiceDate()%></td>
 				<td class="hidden-phone"><%=invoice.getTotalAmount()%></td>
+				<td class="hidden-phone"><%=invoice.getInvoiceStatus().getInvoiceStatusDesc()%></td>
 				<td class="hidden-phone">
 					<div class="btn-group">
 						<button data-toggle="dropdown" class="btn btn-xs dropdown-toggle"
@@ -113,13 +115,13 @@
 								}
 							%>
 							<%
-								if (invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())
-									|| invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())) {
+								if (invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.ACTIVE.getCode())) {
 							%>
-							<li><a href="${deleteInvoice}?invoiceId=<%=invoice.getInvoiceId()%>">Delete</a></li>
+							<li><a href="${cancelInvoice}?invoiceId=<%=invoice.getInvoiceId()%>">Cancel</a></li>
 							<%
 								}
 							%>
+							
 						</ul>
 					</div>
 				</td>

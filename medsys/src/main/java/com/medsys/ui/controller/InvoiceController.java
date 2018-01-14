@@ -107,7 +107,7 @@ public class InvoiceController extends SuperController {
 		if (invoice.getInvoiceNo() == null && invoice.getCustomer().getName() == null
 				&& invoice.getInvoiceDate() == null && invoice.getInvoiceStatus() == null) {
 			logger.info("Fetching All invoices.");
-			//List<Invoice> invoices = invoiceBD.getAllInvoice();
+			// List<Invoice> invoices = invoiceBD.getAllInvoice();
 			List<Invoice> invoices = invoiceBD.getLastThreeMonthsInvoice();
 			model.addAttribute("invoices", invoices);
 		} else {
@@ -124,7 +124,8 @@ public class InvoiceController extends SuperController {
 		return MedsysUITiles.SEARCH_INVOICES.getTile();
 	}
 
-	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_INVOICE, method = {RequestMethod.GET,RequestMethod.POST})
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_ADD_INVOICE, method = { RequestMethod.GET,
+			RequestMethod.POST })
 	public String loadAddInvoice(@ModelAttribute Invoice invoice, Model model) {
 
 		logger.info("IN: Invoice/loadAdd-GET");
@@ -236,7 +237,7 @@ public class InvoiceController extends SuperController {
 		 * START Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
-		
+
 		/** Set Listing for ADD Product Filter **/
 		List<Set> setMasterList = setBD.getAllSet();
 		String setList = "{";
@@ -247,10 +248,10 @@ public class InvoiceController extends SuperController {
 		setList += "}";
 		// Figure out how to cache all these values
 		model.addAttribute("setList", setList);
-		
-		
+
 		/** ProductGroup Listing for ADD Product Filter **/
-		List<ProductGroup> productGroupMasterList = setBD.getAllProductGroupForSet(invoice.getOrder().getSet().getSetId());
+		List<ProductGroup> productGroupMasterList = setBD
+				.getAllProductGroupForSet(invoice.getOrder().getSet().getSetId());
 		String pdtGroupList = "{";
 		for (ProductGroup productGroup : productGroupMasterList) {
 			pdtGroupList += "'" + productGroup.getGroupId() + "':'" + productGroup.getGroupName() + "',";
@@ -266,14 +267,14 @@ public class InvoiceController extends SuperController {
 		} else {
 			logger.error("NO SETs found hence, products search aborted!");
 		}
-		
+
 		Set searchMiscSet = new Set();
 		searchMiscSet.setSetName(UIConstants.MISCELLANEOUS_SET_NAME.getValue());
 		List<Set> miscSet = setBD.searchForSet(searchMiscSet);
 		logger.info("Expecting only one set else system error!!! miscSet: " + miscSet);
-		//Expecting only one set Else system error!!!
+		// Expecting only one set Else system error!!!
 		productMasterList.addAll(setBD.getMiscellaneousProducts(miscSet.get(0).getSetId()));
-		
+
 		String pdtList = "{";
 		for (ProductMaster product : productMasterList) {
 			pdtList += "'" + product.getProductId() + "':'" + product.getProductCode() + " - "
@@ -319,11 +320,11 @@ public class InvoiceController extends SuperController {
 		 * END Of Converting the MasterData into the format of
 		 * "Code:DisplayValue" as required by the JQGrid Select Options
 		 */
-		/*if (invoice.isGstInvoice()) {*/
-			return MedsysUITiles.EDIT_GST_INVOICE.getTile();
-		/*} else {
-			return MedsysUITiles.EDIT_INVOICE.getTile();
-		}*/
+		/* if (invoice.isGstInvoice()) { */
+		return MedsysUITiles.EDIT_GST_INVOICE.getTile();
+		/*
+		 * } else { return MedsysUITiles.EDIT_INVOICE.getTile(); }
+		 */
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.SAVE_INVOICE, method = RequestMethod.POST)
@@ -352,6 +353,7 @@ public class InvoiceController extends SuperController {
 	}
 
 	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_DELETE_INVOICE, method = RequestMethod.GET)
+	@Transactional
 	public String loadDeleteInvoicePage(@RequestParam(value = "invoiceId", required = true) Integer invoiceId,
 			Model model) {
 
@@ -370,6 +372,42 @@ public class InvoiceController extends SuperController {
 
 		invoiceBD.deleteInvoice(invoiceId);
 		String message = "Invoice with invoiceId: " + invoiceId + " was successfully deleted";
+		model.addAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
+		return UIActions.REDIRECT + UIActions.LIST_ALL_INVOICES;
+	}
+
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.LOAD_CANCEL_INVOICE, method = RequestMethod.GET)
+	@Transactional
+	public String loadCancelInvoicePage(@RequestParam(value = "invoiceId", required = true) Integer invoiceId,
+			Model model) {
+
+		if (invoiceId == null) {
+			logger.info("Checking in model for invoiceId = " + model.asMap().get("invoiceId"));
+			invoiceId = (Integer) model.asMap().get("invoiceId");
+		}
+
+		Invoice invoice = null;
+		if (!model.containsAttribute("invoice")) {
+
+			logger.info("Adding Invoice object to model");
+			invoice = invoiceBD.getInvoice(invoiceId);
+			logger.info("Invoice/edit-GET:  " + invoice);
+			model.addAttribute("invoice", invoice);
+		} else {
+			logger.info("fetching invoice from request model.");
+			invoice = (Invoice) model.asMap().get("invoice");
+		}
+
+		return MedsysUITiles.CONFIRM_CANCEL_INVOICE.getTile();
+	}
+
+	@RequestMapping(value = UIActions.FORWARD_SLASH + UIActions.CANCEL_INVOICE, method = RequestMethod.POST)
+	public String cancelInvoicePage(Integer invoiceId, Model model) {
+
+		logger.info("IN: Invoice/cancel-POST | invoiceId = " + invoiceId);
+
+		invoiceBD.cancelInvoice(invoiceId);
+		String message = "Status of invoice with invoiceId: " + invoiceId + " has been updated as cancelled ";
 		model.addAttribute(UIConstants.MSG_FOR_USER.getValue(), message);
 		return UIActions.REDIRECT + UIActions.LIST_ALL_INVOICES;
 	}

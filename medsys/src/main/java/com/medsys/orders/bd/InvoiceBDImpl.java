@@ -71,6 +71,12 @@ public class InvoiceBDImpl implements InvoiceBD {
 	}
 
 	@Override
+	public Response cancelInvoice(Integer invoiceId) {
+		return invoiceDAO.cancelInvoice(invoiceId);
+	}
+
+	
+	@Override
 	public List<Invoice> getAllInvoice() {
 		return invoiceDAO.getAllInvoice();
 	}

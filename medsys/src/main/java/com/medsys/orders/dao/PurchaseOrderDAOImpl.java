@@ -245,8 +245,8 @@ public class PurchaseOrderDAOImpl implements PurchaseOrderDAO {
 
 	@Override
 	public int getCountOfTotalPurchaseOrdersForYear() {
-		Date startDate = CalendarUtility.getFirstDateOfYear();
-		Date endDate = CalendarUtility.getLastDateOfYear();
+		Date startDate = CalendarUtility.getFirstDateOfFinancialYear();
+		Date endDate = CalendarUtility.getLastDateOfFinancialYear();
 		logger.debug("getCountOfTotalPurchaseOrdersForYear for the Year - [" + startDate + " - " + endDate + "]");
 		return getCountOfTotalPurchaseOrdersInDateRange(startDate, endDate);
 	}

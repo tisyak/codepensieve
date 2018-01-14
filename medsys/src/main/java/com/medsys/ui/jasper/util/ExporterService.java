@@ -69,7 +69,7 @@ public class ExporterService {
 		exporter.setExporterInput(new SimpleExporterInput(jp));
 		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(baos));
 		SimpleXlsReportConfiguration configuration = new SimpleXlsReportConfiguration();
-		configuration.setOnePagePerSheet(true);
+		configuration.setOnePagePerSheet(false);
 		configuration.setDetectCellType(true);
 		configuration.setCollapseRowSpan(false);
 		exporter.setConfiguration(configuration);

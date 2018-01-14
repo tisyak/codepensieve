@@ -52,7 +52,9 @@ public class SetReportDownloadService {
 	@Autowired
 	private TokenService tokenService;
 	
-	public void download(String type, String token, Integer setId,String challanKind, String extraParam, HttpServletResponse response) {
+	public void download(String type, String token, 
+			Integer setId,String challanKind, 
+			String extraParam, HttpServletResponse response) {
 		 
 		try {
 			// 1. Add report parameters

@@ -52,6 +52,8 @@ public interface InvoiceBD {
 
 	public List<Invoice> getLastThreeMonthsInvoice();
 
+	public Response cancelInvoice(Integer invoiceId);
+
 	
 
 }

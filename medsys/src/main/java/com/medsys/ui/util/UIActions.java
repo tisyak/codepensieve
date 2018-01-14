@@ -129,6 +129,9 @@ public class UIActions {
     public static final String SAVE_INVOICE="invoices/save";
     public static final String LOAD_DELETE_INVOICE="invoices/loadDelete";
     public static final String DELETE_INVOICE="invoices/delete";
+    public static final String LOAD_CANCEL_INVOICE="invoices/loadCancel";
+    public static final String CANCEL_INVOICE="invoices/cancel";
+    
     public static final String GET_INVOICE_REPORT="invoices/download";
     
     public static final String LIST_ALL_PRODUCT_INVOICES="invoiceproduct/list";

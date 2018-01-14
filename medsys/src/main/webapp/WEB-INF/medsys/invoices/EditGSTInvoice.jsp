@@ -155,7 +155,9 @@
 		   		
 		   			{name:'groupId',index:'groupId',  hidden: true,edittype:"select", editable: true, editrules: { edithidden: true }, 
 					editoptions: { 
-						value: ${pdtGroupList},
+						
+						value: {0:''},
+						
 						dataEvents :[
 								{ type: 'change', fn: function(e) {
 									//alert("Calling filter products");
@@ -190,7 +192,8 @@
 					}},
 				{name:'product.productId',index:'product.productId',hidden: true, width:50, editable: true, editrules: { edithidden: true },
 			   			edittype:"select", editoptions: {
-							value: ${pdtList}
+			   				value: {0:''}
+							
 							/*dataUrl: '${getFilteredProductsUrl}?setId='+${setId},
 							buildSelect: function(response){
                                                 var data = $.parseJSON(eval(response));

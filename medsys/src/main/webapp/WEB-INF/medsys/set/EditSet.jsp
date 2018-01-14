@@ -186,6 +186,16 @@
 				} 
 			);
 		
+		$("#grid").navButtonAdd('#pager',
+				{ 	caption:"Pricelist Xls", 
+					buttonicon:"ui-icon-arrowreturn-1-s", 
+					onClickButton: downloadPricelistXls,
+					position: "last", 
+					title:"", 
+					cursor: "pointer"
+				} 
+			);
+		
 	});
         
         $(function() {
@@ -203,25 +213,27 @@
 	                       event.preventDefault();
 	                       $( "[for = pricelistPercentage]" ).addClass( "invalid" );
 	                    }
+	                    //alert($("#pricelistPercentageDialog").data('type'));
 	                 },
 	                 width: 600,
     			 
     		 
     		        close: function(event, ui) { 
-    		        	download('pdf','pricelist',$("#pricelistPercentage").val());
+    		        	download($("#pricelistPercentageDialog").data('type'),'pricelist',$("#pricelistPercentage").val());
     		        }
     		    });
 			});
 		
-		function downloadXls() {download('xls');}
     	
     	function downloadBlankOrderPdf() {download('pdf','products',0);}
     	function downloadBlankOrderInstrPdf() {download('pdf','instr',0);}
     	function downloadPricelistPdf() {
-			 $( "#pricelistPercentageDialog" ).dialog( "open" );
-    		
-    		
+			 $( "#pricelistPercentageDialog" ).data('type', 'pdf').dialog( "open" );
     	}
+    	function downloadPricelistXls() {
+			 $( "#pricelistPercentageDialog" ).data('type', 'xls').dialog( "open" );
+	   	}    	
+    	
     	
     	function download(type,challanKind,extraParam) {
     		// Retrieve download token

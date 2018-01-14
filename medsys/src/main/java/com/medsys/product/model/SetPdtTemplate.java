@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 @Table(name = "set_pdt_template")
-public class SetPdtTemplate implements Serializable,Comparable<SetPdtTemplate> {
+public class SetPdtTemplate implements Serializable, Comparable<SetPdtTemplate> {
 	/**
 	 * 
 	 */
@@ -41,9 +41,12 @@ public class SetPdtTemplate implements Serializable,Comparable<SetPdtTemplate> {
 	@JoinColumn(name = "product_id", referencedColumnName = "product_id")
 	@OrderBy("productCode")
 	private ProductMaster product;
-	
+
 	@Formula("(select pdtInv.price from product_inv pdtInv where pdtInv.product_id= product_id)")
 	private BigDecimal pricePerUnit;
+
+	@Formula("(select pdtInv.mrp from product_inv pdtInv where pdtInv.product_id= product_id)")
+	private BigDecimal mrp;
 
 	@Column(name = "qty")
 	private Integer qty;
@@ -58,19 +61,17 @@ public class SetPdtTemplate implements Serializable,Comparable<SetPdtTemplate> {
 	/** The update timestamp. */
 	@Column(name = "update_timestamp")
 	private Timestamp updateTimestamp;
-	
 
 	public SetPdtTemplate() {
 	}
 
-	public SetPdtTemplate(Integer setId,Integer setPdtId,ProductMaster product, Integer qty) {
+	public SetPdtTemplate(Integer setId, Integer setPdtId, ProductMaster product, Integer qty) {
 		this.setId = setId;
-		this.setPdtId =  setPdtId;
+		this.setPdtId = setPdtId;
 		this.product = product;
 		this.qty = qty;
 
 	}
-
 
 	public Integer getSetPdtId() {
 		return setPdtId;
@@ -98,6 +99,14 @@ public class SetPdtTemplate implements Serializable,Comparable<SetPdtTemplate> {
 		} else {
 			this.pricePerUnit = pricePerUnit;
 		}
+	}
+
+	public BigDecimal getMrp() {
+		return mrp;
+	}
+
+	public void setMrp(BigDecimal mrp) {
+		this.mrp = mrp;
 	}
 
 	public Integer getQty() {
@@ -134,16 +143,16 @@ public class SetPdtTemplate implements Serializable,Comparable<SetPdtTemplate> {
 
 	@Override
 	public String toString() {
-		return "SetPdtTemplate [setPdtId=" + setPdtId + ", setId=" + setId + ", product=" + product
-				+ ", pricePerUnit=" + pricePerUnit + ", qty=" + qty + ", availableQty=" + availableQty + ", updateBy="
-				+ updateBy + ", updateTimestamp=" + updateTimestamp + "]";
+		return "SetPdtTemplate [setPdtId=" + setPdtId + ", setId=" + setId + ", product=" + product + ", pricePerUnit="
+				+ pricePerUnit + ", qty=" + qty + ", availableQty=" + availableQty + ", updateBy=" + updateBy
+				+ ", updateTimestamp=" + updateTimestamp + "]";
 	}
-	
+
 	@Override
 	public int compareTo(SetPdtTemplate aThat) {
 
 		return this.product.compareTo(aThat.product);
-		
+
 	}
 
 	@Override
@@ -182,7 +191,5 @@ public class SetPdtTemplate implements Serializable,Comparable<SetPdtTemplate> {
 			return false;
 		return true;
 	}
-	
-	
 
 }

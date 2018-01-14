@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.medsys.master.model.InvoiceStatusCode;
 import com.medsys.orders.bd.InvoiceBD;
 import com.medsys.orders.model.Invoice;
 import com.medsys.orders.model.SalesTax;
@@ -132,16 +133,18 @@ public class SalesTaxReportDownloadService {
 		salesTax.setTotalCGSTTax(new BigDecimal(Integer.parseInt(UIConstants.TOTAL_ZERO.getValue())));
 		salesTax.setTotalSGSTTax(new BigDecimal(Integer.parseInt(UIConstants.TOTAL_ZERO.getValue())));
 		for (Invoice invoice : lstInvoices) {
-			if (invoice.getTotalCgst() != null) {
-				salesTax.setTotalCGSTTax(salesTax.getTotalCGSTTax().add(invoice.getTotalCgst()));
-				invoiceSetForCGST.add(invoice);
+			if (invoice.getInvoiceStatus().getInvoiceStatusCode() != InvoiceStatusCode.CANCELLED.getCode()) {
+				if (invoice.getTotalCgst() != null) {
+					salesTax.setTotalCGSTTax(salesTax.getTotalCGSTTax().add(invoice.getTotalCgst()));
+					invoiceSetForCGST.add(invoice);
+				}
+
+				if (invoice.getTotalSgst() != null) {
+					salesTax.setTotalSGSTTax(salesTax.getTotalSGSTTax().add(invoice.getTotalSgst()));
+					invoiceSetForSGST.add(invoice);
+				}
 			}
-			
-			if (invoice.getTotalSgst() != null) {
-				salesTax.setTotalSGSTTax(salesTax.getTotalSGSTTax().add(invoice.getTotalSgst()));
-				invoiceSetForSGST.add(invoice);
-			}
-		
+
 		}
 		salesTax.setInvoicesHavingCGST(invoiceSetForCGST);
 		salesTax.setInvoicesHavingSGST(invoiceSetForSGST);

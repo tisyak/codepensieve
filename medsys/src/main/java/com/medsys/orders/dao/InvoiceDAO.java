@@ -17,6 +17,8 @@ public interface InvoiceDAO {
     public Invoice updateInvoice(Invoice invoice);
  
     public Response deleteInvoice(Integer invoiceId);
+    
+    public Response cancelInvoice(Integer invoiceId);
  
     public List<Invoice> getAllInvoice();
 
@@ -59,6 +61,8 @@ public interface InvoiceDAO {
 	public BigDecimal getTotalGSTInYear();
 	
 	BigDecimal getTotalGSTInDateRange(Date startDate, Date endDate);
+
+	
 
 	//public void updateEffectiveTotalsInInvoice(Integer invoiceId, String updateBy, Timestamp updateTimestamp);
 	

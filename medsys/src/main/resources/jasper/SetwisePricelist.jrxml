@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.1.final using JasperReports Library version 6.3.1  -->
-<!-- 2017-07-16T23:46:20 -->
+<!-- 2018-01-06T13:40:00 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Pricelist" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4eedbb89-b4f6-4469-9ab6-f642a1688cf7">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="479"/>
@@ -125,6 +125,9 @@
 		</field>
 		<field name="pricePerUnit" class="java.math.BigDecimal">
 			<fieldDescription><![CDATA[pricePerUnit]]></fieldDescription>
+		</field>
+		<field name="mrp" class="java.math.BigDecimal">
+			<fieldDescription><![CDATA[mrp]]></fieldDescription>
 		</field>
 	</subDataset>
 	<parameter name="prmSetTableTitle" class="java.lang.String"/>
@@ -255,7 +258,7 @@
 						<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{pdtTemplates})]]></dataSourceExpression>
 					</datasetRun>
 					<jr:columnGroup width="551" uuid="a66beced-4a44-4833-9807-1d2ea939af22">
-						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Columns [4]"/>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Columns [5]"/>
 						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 						<jr:columnHeader style="Table 2_CH" height="22" rowSpan="1">
 							<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -272,7 +275,7 @@
 							</textField>
 						</jr:columnHeader>
 						<jr:columnGroup width="551" uuid="5d03c68d-a806-4079-84f0-fd276c57e594">
-							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Columns [4]"/>
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Columns [5]"/>
 							<jr:column width="30" uuid="32a00df6-6aff-44c5-9bd4-c9d19a5274fb">
 								<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
 								<jr:columnHeader style="Table 2_CH" height="20" rowSpan="1">
@@ -317,11 +320,11 @@
 									</textField>
 								</jr:detailCell>
 							</jr:column>
-							<jr:column width="370" uuid="96e66181-a940-4de3-b478-7dd565ec8cb9">
+							<jr:column width="310" uuid="96e66181-a940-4de3-b478-7dd565ec8cb9">
 								<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
 								<jr:columnHeader style="Table 2_CH" height="20" rowSpan="1">
 									<staticText>
-										<reportElement x="0" y="0" width="364" height="20" uuid="cbac06e0-b82a-42f8-909d-269c474df70d"/>
+										<reportElement x="0" y="0" width="304" height="20" uuid="cbac06e0-b82a-42f8-909d-269c474df70d"/>
 										<textElement verticalAlignment="Middle">
 											<font size="9"/>
 										</textElement>
@@ -330,7 +333,7 @@
 								</jr:columnHeader>
 								<jr:detailCell style="Table 2_TD" height="20">
 									<textField>
-										<reportElement x="0" y="0" width="364" height="20" uuid="69180c97-1321-4698-80a5-b0cf4001c02a"/>
+										<reportElement x="0" y="0" width="304" height="20" uuid="69180c97-1321-4698-80a5-b0cf4001c02a"/>
 										<textElement verticalAlignment="Middle">
 											<font size="9"/>
 										</textElement>
@@ -338,11 +341,11 @@
 									</textField>
 								</jr:detailCell>
 							</jr:column>
-							<jr:column width="81" uuid="12d05f3e-4b23-46f7-bfd9-e67bc0dc71d9">
+							<jr:column width="70" uuid="12d05f3e-4b23-46f7-bfd9-e67bc0dc71d9">
 								<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
 								<jr:columnHeader style="Table 2_CH" height="20" rowSpan="1">
 									<staticText>
-										<reportElement x="0" y="0" width="75" height="20" uuid="d090a47f-379a-4251-9a71-4170e0624888"/>
+										<reportElement x="0" y="0" width="64" height="20" uuid="d090a47f-379a-4251-9a71-4170e0624888"/>
 										<textElement textAlignment="Right" verticalAlignment="Middle">
 											<font size="9"/>
 											<paragraph rightIndent="3"/>
@@ -352,11 +355,33 @@
 								</jr:columnHeader>
 								<jr:detailCell style="Table 2_TD" height="20">
 									<textField pattern="#####">
-										<reportElement x="0" y="0" width="75" height="20" uuid="0d869477-ad9b-45de-b349-e8049ae1e857"/>
+										<reportElement x="0" y="0" width="64" height="20" uuid="0d869477-ad9b-45de-b349-e8049ae1e857"/>
 										<textElement textAlignment="Right" verticalAlignment="Middle">
 											<font size="9"/>
 										</textElement>
 										<textFieldExpression><![CDATA[$F{pricePerUnit}]]></textFieldExpression>
+									</textField>
+								</jr:detailCell>
+							</jr:column>
+							<jr:column width="71" uuid="4e305472-31a6-4ae2-9111-8bb5c89cd6ea">
+								<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+								<jr:columnHeader style="Table 2_CH" height="20">
+									<staticText>
+										<reportElement x="0" y="0" width="65" height="20" uuid="3ec3ff1d-0db6-4422-a197-5891a1e05aeb"/>
+										<textElement textAlignment="Right" verticalAlignment="Middle">
+											<font size="9"/>
+											<paragraph rightIndent="3"/>
+										</textElement>
+										<text><![CDATA[MRP]]></text>
+									</staticText>
+								</jr:columnHeader>
+								<jr:detailCell style="Table 2_TD" height="20">
+									<textField pattern="#####">
+										<reportElement x="0" y="0" width="65" height="20" uuid="051e0a5a-2305-488d-9842-1e9bf7f54158"/>
+										<textElement textAlignment="Right" verticalAlignment="Middle">
+											<font size="9"/>
+										</textElement>
+										<textFieldExpression><![CDATA[$F{mrp}]]></textFieldExpression>
 									</textField>
 								</jr:detailCell>
 							</jr:column>

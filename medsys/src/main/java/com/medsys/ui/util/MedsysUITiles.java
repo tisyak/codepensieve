@@ -42,6 +42,8 @@ public enum MedsysUITiles {
 
 	CONFIRM_DELETE_INVOICE("invoices.DeleteInvoice"),
 	
+	CONFIRM_CANCEL_INVOICE("invoices.CancelInvoice"),
+	
 	SALES_TAX_REPORT("invoices.SalesTax"),
 	
 	PRODUCT_DEFICIT_REPORT("product.ProductDeficit"),

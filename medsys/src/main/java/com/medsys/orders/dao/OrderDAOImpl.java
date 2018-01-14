@@ -318,8 +318,8 @@ public class OrderDAOImpl implements OrderDAO {
 	@Override
 	public int getCountOfTotalOrdersForYear() {
 
-		Date startDate = CalendarUtility.getFirstDateOfYear();
-		Date endDate = CalendarUtility.getLastDateOfYear();
+		Date startDate = CalendarUtility.getFirstDateOfFinancialYear();
+		Date endDate = CalendarUtility.getLastDateOfFinancialYear();
 		logger.debug(
 				"OrderDAOImpl.getCountOfTotalOrdersForYear() for the Year - [" + startDate + " - " + endDate + "]");
 		return getCountOfTotalOrdersInDateRange(startDate, endDate);

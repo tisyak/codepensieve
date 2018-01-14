@@ -1,7 +1,5 @@
 package com.medsys.orders.bd;
 
-import java.util.GregorianCalendar;
-
 public class InvoiceNoGenerator {
 	
 	public static synchronized  String getNextInvoiceNumber(String prevInvoiceNumber) throws Exception {
@@ -11,20 +9,19 @@ public class InvoiceNoGenerator {
 		char[] str = arrSplitInvNumber[2].toCharArray();
 		int n = Integer.parseInt(arrSplitInvNumber[3]);
 
-		int yearInPrevInvoiceNumber = Integer.parseInt(arrSplitInvNumber[1]);
+		
+		/*int yearInPrevInvoiceNumber = Integer.parseInt(arrSplitInvNumber[1]);
 
 		int currentYear = GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
 
 		if (yearInPrevInvoiceNumber != currentYear) {
-			/*
-			 * The year is changed. Hence, resetting all following counters to
-			 * initial values
-			 */
+			// The year is changed. Hence, resetting all following counters to
+			 // initial values
+			 
 
 			n = 0;
 			str = new char[] { 'A', 'A', 'A' };
-		}
-
+		}*/
 		
 
 		if (n == 999) { // Once the number reaches 9999, increase the
@@ -37,7 +34,7 @@ public class InvoiceNoGenerator {
 		// to "AAA" prints out "AAB".
 		String id = String.format("%03d", n); // Create "id". pads the number to
 		// make it 4 digits.
-		return (arrSplitInvNumber[0] + "-" + currentYear + "-" + new String(str) + "-" + id);
+		return (arrSplitInvNumber[0] + "-" + arrSplitInvNumber[1] + "-" + new String(str) + "-" + id);
 	}
 	
 	public static void incrementString(char[] str) throws Exception {

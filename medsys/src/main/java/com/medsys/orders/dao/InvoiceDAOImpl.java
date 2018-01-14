@@ -1,6 +1,7 @@
 package com.medsys.orders.dao;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.medsys.common.model.Response;
 import com.medsys.master.bd.MasterDataBD;
+import com.medsys.master.model.InvoiceStatusCode;
+import com.medsys.master.model.InvoiceStatusMaster;
 import com.medsys.master.model.SeedMaster;
 import com.medsys.master.model.SeedMasterKey;
 import com.medsys.orders.bd.InvoiceNoGenerator;
@@ -102,6 +105,27 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	}
 
 	@Override
+	public Response cancelInvoice(Integer invoiceId) {
+		try {
+			Invoice invoice = getInvoice(invoiceId);
+			if (invoice != null) {
+				invoice.setInvoiceStatus((InvoiceStatusMaster) masterDataBD.getbyCode(InvoiceStatusMaster.class,
+						InvoiceStatusCode.CANCELLED.getCode()));
+				// invoice.setUpdateBy(invoice.getUpdateBy());
+				invoice.setUpdateTimestamp(new Timestamp(System.currentTimeMillis()));
+				getCurrentSession().update(invoice);
+				logger.info("Cancellation of invoice with invoiceId: " + invoiceId + " successful");
+				return new Response(true, null);
+			} else {
+				throw new EmptyResultDataAccessException("Invoice [" + invoiceId + "] not found", 1);
+			}
+		} catch (HibernateException he) {
+			logger.error("Cancellation of invoice with invoiceId: " + invoiceId + " failed.");
+			return new Response(false, EpSystemError.DB_EXCEPTION);
+		}
+	}
+
+	@Override
 	public List<Invoice> getAllInvoice() {
 
 		return getCurrentSession().createQuery(" from Invoice order by invoiceNo desc, invoiceDate asc ", Invoice.class)
@@ -129,11 +153,10 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	@Override
 	public List<Invoice> searchForInvoice(Invoice invoice) {
 		logger.debug("InvoiceDAOImpl.searchForInvoice() - [" + invoice.toString() + "]");
-		Query<Invoice> query = getCurrentSession()
-				.createQuery(
-						" from Invoice where lower(invoiceNo) like :invoiceNo OR lower(customer.name) like :custName "
-								+ " OR invoiceDate = :invoiceDate " + " order by invoiceNo desc, invoiceDate asc ",
-						Invoice.class);
+		Query<Invoice> query = getCurrentSession().createQuery(
+				" from Invoice where lower(invoiceNo) like :invoiceNo OR lower(customer.name) like :custName "
+						+ " OR invoiceDate = :invoiceDate " + " order by invoiceNo desc, invoiceDate asc ",
+				Invoice.class);
 
 		if (invoice.getInvoiceNo() != null) {
 			query.setParameter("invoiceNo", "%" + invoice.getInvoiceNo().toLowerCase() + "%");
@@ -276,8 +299,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
 	@Override
 	public BigDecimal getTotalSalesAmountInYear() {
-		Date startDate = CalendarUtility.getFirstDateOfYear();
-		Date endDate = CalendarUtility.getLastDateOfYear();
+		Date startDate = CalendarUtility.getFirstDateOfFinancialYear();
+		Date endDate = CalendarUtility.getLastDateOfFinancialYear();
 		logger.debug("getTotalSalesAmountInYear for the Year - [" + startDate + " - " + endDate + "]");
 		return getTotalSalesAmountInDateRange(startDate, endDate);
 	}
@@ -294,7 +317,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 	public BigDecimal getTotalSalesAmountInDateRange(Date startDate, Date endDate) {
 		logger.debug("getTotalSalesAmountInDateRange for - [" + startDate + " - " + endDate + "]");
 		Query<BigDecimal> sumQuery = getCurrentSession().createQuery(
-				"select sum(totalAmount) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ",
+				"select sum(totalAmount) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate and invoiceStatus.invoiceStatusCode !='" + InvoiceStatusCode.CANCELLED.getCode()+"'",
 				BigDecimal.class);
 		sumQuery.setParameter("stDate", startDate, TemporalType.DATE);
 		sumQuery.setParameter("edDate", endDate, TemporalType.DATE);
@@ -304,8 +327,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
 	@Override
 	public int getCountOfTotalInvoicesForYear() {
-		Date startDate = CalendarUtility.getFirstDateOfYear();
-		Date endDate = CalendarUtility.getLastDateOfYear();
+		Date startDate = CalendarUtility.getFirstDateOfFinancialYear();
+		Date endDate = CalendarUtility.getLastDateOfFinancialYear();
 		logger.debug("getCountOfTotalInvoicesForYear for the Year - [" + startDate + " - " + endDate + "]");
 		return getCountOfTotalInvoicesInDateRange(startDate, endDate);
 	}
@@ -324,7 +347,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		logger.debug("getCountOfTotalInvoicesInDateRange for  [" + startDate + " - " + endDate + "]");
 
 		Query<Long> countQuery = getCurrentSession()
-				.createQuery("select count(*) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ", Long.class);
+				.createQuery("select count(*) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate  and invoiceStatus.invoiceStatusCode !='" + InvoiceStatusCode.CANCELLED.getCode()+"'", Long.class);
 
 		countQuery.setParameter("stDate", startDate, TemporalType.DATE);
 		countQuery.setParameter("edDate", endDate, TemporalType.DATE);
@@ -336,8 +359,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
 	@Override
 	public BigDecimal getTotalVATInYear() {
-		Date startDate = CalendarUtility.getFirstDateOfYear();
-		Date endDate = CalendarUtility.getLastDateOfYear();
+		Date startDate = CalendarUtility.getFirstDateOfFinancialYear();
+		Date endDate = CalendarUtility.getLastDateOfFinancialYear();
 		return getTotalVATInDateRange(startDate, endDate);
 	}
 
@@ -346,7 +369,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		logger.debug("getTotalVATInDateRange for - [" + startDate + " - " + endDate + "]");
 
 		Query<BigDecimal> sumQuery = getCurrentSession().createQuery(
-				"select sum(totalVat) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ", BigDecimal.class);
+				"select sum(totalVat) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate  and invoiceStatus.invoiceStatusCode !='" + InvoiceStatusCode.CANCELLED.getCode()+"'", BigDecimal.class);
 
 		sumQuery.setParameter("stDate", startDate, TemporalType.DATE);
 		sumQuery.setParameter("edDate", endDate, TemporalType.DATE);
@@ -358,8 +381,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
 	@Override
 	public BigDecimal getTotalGSTInYear() {
-		Date startDate = CalendarUtility.getFirstDateOfYear();
-		Date endDate = CalendarUtility.getLastDateOfYear();
+		Date startDate = CalendarUtility.getFirstDateOfFinancialYear();
+		Date endDate = CalendarUtility.getLastDateOfFinancialYear();
 		return getTotalGSTInDateRange(startDate, endDate);
 	}
 
@@ -368,7 +391,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		logger.debug("getTotalGSTInDateRange for - [" + startDate + " - " + endDate + "]");
 
 		Query<BigDecimal> sumQuery = getCurrentSession().createQuery(
-				"select sum(totalSgst)+sum(totalCgst) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ",
+				"select sum(totalSgst)+sum(totalCgst) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate  and invoiceStatus.invoiceStatusCode !='" + InvoiceStatusCode.CANCELLED.getCode()+"'",
 				BigDecimal.class);
 
 		sumQuery.setParameter("stDate", startDate, TemporalType.DATE);
@@ -381,8 +404,8 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 
 	@Override
 	public int getCountOfCustomerBilledForYear() {
-		Date startDate = CalendarUtility.getFirstDateOfYear();
-		Date endDate = CalendarUtility.getLastDateOfYear();
+		Date startDate = CalendarUtility.getFirstDateOfFinancialYear();
+		Date endDate = CalendarUtility.getLastDateOfFinancialYear();
 		return getCountOfCustomerBilledInDateRange(startDate, endDate);
 	}
 
@@ -398,7 +421,7 @@ public class InvoiceDAOImpl implements InvoiceDAO {
 		logger.debug("getCountOfCustomerBilledInDateRange for - [" + startDate + " - " + endDate + "]");
 
 		Query<Long> sumQuery = getCurrentSession().createQuery(
-				"select count(distinct customer) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate ",
+				"select count(distinct customer) from Invoice WHERE invoiceDate BETWEEN :stDate AND :edDate  and invoiceStatus.invoiceStatusCode !='" + InvoiceStatusCode.CANCELLED.getCode()+"'",
 				Long.class);
 
 		sumQuery.setParameter("stDate", startDate, TemporalType.DATE);
