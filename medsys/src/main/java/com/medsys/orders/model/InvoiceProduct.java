@@ -56,35 +56,35 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 	private BigDecimal mrp;
 	
 	@NotNull
-	@Column(name = "rate_per_unit",precision = 15, scale = 0)
+	@Column(name = "rate_per_unit",precision = 15, scale = 1)
 	private BigDecimal ratePerUnit;
 
 	@NotNull
 	@Column(name = "qty")
 	private Integer qty;
 	
-	@Column(name = "discount",precision = 15, scale=0)
+	@Column(name = "discount",precision = 15, scale=1)
 	private BigDecimal discount;
 	
 	@NotNull
-	@Column(name = "total_before_tax",precision = 15, scale=0)
+	@Column(name = "total_before_tax",precision = 15, scale=1)
 	private BigDecimal totalBeforeTax;
 
-	@Column(name = "vat_amount",precision = 15, scale=0)
+	@Column(name = "vat_amount",precision = 15, scale=1)
 	private BigDecimal vatAmount;
 
 	@ManyToOne
 	@JoinColumn(name = "vat_type", referencedColumnName = "tax_id")
 	private TaxMaster vatType;
 	
-	@Column(name = "cgst_amount",precision = 15, scale=0)
+	@Column(name = "cgst_amount",precision = 15, scale=1)
 	private BigDecimal cgstAmount;
 
 	@ManyToOne
 	@JoinColumn(name = "cgst_type", referencedColumnName = "tax_id")
 	private TaxMaster cgstType;
 	
-	@Column(name = "sgst_amount",precision = 15, scale=0)
+	@Column(name = "sgst_amount",precision = 15, scale=1)
 	private BigDecimal sgstAmount;
 
 	@ManyToOne
@@ -93,7 +93,7 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 	
 
 	@NotNull
-	@Column(name = "total",precision = 15, scale=0)
+	@Column(name = "total",precision = 15, scale=1)
 	private BigDecimal totalPrice;
 
 	
@@ -183,7 +183,7 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 
 	public void setTotalPrice(BigDecimal totalPrice) {
 		if (totalPrice != null) {
-			this.totalPrice = totalPrice.setScale(0, RoundingMode.HALF_UP);
+			this.totalPrice = totalPrice.setScale(2, RoundingMode.HALF_UP);
 		} else {
 			this.totalPrice = totalPrice;
 		}
@@ -195,7 +195,7 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 
 	public void setVatAmount(BigDecimal vatAmount) {
 		if (vatAmount != null) {
-			this.vatAmount = vatAmount.setScale(0, RoundingMode.HALF_UP);
+			this.vatAmount = vatAmount.setScale(2, RoundingMode.HALF_UP);
 		} else {
 			this.vatAmount = vatAmount;
 		}
@@ -215,7 +215,7 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 
 	public void setCgstAmount(BigDecimal cgstAmount) {
 		if (cgstAmount != null) {
-			this.cgstAmount = cgstAmount.setScale(0, RoundingMode.HALF_UP);
+			this.cgstAmount = cgstAmount.setScale(2, RoundingMode.HALF_UP);
 		} else {
 			this.cgstAmount = cgstAmount;
 		}
@@ -235,7 +235,7 @@ public class InvoiceProduct  implements Serializable,Comparable<InvoiceProduct> 
 
 	public void setSgstAmount(BigDecimal sgstAmount) {
 		if (sgstAmount != null) {
-			this.sgstAmount = sgstAmount.setScale(0, RoundingMode.HALF_UP);
+			this.sgstAmount = sgstAmount.setScale(2, RoundingMode.HALF_UP);
 		} else {
 			this.sgstAmount = sgstAmount;
 		}

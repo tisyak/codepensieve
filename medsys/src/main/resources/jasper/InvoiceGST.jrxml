@@ -597,11 +597,11 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="30" uuid="89031601-4e19-43f6-ac1c-d59e597ec486">
+					<jr:column width="32" uuid="89031601-4e19-43f6-ac1c-d59e597ec486">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column9"/>
 						<jr:tableFooter style="Table 2_TH" height="30" rowSpan="1">
 							<textField pattern="######">
-								<reportElement x="0" y="0" width="24" height="30" uuid="7dfa2856-59a9-4b04-81f3-a855f38890ad"/>
+								<reportElement x="0" y="0" width="26" height="30" uuid="7dfa2856-59a9-4b04-81f3-a855f38890ad"/>
 								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -610,7 +610,7 @@
 						</jr:tableFooter>
 						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="24" height="30" uuid="d785d6a0-b066-402e-ac76-6c5743620240"/>
+								<reportElement x="0" y="0" width="26" height="30" uuid="d785d6a0-b066-402e-ac76-6c5743620240"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="9"/>
 								</textElement>
@@ -619,7 +619,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="Table 2_TD" height="30">
 							<textField pattern="#####">
-								<reportElement x="0" y="0" width="24" height="30" uuid="6aee1352-634c-47b2-8fec-cce55b8c8c41"/>
+								<reportElement x="0" y="0" width="26" height="30" uuid="6aee1352-634c-47b2-8fec-cce55b8c8c41"/>
 								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font size="9"/>
 								</textElement>
@@ -627,11 +627,11 @@
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="44" uuid="cffc12b0-9c7f-484e-9f3c-467614c3b80e">
+					<jr:column width="42" uuid="cffc12b0-9c7f-484e-9f3c-467614c3b80e">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column10"/>
 						<jr:tableFooter style="Table 2_TH" height="30" rowSpan="1">
 							<textField pattern="######">
-								<reportElement x="0" y="0" width="38" height="30" uuid="9a299a95-64ac-4e50-b52f-b45307035d2b"/>
+								<reportElement x="0" y="0" width="36" height="30" uuid="9a299a95-64ac-4e50-b52f-b45307035d2b"/>
 								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font size="9" isBold="true"/>
 								</textElement>
@@ -640,7 +640,7 @@
 						</jr:tableFooter>
 						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="38" height="30" uuid="5ceccf0d-9f94-4b8f-89cd-3c426f4041f9"/>
+								<reportElement x="0" y="0" width="36" height="30" uuid="5ceccf0d-9f94-4b8f-89cd-3c426f4041f9"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="9"/>
 								</textElement>
@@ -649,7 +649,7 @@
 						</jr:columnHeader>
 						<jr:detailCell style="Table 2_TD" height="30">
 							<textField pattern="#####">
-								<reportElement x="0" y="0" width="38" height="30" uuid="6be0c35f-4af3-47ee-9419-fb25e10e4491"/>
+								<reportElement x="0" y="0" width="36" height="30" uuid="6be0c35f-4af3-47ee-9419-fb25e10e4491"/>
 								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font size="9"/>
 								</textElement>

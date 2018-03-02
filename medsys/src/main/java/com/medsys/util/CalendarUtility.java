@@ -4,9 +4,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CalendarUtility {
 
-	private static final int    FIRST_FISCAL_MONTH  = Calendar.MARCH;
+	private static final int    FIRST_FISCAL_MONTH  = Calendar.APRIL;
+	private static final int    LAST_FISCAL_MONTH  = Calendar.MARCH;
+	/** The Constant logger. */
+	private static final Logger logger = LoggerFactory.getLogger(CalendarUtility.class);
 
 	
 	public static Date getStartDateForLastThreeMonths() {
@@ -40,7 +46,9 @@ public class CalendarUtility {
     	Calendar cal = GregorianCalendar.getInstance();
         int month = cal.get(Calendar.MONTH);
         int year = cal.get(Calendar.YEAR);
-        return (month >= FIRST_FISCAL_MONTH) ? year : year - 1;
+        int fiscalYear = (month >= FIRST_FISCAL_MONTH) ? year : year - 1;
+        logger.debug("Fiscal Year Start: "+fiscalYear);
+        return fiscalYear ;
     }
 
 	
@@ -49,8 +57,8 @@ public class CalendarUtility {
 		cal.setTime(new Date());
 		// set date to first day of financial year
 		cal.set(Calendar.YEAR,getFiscalYear());
-		cal.set(Calendar.MONTH, 3); // 3 = april
-		cal.set(Calendar.DAY_OF_MONTH, 1); // 1st april
+		cal.set(Calendar.MONTH, FIRST_FISCAL_MONTH); 
+		cal.set(Calendar.DAY_OF_MONTH, 1); // 1st 
 		setTimeToBeginningOfDay(cal);
 		return cal.getTime();
 	}
@@ -60,8 +68,8 @@ public class CalendarUtility {
 		cal.setTime(new Date());
 		// set date to last day of year
 		cal.set(Calendar.YEAR,getFiscalYear()+1);
-		cal.set(Calendar.MONTH, 2); // 2 = march
-		cal.set(Calendar.DAY_OF_MONTH, 31); // 31st March
+		cal.set(Calendar.MONTH, LAST_FISCAL_MONTH); 
+		cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH)); // Maximum Date possible in the month
 		setTimeToEndofDay(cal);
 		return cal.getTime();
 

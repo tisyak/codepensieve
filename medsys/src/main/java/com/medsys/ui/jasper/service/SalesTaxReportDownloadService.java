@@ -133,7 +133,9 @@ public class SalesTaxReportDownloadService {
 		salesTax.setTotalCGSTTax(new BigDecimal(Integer.parseInt(UIConstants.TOTAL_ZERO.getValue())));
 		salesTax.setTotalSGSTTax(new BigDecimal(Integer.parseInt(UIConstants.TOTAL_ZERO.getValue())));
 		for (Invoice invoice : lstInvoices) {
-			if (invoice.getInvoiceStatus().getInvoiceStatusCode() != InvoiceStatusCode.CANCELLED.getCode()) {
+			logger.info(" Invoice ID: " + invoice.getInvoiceNo() + " Invoice Status: "
+					+ invoice.getInvoiceStatus().getInvoiceStatusDesc());
+			if (!invoice.getInvoiceStatus().getInvoiceStatusCode().equals(InvoiceStatusCode.CANCELLED.getCode())) {
 				if (invoice.getTotalCgst() != null) {
 					salesTax.setTotalCGSTTax(salesTax.getTotalCGSTTax().add(invoice.getTotalCgst()));
 					invoiceSetForCGST.add(invoice);
